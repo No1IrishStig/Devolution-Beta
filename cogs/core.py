@@ -21,7 +21,6 @@ class Core(commands.Cog):
     async def help(self, ctx):
         await ctx.message.delete()
         author = ctx.message.author
-        #await author.send(embed=tools.Editable('Help','**Core**\n`ping` - Returns Pong!\n`help` - Sends a list of commands\n`bug` - Gives usage details.\n\n**Information**\n`sinfo` - Displays guild information.\n`uinfo` - Displays user information\n`uptime` - Displays the bots uptime\n`about` - Displays stuff about the bot\n`changelog` - Displays the entire bots changelog\n\n**Fun**\n`coinflip` - Flip a coin\n`space` - Get live information about the ISS\n`colour` - Get a random colour\n\n**Music**\n`play` - Plays the song\n`pause` - Pauses the song\n`resume` - Resumes the song\n`stop` - Stops the song\n`skip` - Skips the song\n\n\n**Moderation**\n`kick` - Kick a mentioned user\n`ban` - Ban a mentioned user\n`punish` - Gives mute options\n`purge` - Option to purge a channel.\n\n\n**Useful**\n`say` - Speak as the bot\n`rename` - Change a users nickname\n`invite` - Gives usage details\n`embed` - Creates an embed message\n`role` - Gives usage details\n\n\n**Admin**\n`leave` - Makes the bot leave the guild\n\n**Owner**\n`setpresence(sp)` - Change the playing status of the bot.\n`shutdown` - Shutdown the bot\n`cog` - Displays list of Cog Options\n`todo` - Displays List of shit todo\n\n\n **Music is currently not working as it needs recoded. Check the changelog!**', 'Help'))
         embed = discord.Embed(
             title = "Help",
             colour = 0x9bf442,

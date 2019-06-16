@@ -8,9 +8,9 @@ import aiohttp
 from cogs.tools import tools
 import random
 
-token = 'Your Token Here'
+token = 'TOKEN HERE'
 
-print(discord.__version__)
+print(discord.__version__ + '<---------- If this isnt 1.2.2 your bot wont work!')
 bot = commands.Bot(command_prefix = "!")
 bot.remove_command('help')
 
@@ -50,6 +50,7 @@ async def leave(ctx):
 @bot.command(pass_context=True, aliases=['sp'])
 async def setpresence(ctx, *args):
     if ctx.author.id == int('439327545557778433'):
+        count = str(len(bot.guilds))
         output = ''
         for gamename in args:
             output += gamename
