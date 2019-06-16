@@ -338,4 +338,4 @@ class Core(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Core(bot))
-    print('Core has successfully been loaded')
+    print('Core has been loaded')

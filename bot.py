@@ -3,8 +3,6 @@ from discord.ext import commands
 from itertools import cycle
 import datetime
 import asyncio
-#from cogs import core
-#from cogs.core import prefixes, default_prefix
 import json
 import aiohttp
 from cogs.tools import tools
@@ -12,6 +10,7 @@ import random
 
 token = 'Your Token Here'
 
+print(discord.__version__)
 bot = commands.Bot(command_prefix = "!")
 bot.remove_command('help')
 
@@ -33,15 +32,6 @@ if __name__ == '__main__':
 async def on_guild_join():
     count = str(len(bot.guilds))
     await bot.change_presence(status=discord.Status.online, activity=discord.Game(name='with ' + count + ' Guilds'))
-
-#@bot.event
-#async def on_channel_create(channel):
-#    role = discord.utils.get(channel.guild.roles, name='punished')
-#    overwrite = discord.PermissionOverwrite()
-#    overwrite.send_messages = False
-#    overwrite.send_tts_messages = False
-#    overwrite.add_reactions = False
-#    await bot.edit_channel_permissions(channel, role, overwrite)
 
 @bot.command(pass_context=True)
 async def invite(ctx):

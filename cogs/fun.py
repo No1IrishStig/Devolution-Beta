@@ -59,4 +59,4 @@ class Fun(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Fun(bot))
-    print('Fun Cog has been loaded.')
+    print('Fun has been loaded.')
