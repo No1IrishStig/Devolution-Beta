@@ -1,0 +1,102 @@
+**Changelog (02/03/2019) V1.51**
+- Fixed Music:
+ - Fixed Embed Messages not sending
+ - Fixed Music failing to play
+ - Fixed anyone being able to skip on the fist vote
+ - Added volume min and max 0 - 200
+
+**Changelog (02/03/2019) V1.5**
+- Added new cog for tournaments
+- Added Tournament commands
+- Added changelog command (So you can see all this)
+- Changed bots default playing status
+- Updated Help command
+
+**Changelog (27/01/2019) V1.4**
+- Added role commands
+- Added Bug command
+- Updated Help command
+
+**Changelog (26/01/2019) V1.35**
+- Added Embed command
+- Changed Punish command to present a menu of options
+- Updated Help command
+- Added lspunish command
+
+**Changelog (26/01/2019) V1.3**
+- Major code overhaul. File sizes cut in half bot should now run faster.
+
+**Changelog (24/01/2019) V1.25**
+- Added Punish command
+- Added Unpunish command
+- Added spp command (Sets the punished permissions for every channel incase the automation failed.)
+- Updated Help command
+
+**Changelog (14/01/2019) V1.21**
+- Fixed Invite command
+- Added Prefix command
+- Added Leave command
+- Updated Help command
+
+**Changelog (04/01/2019) V1.2**
+Today I figured out how to implement WebAPi's into the bot sooo
+- Added Colour command (generates random hex value and sets embed colour to it)
+- Added Space command (Sends info about the ISS)
+- Added Meme command
+- Updated Help command
+
+**Changelog (04/01/2019) V1.13**
+- Edited music Play embed again... (Added details)
+
+**Changelog (29/12/2018) V1.12**
+- Added rename command
+- Added coinflip command
+- Updated Help command
+
+**Changelog (23/12/2018) V1.1**
+- Changed kick embed message, bot sends embed to kick user {server} {kicked_by} {reason (if there was one)}
+- Kick command now accepts reasons. If no reason is given, they just get kicked.
+- Added ban command. With the same parameters and embeds
+- Added Purge command
+- Added Say command
+- Added uinfo command, works with mentioned users
+- Added Avatar command. (Embedded)
+- Added About command
+- Added PM Command
+- Updated Help command
+
+**Changelog (22/12/2018) V1.04**
+- Added Set Presence command (Alias sp)
+- Added Cog commands Load, Unload and List.
+- Added Cog check, if you arent me, goodluck using that one.
+- Updated Help command
+
+**Changelog (21/12/2018 (3 hours later)) V1.035**
+- Changed all timestamps to make them actually work.
+- Changed set presence command text to be inside an embedded message
+- Added Uptime command
+- Added Kick command (Permission checks included)
+- Updated Help command (Added Music commands. Added Moderation (Purge, Say))
+
+**Changelog (21/12/2018) V1.03**
+- Music Cog Work - Edited many embed messages. Author will now be the command author for nearly all other music commands.
+- Added Server info
+- Updated Help command
+
+**Changelog (18/12/2018) V1.02**
+__Please keep in mind, these commands wont actually work yet, they are just placeholders.__
+- Music cleanup. (Put all messages into embedded messages)
+- Help command updated to add (sinfo, uinfo, uptime)
+
+**Changelog (16/12/2018) V1.01**
+- Added a few embed to music for testing. Author will now be command author for some commands.
+- Added shutdown command
+
+**Changelog (15/12/2018) V1.0**
+- Bot creation
+- Music Cog implementation
+- Added Help command
+- Added Ping command
+
+
+**Changelog (02/03/2019) V1.51**\n- Fixed Music:\n - Fixed Embed Messages not sending\n - Fixed Music failing to play\n - Fixed anyone being able to skip on the fist vote\n - Added volume min and max 0 - 200
