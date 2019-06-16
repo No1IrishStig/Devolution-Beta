@@ -32,8 +32,6 @@ from installation and updating.
 
 # Installation
 
-**The following platforms are officially supported:**
-
 Firstly install [Python3.7](https://www.python.org/downloads/) or newer
 
 - [All OS Versions](https://pypi.org/project/discord.py/)
