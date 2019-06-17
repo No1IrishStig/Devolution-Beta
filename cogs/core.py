@@ -36,7 +36,7 @@ class Core(commands.Cog):
         await user.send(embed=ee)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def todo(ctx):
+    async def todo(self, ctx):
             user = ctx.message.author
             await user.send(embed=tools.Editable('Todo List', 'Remake Music, Finish cleanup command', 'Todo'))
 
@@ -60,7 +60,7 @@ class Core(commands.Cog):
         await author.send(embed=embed)
 
     @commands.command(pass_context=True)
-    async def invite(ctx):
+    async def invite(self, ctx):
         user = ctx.message.author
         await user.send('Heres the link to invite me to your guilds!\n\nhttps://discordapp.com/oauth2/authorize?client_id=449328225001406467&scope=bot&permissions=8')
         await ctx.message.delete()
@@ -116,7 +116,7 @@ class Core(commands.Cog):
         await ctx.message.delete()
         ques = await ctx.channel.send('What would you like to say?')
         msg = await self.bot.wait_for('message', check=lambda message: message.author == ctx.author, timeout = 120)
-        user = ctx.message.author.name
+        user = ctx.message.author
         userid = ctx.message.author.id
         guild = ctx.message.guild.name
         guildid = ctx.message.guild.id

@@ -8,7 +8,7 @@ import aiohttp
 from cogs.tools import tools
 import random
 
-token = 'TOKEN HERE'
+token = ''
 
 print(discord.__version__ + '    <---------- If this isnt 1.2.2 your bot wont work!')
 print()

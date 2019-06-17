@@ -242,7 +242,7 @@ class Mod(commands.Cog):
                 await msg2.delete()
             else:
                  deleted = await ctx.channel.purge(limit=num + 1)
-                 msg = await ctx.send(embed=tools.Editable('Success', f'{len(deleted)} Messages were deleted!', 'Moderation'))
+                 msg = await ctx.send(embed=tools.Editable('Success', num + ' Messages were deleted!', 'Moderation'))
                  await asyncio.sleep(10)
                  await msg.delete()
 
