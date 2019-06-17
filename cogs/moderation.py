@@ -8,21 +8,6 @@ class Mod(commands.Cog):
     def __init__(self, bot):
             self.bot = bot
 
-    @commands.command(pass_context=True, no_pm=True, aliases=['prune'])
-    async def purge(self, ctx, amount:int=None):
-            if not ctx.message.author.guild_permissions.manage_messages:
-                await self.bot.say(embed=tools.NoPerm())
-            else:
-                if amount is None:
-                    msg2 = await ctx.send(embed=tools.Editable('Error!', 'Please enter an amount of messages to delete!', 'Moderation'))
-                    await asyncio.sleep(30)
-                    await msg2.delete()
-                else:
-                     deleted = await ctx.channel.purge(limit=amount)
-                     msg = await ctx.send(embed=tools.Editable('Success', f'{len(deleted)} Messages were deleted!', 'Moderation'))
-                     await asyncio.sleep(30)
-                     await msg.delete()
-
     @commands.command(pass_context=True, no_pm=True)
     async def say(self, ctx, *args):
         if not ctx.message.author.guild_permissions.manage_messages:
@@ -151,8 +136,6 @@ class Mod(commands.Cog):
                             await member.send(embed=tools.Editable('Punished!', 'You were punished from {} by {} for {}'.format(server, author, reason), 'Moderation'))
                             await ctx.send(embed=tools.Editable('Success!', 'User has been punished by {} for {}'.format(author, reason), 'Moderation'))
                             await member.add_roles(role)
-                        #except Exception as error:
-                                #await ctx.send(embed=tools.Editable('Error!', '{} could not be punished!'.format(member), 'Error'))
 
     @commands.command(pass_context=True, no_pm=True)
     async def unpunish(self, ctx, member: discord.Member=None):
@@ -221,21 +204,47 @@ class Mod(commands.Cog):
             except Exception as error:
                     await self.bot.say('{} cannot be renamed.'.format(user))
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def spp(self, ctx):
-        for channel in ctx.message.guild.channels:
-            role = discord.utils.get(channel.guild.roles, name='punished')
-            overwrite = discord.PermissionOverwrite()
-            overwrite.send_messages = False
-            overwrite.send_tts_messages = False
-            overwrite.add_reactions = False
-            await channel.set_permissions(role, overwrite=overwrite),
-        msg = await ctx.send(embed=tools.Editable('Setting Permissions', 'This may take a while, Ill tell you when im done.', 'Moderation'))
-        await asyncio.sleep(5)
-        await msg.delete()
-        msg2 = await ctx.send(embed=tools.Editable('Im Finished!', 'Depending on how many channels you have, all permissions should be set.', 'Moderation'))
-        await asyncio.sleep(5)
-        await msg2.delete()
+    @commands.group(pass_context=True, invoke_without_command=True)
+    async def cleanup(self, ctx):
+        if not ctx.message.author.guild_permissions.manage_messages:
+            error = await ctx.send(embed=tools.NoPerm())
+            await asyncio.sleep(30)
+            await ctx.message.delete()
+            await error.delete()
+        else:
+            usage = await ctx.send(embed=tools.Editable('Cleanup Usage', '**after** - Deletes messages after a specified message.\n **messages** - Deletes X amount of messages', 'Roles'))
+            await asyncio.sleep(30)
+            await ctx.message.delete()
+            await usage.delete()
+
+    @cleanup.group(pass_context=True, invoke_without_command=True)
+    async def after(self, ctx, id=None):
+        if not ctx.message.author.guild_permissions.manage_messages:
+            await ctx.send(embed=tools.NoPerm())
+        else:
+            channel = ctx.message.channel
+            author = ctx.message.author
+            server = channel.guild
+            to_delete = []
+            after = await channel.fetch_message(id)
+            async for message in channel.history(limit=100, after=after):
+                to_delete.append(message)
+            await channel.delete_messages(to_delete)
+
+    @cleanup.group(pass_context=True, invoke_without_command=True)
+    async def messages(self, ctx, num:int=None):
+        if not ctx.message.author.guild_permissions.manage_messages:
+            await ctx.send(embed=tools.NoPerm())
+        else:
+            if num is None:
+                msg2 = await ctx.send(embed=tools.Editable('Error!', 'Please enter an amount of messages to delete!', 'Moderation'))
+                await asyncio.sleep(30)
+                await msg2.delete()
+            else:
+                 deleted = await ctx.channel.purge(limit=num + 1)
+                 msg = await ctx.send(embed=tools.Editable('Success', f'{len(deleted)} Messages were deleted!', 'Moderation'))
+                 await asyncio.sleep(10)
+                 await msg.delete()
 
 def setup(bot):
     bot.add_cog(Mod(bot))
