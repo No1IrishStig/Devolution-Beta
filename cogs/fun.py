@@ -111,8 +111,35 @@ class Fun(commands.Cog):
                 ass = "http://media.obutts.ru/{}".format(ass["preview"])
             await ctx.send("{}".format(ass))
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def gif(self, ctx, *keywords):
+        url = ("http://api.giphy.com/v1/gifs/search?&api_key=dc6zaTOxFJmzC&q={}".format(keywords))
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(url) as r:
+                result = await r.json()
+                if r.status == 200:
+                    if result["data"]:
+                        await ctx.send(result["data"][0]["url"])
+                    else:
+                        await ctx.send(embed=tools.Editable('Error!', 'No search results found', 'Giphy'))
+                else:
+                    await ctx.send(embed=tools.Editable('Error!', 'There was an error contacting the API! Report this with !bug', 'Giphy'))
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def gifr(self, ctx, *keywords):
+        url = ("http://api.giphy.com/v1/gifs/random?&api_key=dc6zaTOxFJmzC&tag={}".format(keywords))
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(url) as r:
+                result = await r.json()
+                if r.status == 200:
+                    if result["data"]:
+                        await ctx.send(result["data"]["url"])
+                    else:
+                        await ctx.send(embed=tools.Editable('Error!', 'No search results found', 'Giphy'))
+                else:
+                    await ctx.send(embed=tools.Editable('Error!', 'There was an error contacting the API! Report this with !bug', 'Giphy'))
 
 
 def setup(bot):
     bot.add_cog(Fun(bot))
-    print('Fun has been loaded.')
+    print('Fun - Initialized')

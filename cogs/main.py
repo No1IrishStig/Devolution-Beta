@@ -286,4 +286,4 @@ class Main(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Main(bot))
-    print('Main has been loaded.')
+    print('Main - Initialized')

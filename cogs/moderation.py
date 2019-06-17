@@ -87,6 +87,39 @@ class Mod(commands.Cog):
                 except Exception as error:
                         await self.bot.say('{} cannot be banned. [{}]'.format(user, error))
 
+    @commands.command(no_pm=True, pass_context=True)
+    async def hackban(self, ctx, user_id: int, *, reason: str = None):
+
+        user_id = str(user_id)
+        author = ctx.message.author
+        server = author.guild
+        avatar = ctx.message.author.avatar_url
+
+        ban_list = await ctx.guild.bans()
+        is_banned = discord.utils.get(ban_list, id=user_id)
+
+        if is_banned:
+            await ctx.send(embed=tools.Editable('Error!', 'That user is already banned!', 'Moderation'))
+            return
+
+        user = ctx.guild.get_member(user_id)
+        if user is not None:
+            await ctx.invoke(self.ban, user=user, reason=reason)
+            return
+        try:
+            await self.bot.http.ban(user_id, server.id, 0)
+        except discord.NotFound:
+            await ctx.send(embed=tools.Editable('Error!', 'Cant find anyone with that ID try again!', 'Moderation'))
+        except discord.Forbidden:
+            await ctx.send(embed=tools.Editable('Error!', 'I dont have permission to do this!', 'Moderation'))
+        else:
+            if reason is None:
+                user = await self.bot.fetch_user(user_id)
+                await ctx.send(embed=tools.AvatarEdit('{}'.format(author) + ' Just yeeted someone!', '{}'.format(avatar), 'Yeet!', 'UserID {} just got hackbanned!'.format(user_id), 'Moderation'))
+            else:
+                user = await self.bot.fetch_user(user_id)
+                await ctx.send(embed=tools.AvatarEdit('{}'.format(author) + ' Just yeeted someone!', '{}'.format(avatar), 'Yeet!', 'UserID {} just got hackbanned for {}!'.format(user_id, reason), 'Moderation'))
+
     @commands.command(pass_context=True, no_pm=True)
     async def punish(self, ctx, member: discord.Member=None, *args):
         if not ctx.message.author.guild_permissions.manage_roles:
@@ -123,7 +156,6 @@ class Mod(commands.Cog):
                         await asyncio.sleep(30)
                         await msg3.delete()
                     else:
-                        #try:
                         reason = ''
                         for word in args:
                             reason += word
@@ -208,12 +240,12 @@ class Mod(commands.Cog):
     async def cleanup(self, ctx):
         if not ctx.message.author.guild_permissions.manage_messages:
             error = await ctx.send(embed=tools.NoPerm())
-            await asyncio.sleep(30)
+            await asyncio.sleep(10)
             await ctx.message.delete()
             await error.delete()
         else:
             usage = await ctx.send(embed=tools.Editable('Cleanup Usage', '**after** - Deletes messages after a specified message.\n **messages** - Deletes X amount of messages', 'Roles'))
-            await asyncio.sleep(30)
+            await asyncio.sleep(10)
             await ctx.message.delete()
             await usage.delete()
 
@@ -238,7 +270,7 @@ class Mod(commands.Cog):
         else:
             if num is None:
                 msg2 = await ctx.send(embed=tools.Editable('Error!', 'Please enter an amount of messages to delete!', 'Moderation'))
-                await asyncio.sleep(30)
+                await asyncio.sleep(10)
                 await msg2.delete()
             else:
                  deleted = await ctx.channel.purge(limit=num + 1)
@@ -248,4 +280,4 @@ class Mod(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Mod(bot))
-    print('Mod has been loaded')
+    print('Mod - Initialized')
