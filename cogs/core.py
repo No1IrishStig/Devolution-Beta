@@ -272,7 +272,7 @@ class Core(commands.Cog):
     @commands.command(pass_context=True, no_pm=True)
     async def music(self, ctx):
         user = ctx.message.author
-        ctx.message.delete()
+        await ctx.message.delete()
         await user.send(embed=tools.Editable('Music Usage', '**play** - Plays a song by name or url from youtube\n**pause** - Pauses the current song\n**resume** - Resumes the current song\n**volume {number}** - Change the volume of the bot\n**stop** - Disconnects the bot ', 'Todo'))
 
     @commands.command(pass_context=True, no_pm=True)
