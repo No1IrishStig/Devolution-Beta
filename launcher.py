@@ -239,6 +239,18 @@ def help_menu():
             break
         clear_screen()
 
+def run_dev():
+    interpreter = sys.executable
+
+    if interpreter is None:
+        raise RuntimeError("Couldn't find Python's interpreter")
+
+        if not INTERACTIVE_MODE:
+            exit(1)
+
+    cmd = (interpreter, "bot.py")
+
+    code = subprocess.call(cmd)
 
 def update_menu():
     clear_screen()
@@ -359,7 +371,11 @@ def main():
         choice = user_choice()
         if choice == "1":
             clear_screen()
-            os.system('python bot.py')
+            if IS_WINDOWS:
+                run_dev()
+            else:
+                os.chdir('/utils/install/')
+                shellscript = subprocess.Popen(["/utils/install/startfix.sh"], stdin=subprocess.PIPE)
         elif choice == "2":
             clear_screen()
             update_menu()

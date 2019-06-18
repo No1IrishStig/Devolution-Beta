@@ -1,14 +1,13 @@
 from discord.ext import commands
 from utils.default import lib
 from utils import default
-#from itertools import cycle
 import sys, traceback
 import datetime
 import discord
 import asyncio
 import json
 
-config = default.get("./utils/cfg.json")
+config = default.get("utils/cfg.json")
 
 bot = commands.Bot(command_prefix = config.prefix)
 bot.remove_command('help')
