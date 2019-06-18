@@ -93,7 +93,7 @@ class Core(commands.Cog):
             )
         e6.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
         e6.set_footer(text="Devolution | Admin Help", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-        e6.add_field(name="Admin", value="**leave** - Makes the bot leave the guild\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**todo** - Displays List of shit todo\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot", inline=False)
+        e6.add_field(name="Admin", value="**leave** - Makes the bot leave the guild\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**todo** - Displays List of shit todo\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.", inline=False)
         await author.send(embed=e6)
 
     @help.group(pass_context=True, invoke_without_command=True)
@@ -131,7 +131,7 @@ class Core(commands.Cog):
             )
         await user.send(embed=ee)
         eee = discord.Embed(
-            description = '__**Changelog (17/06/2019) V1.02**__\nAdded music command!(Play, Pause, Resume, Volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) V1.03**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added utils folder\n+ Added config file\n\n- Merged tools into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs',
+            description = '__**Changelog (17/06/2019) V1.02**__\nAdded music command!(Play, Pause, Resume, Volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) V1.03**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Added amiadmin command\n+ Created a new admin cog\n+ Added utils folder\n+ Added config file\n\n- Merged tools into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs',
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
