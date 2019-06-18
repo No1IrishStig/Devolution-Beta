@@ -131,7 +131,7 @@ class Core(commands.Cog):
             )
         await user.send(embed=ee)
         eee = discord.Embed(
-            description = '__**Changelog (17/06/2019) V1.02**__\nAdded music command!(Play, Pause, Resume, Volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) V1.03**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Added amiadmin command\n+ Created a new admin cog\n+ Added utils folder\n+ Added config file\n\n- Merged tools into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs',
+            description = '__**Changelog (17/06/2019) V1.02**__\nAdded music command!(Play, Pause, Resume, Volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) V1.03**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added amiadmin command\n+ Added utils folder\n+ Added config file\n\n- Merged tools into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs',
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
