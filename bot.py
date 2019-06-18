@@ -1,4 +1,5 @@
 import discord
+import sys, traceback
 from discord.ext import commands
 from itertools import cycle
 import datetime
@@ -28,7 +29,7 @@ if __name__ == '__main__':
         try:
             bot.load_extension(extension)
         except Exception as error:
-            print('{} cannot be loaded. [{}]'.format(extension, error))
+            traceback.print_exc()
 
 @bot.event
 async def on_guild_join():
