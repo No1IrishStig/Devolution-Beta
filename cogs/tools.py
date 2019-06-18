@@ -28,7 +28,7 @@ class tools(commands.Cog):
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        e.set_footer(text='Devolution | {}'.format(footer))
+        e.set_footer(text='Devolution | {}'.format(footer), icon_url='https://i.imgur.com/BS6YRcT.jpg')
         e.set_author(name='Devolution', icon_url='https://i.imgur.com/BS6YRcT.jpg')
         return e
 
