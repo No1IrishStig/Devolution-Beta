@@ -240,48 +240,51 @@ class Mod(commands.Cog):
 
     @commands.command(no_pm=True)
     async def clean(self, ctx):
-        number = 99
-        channel = ctx.channel
-        author = ctx.author
-        server = channel.guild
-        is_bot = self.bot.user.bot
-        has_permissions = channel.permissions_for(server.me).manage_messages
+        if ctx.author.guild_permissions.manage_messages:
+            number = 99
+            channel = ctx.channel
+            author = ctx.author
+            server = channel.guild
+            is_bot = self.bot.user.bot
+            has_permissions = channel.permissions_for(server.me).manage_messages
 
-        prefixes = self.config.prefix
-        if isinstance(prefixes, str):
-            prefixes = [prefixes]
-        elif callable(prefixes):
-            if asyncio.iscoroutine(prefixes):
-                await ctx.send('Coroutine prefixes not yet implemented.')
-                return
-            prefixes = prefixes(self.bot, ctx.message)
+            prefixes = self.config.prefix
+            if isinstance(prefixes, str):
+                prefixes = [prefixes]
+            elif callable(prefixes):
+                if asyncio.iscoroutine(prefixes):
+                    await ctx.send('Coroutine prefixes not yet implemented.')
+                    return
+                prefixes = prefixes(self.bot, ctx.message)
 
-        if '' in prefixes:
-            prefixes.pop('')
+            if '' in prefixes:
+                prefixes.pop('')
 
-        def check(m):
-            if m.author.id == self.bot.user.id:
-                return True
-            elif m == ctx.message:
-                return True
-            p = discord.utils.find(m.content.startswith, prefixes)
-            if p and len(p) > 0:
-                return m.content[len(p):]
-            return False
+            def check(m):
+                if m.author.id == self.bot.user.id:
+                    return True
+                elif m == ctx.message:
+                    return True
+                p = discord.utils.find(m.content.startswith, prefixes)
+                if p and len(p) > 0:
+                    return m.content[len(p):]
+                return False
 
-        to_delete = [ctx.message]
+            to_delete = [ctx.message]
 
-        tries_left = 5
-        tmp = ctx.message
+            tries_left = 5
+            tmp = ctx.message
 
-        while tries_left and len(to_delete) - 1 < number:
-            async for message in channel.history(limit=number, before=tmp):
-                if len(to_delete) - 1 < number and check(message):
-                    to_delete.append(message)
-                tmp = message
-            tries_left -= 1
+            while tries_left and len(to_delete) - 1 < number:
+                async for message in channel.history(limit=number, before=tmp):
+                    if len(to_delete) - 1 < number and check(message):
+                        to_delete.append(message)
+                    tmp = message
+                tries_left -= 1
 
-            await channel.delete_messages(to_delete)
+                await channel.delete_messages(to_delete)
+        else:
+            await ctx.send(embed=lib.NoPerm())
 
     @commands.group(invoke_without_command=True, no_pm=True)
     async def cleanup(self, ctx):
@@ -327,82 +330,87 @@ class Mod(commands.Cog):
 
     @cleanup.group(invoke_without_command=True, no_pm=True)
     async def user(self, ctx, user: discord.Member=None, number: int=None):
-        channel = ctx.channel
-        author = ctx.author
-        server = author.guild
-        is_bot = self.bot.user.bot
-        self_delete = user == self.bot.user
+        if ctx.author.guild_permissions.manage_messages:
+            channel = ctx.channel
+            author = ctx.author
+            server = author.guild
+            is_bot = self.bot.user.bot
+            self_delete = user == self.bot.user
 
-        if user is None:
-            return await ctx.send(embed=lib.Editable('Error', f'Please tag a user {ctx.author.mention}!', 'Moderation'))
-        if number is None:
-            return await ctx.send(embed=lib.Editable('Error', f'Please enter a number of messages {ctx.author.mention}!', 'Moderation'))
+            if user is None:
+                return await ctx.send(embed=lib.Editable('Error', f'Please tag a user {ctx.author.mention}!', 'Moderation'))
+            if number is None:
+                return await ctx.send(embed=lib.Editable('Error', f'Please enter a number of messages {ctx.author.mention}!', 'Moderation'))
 
-        def check(m):
-            if m.author == user:
-                return True
-            elif m == ctx.message:
-                return True
-            else:
-                return False
+            def check(m):
+                if m.author == user:
+                    return True
+                elif m == ctx.message:
+                    return True
+                else:
+                    return False
 
-        to_delete = [ctx.message]
+            to_delete = [ctx.message]
 
-        tries_left = 5
-        tmp = ctx.message
+            tries_left = 5
+            tmp = ctx.message
 
-        while tries_left and len(to_delete) - 1 < number:
-            async for message in channel.history(limit=number, before=tmp):
-                if len(to_delete) - 1 < number and check(message):
-                    to_delete.append(message)
-                tmp = message
-            tries_left -= 1
-            await channel.delete_messages(to_delete)
+            while tries_left and len(to_delete) - 1 < number:
+                async for message in channel.history(limit=number, before=tmp):
+                    if len(to_delete) - 1 < number and check(message):
+                        to_delete.append(message)
+                    tmp = message
+                tries_left -= 1
+                await channel.delete_messages(to_delete)
+        else:
+            await ctx.send(embed=lib.NoPerm())
 
     @cleanup.group(pass_context=True, no_pm=True)
     async def bot(self, ctx, number: int=None):
+        if ctx.author.guild_permissions.manage_messages:
+            channel = ctx.channel
+            author = ctx.author
+            server = channel.guild
+            is_bot = self.bot.user.bot
+            has_permissions = channel.permissions_for(server.me).manage_messages
 
-        channel = ctx.channel
-        author = ctx.author
-        server = channel.guild
-        is_bot = self.bot.user.bot
-        has_permissions = channel.permissions_for(server.me).manage_messages
+            prefixes = self.config.prefix
+            if isinstance(prefixes, str):
+                prefixes = [prefixes]
+            elif callable(prefixes):
+                if asyncio.iscoroutine(prefixes):
+                    await ctx.send('Coroutine prefixes not yet implemented.')
+                    return
+                prefixes = prefixes(self.bot, ctx.message)
 
-        prefixes = self.config.prefix
-        if isinstance(prefixes, str):
-            prefixes = [prefixes]
-        elif callable(prefixes):
-            if asyncio.iscoroutine(prefixes):
-                await ctx.send('Coroutine prefixes not yet implemented.')
-                return
-            prefixes = prefixes(self.bot, ctx.message)
+            if '' in prefixes:
+                prefixes.pop('')
 
-        if '' in prefixes:
-            prefixes.pop('')
+            def check(m):
+                if m.author.id == self.bot.user.id:
+                    return True
+                elif m == ctx.message:
+                    return True
+                p = discord.utils.find(m.content.startswith, prefixes)
+                if p and len(p) > 0:
+                    return m.content[len(p):]
+                return False
 
-        def check(m):
-            if m.author.id == self.bot.user.id:
-                return True
-            elif m == ctx.message:
-                return True
-            p = discord.utils.find(m.content.startswith, prefixes)
-            if p and len(p) > 0:
-                return m.content[len(p):]
-            return False
+            to_delete = [ctx.message]
 
-        to_delete = [ctx.message]
+            tries_left = 5
+            tmp = ctx.message
 
-        tries_left = 5
-        tmp = ctx.message
+            while tries_left and len(to_delete) - 1 < number:
+                async for message in channel.history(limit=number, before=tmp):
+                    if len(to_delete) - 1 < number and check(message):
+                        to_delete.append(message)
+                    tmp = message
+                tries_left -= 1
 
-        while tries_left and len(to_delete) - 1 < number:
-            async for message in channel.history(limit=number, before=tmp):
-                if len(to_delete) - 1 < number and check(message):
-                    to_delete.append(message)
-                tmp = message
-            tries_left -= 1
-
-            await channel.delete_messages(to_delete)
+                await channel.delete_messages(to_delete)
+        else:
+            await ctx.send(embed=lib.NoPerm())
 
 
 def setup(bot):
