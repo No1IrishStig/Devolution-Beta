@@ -20,7 +20,7 @@ class Admin(commands.Cog):
         else:
             await ctx.send(f"You arent an admin, {ctx.author.name}")
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def pm(self, ctx, user : discord.User=None, *args):
         if ctx.author.id in self.config.owner:
             if user is None:
@@ -38,7 +38,7 @@ class Admin(commands.Cog):
         else:
             await ctx.channel.send(embed=lib.NoPerm())
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def pmid(self, ctx, id=None, *args):
         if ctx.author.id in self.config.owner:
             if id is None:

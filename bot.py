@@ -26,7 +26,7 @@ if __name__ == '__main__':
         except Exception as error:
             traceback.print_exc()
 
-@bot.command(pass_context=True, no_pm=True)
+@bot.command(no_pm=True)
 async def leave(ctx):
     guild = ctx.message.guild
     if ctx.author == guild.owner:
@@ -34,7 +34,7 @@ async def leave(ctx):
     else:
         await ctx.channel.send(embed=lib.NoPerm())
 
-@bot.command(pass_context=True, aliases=['sp'])
+@bot.command(aliases=['sp'])
 async def setpresence(ctx, *args):
     if ctx.author.id in config.owner:
         count = str(len(bot.guilds))
@@ -54,7 +54,7 @@ async def setpresence(ctx, *args):
     else:
         await ctx.channel.send(embed=lib.NoPerm())
 
-@bot.command(pass_context=True, aliases=['sa'])
+@bot.command(aliases=['sa'])
 async def setactivity(ctx, activity:str=None, *args):
     if ctx.author.id in config.owner:
         output = ''
@@ -79,7 +79,7 @@ async def setactivity(ctx, activity:str=None, *args):
     else:
         await ctx.channel.send(embed=lib.NoPerm())
 
-@bot.command(pass_context=True)
+@bot.command()
 async def shutdown(ctx):
         if ctx.author.id in config.owner:
             await ctx.channel.send(embed=lib.Editable('Shutting Down!', 'I am shutting down in 5 seconds. Goodnight :zzz:', 'Sleep'))
@@ -88,14 +88,14 @@ async def shutdown(ctx):
         else:
             await ctx.channel.send(embed=lib.NoPerm())
 
-@bot.group(pass_context=True, invoke_without_command=True)
+@bot.group(invoke_without_command=True)
 async def cog(ctx):
     if ctx.author.id in config.owner:
         await ctx.channel.send(embed=lib.Editable('Cog Commands', '**Load** - loads named cog.\n **Unload** - Unloads named cog.\n **List** - Lists all cogs.', 'Cogs'))
     else:
         await ctx.channel.send(embed=lib.NoPerm())
 
-@cog.group(pass_context=True, invoke_without_command=True)
+@cog.group(invoke_without_command=True)
 async def load(ctx, extension : str=None):
     if ctx.author.id in config.owner:
         if extension is None:
@@ -109,7 +109,7 @@ async def load(ctx, extension : str=None):
     else:
         await ctx.channel.send(embed=lib.NoPerm())
 
-@cog.group(pass_context=True, invoke_without_command=True)
+@cog.group(invoke_without_command=True)
 async def unload(ctx, extension : str=None):
     if ctx.author.id in config.owner:
         if extension is None:
@@ -123,7 +123,7 @@ async def unload(ctx, extension : str=None):
     else:
         await ctx.channel.send(embed=lib.NoPerm())
 
-@cog.command(pass_context=True)
+@cog.command()
 async def list(ctx):
     if ctx.author.id in config.owner:
         await ctx.channel.send(embed=lib.Editable('Available Cogs', 'cogs.core','cogs.main', 'cogs.fun, cogs.mod', 'Cogs'))

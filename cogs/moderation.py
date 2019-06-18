@@ -5,11 +5,13 @@ import datetime
 import asyncio
 import discord
 
+
 class Mod(commands.Cog):
     def __init__(self, bot):
             self.bot = bot
+            self.config = default.get("utils/cfg.json")
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def say(self, ctx, *args):
         if not ctx.author.guild_permissions.manage_messages:
             await ctx.message.delete()
@@ -29,7 +31,7 @@ class Mod(commands.Cog):
             else:
                 await ctx.send(output)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def kick(self, ctx, user : discord.User=None, *args):
         if not ctx.author.guild_permissions.kick_members:
             msg = await self.bot.say(embed=lib.NoPerm())
@@ -58,7 +60,7 @@ class Mod(commands.Cog):
                 except Exception as error:
                         await ctx.send('{} cannot be kicked.'.format(user))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def ban(self, ctx, user : discord.User=None, *args):
         if not ctx.author.guild_permissions.ban_members:
             msg = await ctx.send(embed=lib.NoPerm())
@@ -88,7 +90,7 @@ class Mod(commands.Cog):
                 except Exception as error:
                         await self.bot.say('{} cannot be banned. [{}]'.format(user, error))
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(no_pm=True)
     async def hackban(self, ctx, user_id: int=None, *, reason: str = None):
 
         author = ctx.author
@@ -120,7 +122,7 @@ class Mod(commands.Cog):
                     await ctx.send(embed=lib.AvatarEdit('{}'.format(author) + ' Just yeeted someone!', '{}'.format(avatar), 'Yeet!', 'UserID {} just got hackbanned for {}!'.format(user_id, reason), 'Moderation'))
                     await user.send(embed=lib.Editable('You were hackbanned!', 'You got hack banned from {} for {}'.format(server, reason), 'Moderation'))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def punish(self, ctx, member: discord.Member=None, *args):
         if not ctx.author.guild_permissions.manage_roles:
             msg = await ctx.send(embed=lib.NoPerm())
@@ -169,7 +171,7 @@ class Mod(commands.Cog):
                             await ctx.send(embed=lib.Editable('Success!', 'User has been punished by {} for {}'.format(author, reason), 'Moderation'))
                             await member.add_roles(role)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def unpunish(self, ctx, member: discord.Member=None):
         if not ctx.author.guild_permissions.manage_roles:
             msg = await ctx.send(embed=lib.NoPerm())
@@ -198,7 +200,7 @@ class Mod(commands.Cog):
                         await ctx.send(embed=lib.Editable('Success!', 'User unpunished by {}'.format(author), 'Moderation'))
                         await member.remove_roles(role)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def lspunish(self, ctx):
         pusers = []
         if not ctx.author.guild_permissions.manage_roles:
@@ -213,7 +215,7 @@ class Mod(commands.Cog):
         await asyncio.sleep(2)
         await ctx.send(embed=lib.Editable('Punished List', '{}'.format(', '.join(pusers)), 'Moderation'))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def rename(self, ctx, user:discord.User=None, *args):
         if not ctx.author.guild_permissions.manage_nicknames:
             msg = await ctx.send(embed=lib.NoPerm())
@@ -236,7 +238,42 @@ class Mod(commands.Cog):
             except Exception as error:
                     await self.bot.say('{} cannot be renamed.'.format(user))
 
-    @commands.group(pass_context=True, invoke_without_command=True)
+    @commands.command(no_pm=True)
+    async def clean(self, ctx):
+        number = 99
+        channel = ctx.channel
+        author = ctx.author
+        server = channel.guild
+        is_bot = self.bot.user.bot
+        has_permissions = channel.permissions_for(server.me).manage_messages
+
+        prefixes = self.config.prefix
+        if isinstance(prefixes, str):
+            prefixes = [prefixes]
+        elif callable(prefixes):
+            if asyncio.iscoroutine(prefixes):
+                await ctx.send('Coroutine prefixes not yet implemented.')
+                return
+            prefixes = prefixes(self.bot, ctx.message)
+
+        if '' in prefixes:
+            prefixes.pop('')
+
+        to_delete = [ctx.message]
+
+        tries_left = 5
+        tmp = ctx.message
+
+        while tries_left and len(to_delete) - 1 < number:
+            async for message in channel.history(limit=number, before=tmp):
+                if len(to_delete) - 1 < number:
+                    to_delete.append(message)
+                tmp = message
+            tries_left -= 1
+
+            await channel.delete_messages(to_delete)
+
+    @commands.group(invoke_without_command=True, no_pm=True)
     async def cleanup(self, ctx):
         if not ctx.author.guild_permissions.manage_messages:
             error = await ctx.send(embed=lib.NoPerm())
@@ -244,12 +281,12 @@ class Mod(commands.Cog):
             await ctx.message.delete()
             await error.delete()
         else:
-            usage = await ctx.send(embed=lib.Editable('Cleanup Usage', '**after** - Deletes messages after a specified message.\n **messages** - Deletes X amount of messages', 'Roles'))
+            usage = await ctx.send(embed=lib.Editable('Cleanup Usage', '**after {id}** - Deletes messages after a specified message.\n**messages {amount}** - Deletes X amount of messages\n**user {name} {amount}** - Delete X amount of messages from a specific user\n**bot {amount}** - Delete X amount of command messages and bot messages', 'Roles'))
             await asyncio.sleep(10)
             await ctx.message.delete()
             await usage.delete()
 
-    @cleanup.group(pass_context=True, invoke_without_command=True)
+    @cleanup.group(invoke_without_command=True, no_pm=True)
     async def after(self, ctx, id=None):
         if not ctx.author.guild_permissions.manage_messages:
             await ctx.send(embed=lib.NoPerm())
@@ -263,20 +300,90 @@ class Mod(commands.Cog):
                 to_delete.append(message)
             await channel.delete_messages(to_delete)
 
-    @cleanup.group(pass_context=True, invoke_without_command=True)
+    @cleanup.group(invoke_without_command=True, no_pm=True)
     async def messages(self, ctx, num:int=None):
-        if not ctx.author.guild_permissions.manage_messages:
-            await ctx.send(embed=lib.NoPerm())
-        else:
+        if ctx.author.guild_permissions.manage_messages:
             if num is None:
                 msg2 = await ctx.send(embed=lib.Editable('Error!', 'Please enter an amount of messages to delete!', 'Moderation'))
                 await asyncio.sleep(10)
                 await msg2.delete()
             else:
                  deleted = await ctx.channel.purge(limit=num + 1)
-                 msg = await ctx.send(embed=lib.Editable('Success', num + ' Messages were deleted!', 'Moderation'))
+                 msg = await ctx.send(embed=lib.Editable('Success', f'{num} Messages were deleted!', 'Moderation'))
                  await asyncio.sleep(10)
                  await msg.delete()
+        else:
+            await ctx.send(embed=lib.NoPerm())
+
+    @cleanup.group(invoke_without_command=True, no_pm=True)
+    async def user(self, ctx, user: discord.Member=None, number: int=None):
+        channel = ctx.channel
+        author = ctx.author
+        server = author.guild
+        is_bot = self.bot.user.bot
+        self_delete = user == self.bot.user
+
+        if user is None:
+            return await ctx.send(embed=lib.Editable('Error', f'Please tag a user {ctx.author.mention}!', 'Moderation'))
+        if number is None:
+            return await ctx.send(embed=lib.Editable('Error', f'Please enter a number of messages {ctx.author.mention}!', 'Moderation'))
+
+        def check(m):
+            if m.author == user:
+                return True
+            elif m == ctx.message:
+                return True
+            else:
+                return False
+
+        to_delete = [ctx.message]
+
+        tries_left = 5
+        tmp = ctx.message
+
+        while tries_left and len(to_delete) - 1 < number:
+            async for message in channel.history(limit=number, before=tmp):
+                if len(to_delete) - 1 < number and check(message):
+                    to_delete.append(message)
+                tmp = message
+            tries_left -= 1
+            await channel.delete_messages(to_delete)
+
+    @cleanup.group(pass_context=True, no_pm=True)
+    async def bot(self, ctx, number: int=None):
+
+        channel = ctx.channel
+        author = ctx.author
+        server = channel.guild
+        is_bot = self.bot.user.bot
+        has_permissions = channel.permissions_for(server.me).manage_messages
+
+        prefixes = self.config.prefix
+        if isinstance(prefixes, str):
+            prefixes = [prefixes]
+        elif callable(prefixes):
+            if asyncio.iscoroutine(prefixes):
+                await ctx.send('Coroutine prefixes not yet implemented.')
+                return
+            prefixes = prefixes(self.bot, ctx.message)
+
+        if '' in prefixes:
+            prefixes.pop('')
+
+        to_delete = [ctx.message]
+
+        tries_left = 5
+        tmp = ctx.message
+
+        while tries_left and len(to_delete) - 1 < number:
+            async for message in channel.history(limit=number, before=tmp):
+                if len(to_delete) - 1 < number:
+                    to_delete.append(message)
+                tmp = message
+            tries_left -= 1
+
+            await channel.delete_messages(to_delete)
+
 
 def setup(bot):
     bot.add_cog(Mod(bot))

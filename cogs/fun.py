@@ -19,11 +19,11 @@ class Fun(commands.Cog):
                     with open("./data/owo/owo.json") as f:
                         self.owo = json.load(f)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def ping(self, ctx):
         await ctx.send('Pong')
 
-    @commands.command(pass_context=True, no_pm=True, aliases=['cf'])
+    @commands.command(no_pm=True, aliases=['cf'])
     async def coinflip(self, ctx):
         await ctx.send('Flipping...')
         await asyncio.sleep(5)
@@ -31,7 +31,7 @@ class Fun(commands.Cog):
         rancoin = random.choice(choices)
         await ctx.send('You flipped a ' + rancoin)
 
-    @commands.command(pass_context=True, aliases=['color'])
+    @commands.command(aliases=['color'])
     async def colour(self, ctx):
         async with aiohttp.ClientSession() as cs:
             async with cs.get('http://www.colr.org/json/color/random') as r:
@@ -45,7 +45,7 @@ class Fun(commands.Cog):
                     )
                 await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True, aliases=['iss'])
+    @commands.command(aliases=['iss'])
     async def space(self, ctx):
             async with aiohttp.ClientSession() as cs:
                 async with cs.get('http://api.open-notify.org/iss-now.json') as r:
@@ -68,7 +68,7 @@ class Fun(commands.Cog):
                         embed.set_footer(text="Devolution | Space", icon_url="https://i.imgur.com/BS6YRcT.jpg")
                         await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def roll(self, ctx, number : int = 100):
         author = ctx.author
         if number > 1:
@@ -77,7 +77,7 @@ class Fun(commands.Cog):
         else:
             await ctx.send("{} Enter a number above 1!".format(author.mention))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def insult(self, ctx, user : discord.Member=None):
         msg = ' '
         if user != None:
@@ -90,7 +90,7 @@ class Fun(commands.Cog):
         else:
                 await ctx.send(ctx.author.mention + msg + randchoice(self.insults))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def boobs(self, ctx):
         author = ctx.author
         rdm = random.randint(0, self.settings["ama_boobs"])
@@ -102,7 +102,7 @@ class Fun(commands.Cog):
                 boob = "http://media.oboobs.ru/{}".format(boob["preview"])
             await ctx.send("{}".format(boob))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def ass(self, ctx):
         author = ctx.author
         rdm = random.randint(0, self.settings["ama_ass"])
@@ -114,7 +114,7 @@ class Fun(commands.Cog):
                 ass = "http://media.obutts.ru/{}".format(ass["preview"])
             await ctx.send("{}".format(ass))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def gif(self, ctx, *keywords):
         url = ("http://api.giphy.com/v1/gifs/search?&api_key=dc6zaTOxFJmzC&q={}".format(keywords))
         async with aiohttp.ClientSession() as cs:
@@ -128,7 +128,7 @@ class Fun(commands.Cog):
                 else:
                     await ctx.send(embed=lib.Editable('Error!', 'There was an error contacting the API! Report this with !bug', 'Giphy'))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def gifr(self, ctx, *keywords):
         url = ("http://api.giphy.com/v1/gifs/random?&api_key=dc6zaTOxFJmzC&tag={}".format(keywords))
         async with aiohttp.ClientSession() as cs:
@@ -142,7 +142,7 @@ class Fun(commands.Cog):
                 else:
                     await ctx.send(embed=lib.Editable('Error!', 'There was an error contacting the API! Report this with !bug', 'Giphy'))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def owo(self, ctx, user : discord.Member=None):
         await ctx.send(ctx.author.mention + ' ' + randchoice(self.owo))
 

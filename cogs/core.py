@@ -13,7 +13,7 @@ class Core(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(pass_context=True, invoke_without_command=True)
+    @commands.group(invoke_without_command=True)
     async def help(self, ctx):
         await ctx.message.add_reaction("📄")
         user = ctx.author
@@ -26,7 +26,7 @@ class Core(commands.Cog):
         e1.set_footer(text="Devolution | Help", icon_url="https://i.imgur.com/BS6YRcT.jpg")
         await user.send(embed=e1)
 
-    @help.group(pass_context=True, invoke_without_command=True)
+    @help.group(invoke_without_command=True)
     async def info(self, ctx):
         await ctx.message.add_reaction("📄")
         author = ctx.author
@@ -40,7 +40,7 @@ class Core(commands.Cog):
         e2.add_field(name="Information", value="**help** - Gives help!\n**bug** - Use it to report bugs.\n**sinfo** - Displays guild information.\n**uinfo** - Displays user information\n**uptime** - Displays the bots uptime\n**about** - Displays stuff about the bot\n**changelog** - Displays the entire bots changelog\n**github** - Provides github link", inline=False)
         await author.send(embed=e2)
 
-    @help.group(pass_context=True, invoke_without_command=True)
+    @help.group(invoke_without_command=True)
     async def fun(self, ctx):
         await ctx.message.add_reaction("📄")
         author = ctx.author
@@ -51,10 +51,10 @@ class Core(commands.Cog):
             )
         e3.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
         e3.set_footer(text="Devolution | Fun Help", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-        e3.add_field(name="Fun", value="**coinflip** - Flip a coin\n**space** - Get live information about the ISS\n**colour** - Get a random colour\n**roll** - Roles a dice\n**insult** - Insult people you dislike!\n**boobs** - See some melons!\n**ass** - See some peaches!\n**gif** - Search up a gif on giphy by name\n**gifr** - Gives a random gif from giphy", inline=False)
+        e3.add_field(name="Fun", value="**coinflip** - Flip a coin\n**space** - Get live information about the ISS\n**colour** - Get a random colour\n**roll** - Roles a dice\n**insult** - Insult people you dislike!\n**boobs** - See some melons!\n**ass** - See some peaches!\n**gif** - Search up a gif on giphy by name\n**gifr** - Gives a random gif from giphy\n**owo** - Get random responses", inline=False)
         await author.send(embed=e3)
 
-    @help.group(pass_context=True, invoke_without_command=True)
+    @help.group(invoke_without_command=True)
     async def mod(self, ctx):
         await ctx.message.add_reaction("📄")
         author = ctx.author
@@ -65,10 +65,10 @@ class Core(commands.Cog):
             )
         e4.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
         e4.set_footer(text="Devolution | Moderation Help", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-        e4.add_field(name="Moderation", value="**kick** - Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives mute options\n**cleanup** - Gives message moderation options", inline=False)
+        e4.add_field(name="Moderation", value="**kick** - Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives mute options\n**cleanup** - Gives message moderation options\n**clean** - Deletes the last 100 command messages and bot messages", inline=False)
         await author.send(embed=e4)
 
-    @help.group(pass_context=True, invoke_without_command=True)
+    @help.group(invoke_without_command=True)
     async def useful(self, ctx):
         await ctx.message.add_reaction("📄")
         author = ctx.author
@@ -82,7 +82,7 @@ class Core(commands.Cog):
         e5.add_field(name="Useful", value="**say** - Speak as the bot\n**rename** - Change a users nickname\n**invite** - Gives usage details\n**embed** - Creates an embed message\n**role** - Gives role options\n**music** - Gives music help", inline=False)
         await author.send(embed=e5)
 
-    @help.group(pass_context=True, invoke_without_command=True)
+    @help.group(invoke_without_command=True)
     async def admin(self, ctx):
         await ctx.message.add_reaction("📄")
         author = ctx.author
@@ -96,7 +96,7 @@ class Core(commands.Cog):
         e6.add_field(name="Admin", value="**leave** - Makes the bot leave the guild\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**todo** - Displays List of shit todo\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.", inline=False)
         await author.send(embed=e6)
 
-    @help.group(pass_context=True, invoke_without_command=True)
+    @help.group(invoke_without_command=True)
     async def all(self, ctx):
         await ctx.message.add_reaction("📄")
         author = ctx.author
@@ -108,13 +108,13 @@ class Core(commands.Cog):
         embed.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
         embed.set_footer(text="Devolution | Help", icon_url="https://i.imgur.com/BS6YRcT.jpg")
         embed.add_field(name="Information", value="**help** - Gives help!\n**bug** - Use it to report bugs.\n**sinfo** - Displays guild information.\n**uinfo** - Displays user information\n**uptime** - Displays the bots uptime\n**about** - Displays stuff about the bot\n**changelog** - Displays the entire bots changelog\n**github** - Provides github link", inline=False)
-        embed.add_field(name="Fun", value="**coinflip** - Flip a coin\n**space** - Get live information about the ISS\n**colour** - Get a random colour\n**roll** - Roles a dice\n**insult** - Insult people you dislike!\n**boobs** - See some melons!\n**ass** - See some peaches!\n**gif** - Search up a gif on giphy by name\n**gifr** - Gives a random gif from giphy", inline=False)
-        embed.add_field(name="Moderation", value="**kick** - Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives mute options\n**cleanup** - Gives message moderation options", inline=False)
+        embed.add_field(name="Fun", value="**coinflip** - Flip a coin\n**space** - Get live information about the ISS\n**colour** - Get a random colour\n**roll** - Roles a dice\n**insult** - Insult people you dislike!\n**boobs** - See some melons!\n**ass** - See some peaches!\n**gif** - Search up a gif on giphy by name\n**gifr** - Gives a random gif from giphy\n**owo** - Get random responses", inline=False)
+        embed.add_field(name="Moderation", value="**kick** - Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives mute options\n**cleanup** - Gives message moderation options\n**clean** - Deletes the last 100 command messages and bot messages", inline=False)
         embed.add_field(name="Useful", value="**say** - Speak as the bot\n**rename** - Change a users nickname\n**invite** - Gives usage details\n**embed** - Creates an embed message\n**role** - Gives role options\n**music** - Gives music help", inline=False)
-        embed.add_field(name="Admin", value="**leave** - Makes the bot leave the guild\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**todo** - Displays List of shit todo\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot", inline=False)
+        embed.add_field(name="Admin", value="**leave** - Makes the bot leave the guild\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**todo** - Displays List of shit todo\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.", inline=False)
         await author.send(embed=embed)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def changelog(self, ctx):
         user = ctx.author
         await ctx.message.add_reaction("📄")
@@ -131,25 +131,25 @@ class Core(commands.Cog):
             )
         await user.send(embed=ee)
         eee = discord.Embed(
-            description = '__**Changelog (17/06/2019) V1.02**__\nAdded music command!(Play, Pause, Resume, Volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) V1.03**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added amiadmin command\n+ Added utils folder\n+ Added config file\n\n- Merged lib into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs',
+            description = '__**Changelog (17/06/2019) V1.02**__\nAdded music command!(Play, Pause, Resume, Volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) V1.03**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added amiadmin command\n+ Added utils folder\n+ Added config file\n\n- Merged lib into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs\n\n__**Changelog (18/06/2019)**__ V1.1\n+ Added owo command (944)\n\n- Fixed Punish not setting channel permissions\n - Finished Cleanup command\n- Fixed volume command\n- Updated help command\n- Added clean command\n- Bug Fixes',
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
         eee.set_footer(text='Devolution | Changelogs', icon_url="https://i.imgur.com/BS6YRcT.jpg")
         await user.send(embed=eee)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def todo(self, ctx, *args):
         user = ctx.author
         await user.send(embed=lib.Editable('Todo List', 'Remake Music, Finish cleanup command', 'Todo'))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def invite(self, ctx):
         user = ctx.author
         await user.send('Heres the link to invite me to your guilds!\n\nhttps://discordapp.com/oauth2/authorize?client_id=449328225001406467&scope=bot&permissions=8')
         await ctx.message.delete()
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def uptime(self, ctx):
         current_time = time.time()
         difference = int(round(current_time - start_time))
@@ -163,7 +163,7 @@ class Core(commands.Cog):
         embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Core')
         await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def about(self, ctx):
         embed=discord.Embed(
             title="About Devolution",
@@ -177,7 +177,7 @@ class Core(commands.Cog):
         embed.set_footer(text="Devolution | About - Providing Discord support since May 2018")
         await ctx.channel.send(embed=embed)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def bug(self, ctx):
         await ctx.message.delete()
         ques = await ctx.channel.send('What would you like to say?')
@@ -203,7 +203,7 @@ class Core(commands.Cog):
         await asyncio.sleep(30)
         await feedback.delete()
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def spp(self, ctx):
         for channel in ctx.message.guild.channels:
             role = discord.utils.get(channel.guild.roles, name='punished')
@@ -219,13 +219,13 @@ class Core(commands.Cog):
         await asyncio.sleep(5)
         await msg2.delete()
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def music(self, ctx):
         user = ctx.author
         ctx.message.delete()
         await user.send(embed=lib.Editable('Music Usage', '**play** - Plays a song by name or url from youtube\n**pause** - Pauses the current song\n**resume** - Resumes the current song\n**volume {number}** - Change the volume of the bot\n**stop** - Disconnects the bot ', 'Todo'))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def github(self, ctx):
         user = ctx.author
         ctx.message.delete()

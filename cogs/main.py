@@ -12,7 +12,7 @@ class Main(commands.Cog):
     def __init__(self, bot):
             self.bot = bot
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def sinfo(self, ctx):
         name = ctx.message.guild.name
         id = ctx.message.guild.id
@@ -39,7 +39,7 @@ class Main(commands.Cog):
         embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
         await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def uinfo(self, ctx, user:discord.User=None):
         if user is None:
             name = ctx.message.author.name
@@ -91,7 +91,7 @@ class Main(commands.Cog):
                 embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
                 await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def avatar(self, ctx, user:discord.User=None):
         if user is None:
             sname = ctx.message.author.name
@@ -123,7 +123,7 @@ class Main(commands.Cog):
                 embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
                 await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     async def embed(self, ctx):
         if ctx.message.author.guild_permissions.manage_messages:
             await ctx.message.delete()
@@ -149,7 +149,7 @@ class Main(commands.Cog):
         else:
             await ctx.send(embed=lib.NoPerm())
 
-    @commands.group(pass_context=True, invoke_without_command=True)
+    @commands.group(invoke_without_command=True)
     async def role(self, ctx):
         if not ctx.message.author.guild_permissions.manage_roles:
             error = await ctx.send(embed=lib.NoPerm())
@@ -162,7 +162,7 @@ class Main(commands.Cog):
             await ctx.message.delete()
             await usage.delete()
 
-    @role.group(pass_context=True, invoke_without_command=True)
+    @role.group(invoke_without_command=True)
     async def list(self, ctx):
         if not ctx.message.author.guild_permissions.manage_roles:
             await ctx.send(embed=lib.NoPerm())
@@ -173,7 +173,7 @@ class Main(commands.Cog):
             roles.remove('@everyone')
             await ctx.send(embed=lib.Editable('Role List', '{}'.format(', '.join(roles)), 'Roles'))
 
-    @role.group(pass_context=True, invoke_without_command=True)
+    @role.group(invoke_without_command=True)
     async def add(self, ctx, rolename=None, member: discord.Member=None):
         if not ctx.message.author.guild_permissions.manage_roles:
             await ctx.send(embed=lib.NoPerm())
@@ -203,7 +203,7 @@ class Main(commands.Cog):
                         await ctx.message.delete()
                         await done.delete()
 
-    @role.group(pass_context=True, invoke_without_command=True)
+    @role.group(invoke_without_command=True)
     async def remove(self, ctx, rolename=None, member: discord.Member=None):
         if not ctx.message.author.guild_permissions.manage_roles:
             await ctx.send(embed=lib.NoPerm())
@@ -233,7 +233,7 @@ class Main(commands.Cog):
                         await ctx.message.delete()
                         await error.delete()
 
-    @role.group(pass_context=True, invoke_without_command=True)
+    @role.group(invoke_without_command=True)
     async def create(self, ctx, rolename=None):
         if not ctx.message.author.guild_permissions.manage_roles:
             await ctx.send(embed=lib.NoPerm())
@@ -257,7 +257,7 @@ class Main(commands.Cog):
                     await ctx.message.delete()
                     await done.delete()
 
-    @role.group(pass_context=True, invoke_without_command=True)
+    @role.group(invoke_without_command=True)
     async def delete(self, ctx, rolename=None):
         if not ctx.message.author.guild_permissions.manage_roles:
             await ctx.send(embed=lib.NoPerm())

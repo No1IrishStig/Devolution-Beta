@@ -64,11 +64,11 @@ class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    #@commands.command()
-    #async def dmusic(self, ctx):
-        #channel = ctx.author.voice.channel
-        #await channel.connect()
-        #await ctx.voice_client.disconnect()
+    @commands.command()
+    async def dmusic(self, ctx):
+        channel = ctx.author.voice.channel
+        await channel.connect()
+        await ctx.voice_client.disconnect()
 
     @commands.command()
     async def summon(self, ctx):
@@ -100,7 +100,6 @@ class Music(commands.Cog):
                             player = await YTDLSource.from_url(url, loop=self.bot.loop)
                             players[server.id] = player
                             ctx.voice_client.play(player, after=lambda: check_queue(server.id))
-                            ctx.voice_client.source.volume = 10 / 100
                             e = discord.Embed(
                                 description = 'Now playing {}'.format(player.title),
                                 colour = 0x9bf442,
@@ -173,28 +172,30 @@ class Music(commands.Cog):
             await ctx.send(embed=e)
 
     @commands.command()
-    async def volume(self, ctx, volume:int):
+    async def volume(self, ctx, volume: int):
         author = ctx.author
         avatar = ctx.author.avatar_url
-
         if ctx.voice_client is None:
-            return await ctx.send(embed=lib.Editable('Error', 'Im not in a voice channel!', 'Music'))
-        if author.voice is None:
-            return await ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
-
-        if volume > 100:
-            return await ctx.send(embed=lib.Editable('Error', 'Please enter a volume between 0 and 100!', 'Music'))
-        if volume < 0:
-            return await ctx.send(embed=lib.Editable('Error', 'Please enter a volume between 0 and 100!', 'Music'))
-            ctx.voice_client.source.volume = volume / 100
-            e = discord.Embed(
-                description = 'The volume is now {}'.format(volume),
-                colour = 0x9bf442,
-                timestamp=datetime.datetime.utcnow()
-                )
-            e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
-            e.set_author(name=author.name + ' changed the volume!', icon_url=avatar)
-            await ctx.send(embed=e)
+            await ctx.send(embed=lib.Editable('Error', 'Im not in a voice channel!', 'Music'))
+        else:
+            if author.voice is None:
+                ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
+            else:
+                if volume > 100:
+                    await ctx.send(embed=lib.Editable('Error', 'Please enter a volume between 0 and 100!', 'Music'))
+                else:
+                    if volume < 0:
+                        await ctx.send(embed=lib.Editable('Error', 'Please enter a volume between 0 and 100!', 'Music'))
+                    else:
+                        ctx.voice_client.source.volume = volume / 100
+                        e = discord.Embed(
+                            description = 'The volume is now {}'.format(volume),
+                            colour = 0x9bf442,
+                            timestamp=datetime.datetime.utcnow()
+                            )
+                        e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
+                        e.set_author(name=author.name + ' changed the volume!', icon_url=avatar)
+                        await ctx.send(embed=e)
 
     @commands.command()
     async def stop(self, ctx):
