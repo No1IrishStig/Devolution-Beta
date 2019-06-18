@@ -63,6 +63,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.config = default.get("utils/cfg.json")
 
     @commands.command()
     async def dmusic(self, ctx):
@@ -200,13 +201,39 @@ class Music(commands.Cog):
                         await ctx.send(embed=e)
 
     @commands.command()
+    async def ovolume(self, ctx, volume: int):
+        if ctx.author.id in self.config.owner:
+            author = ctx.author
+            avatar = ctx.author.avatar_url
+            if ctx.voice_client is None:
+                await ctx.send(embed=lib.Editable('Error', 'Im not in a voice channel!', 'Music'))
+            else:
+                if author.voice is None:
+                    ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
+                else:
+                    ctx.voice_client.source.volume = volume / 100
+                    e = discord.Embed(
+                        description = 'The volume is now {}'.format(volume),
+                        colour = 0x9bf442,
+                        timestamp=datetime.datetime.utcnow()
+                        )
+                    e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
+                    e.set_author(name=author.name + ' changed the volume using magic!', icon_url=avatar)
+                    await ctx.send(embed=e)
+        else:
+            await ctx.send(embed=lib.NoPerm())
+
+    @commands.command()
     async def stop(self, ctx):
-        author = ctx.author
-        if ctx.voice_client is None:
-            return await ctx.send(embed=lib.Editable('Error', 'Im not in a voice channel!', 'Music'))
-        if author.voice is None:
-            return await ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
-        await ctx.voice_client.disconnect()
+        if ctx.author.guild_permissions.manage_roles:
+            author = ctx.author
+            if ctx.voice_client is None:
+                return await ctx.send(embed=lib.Editable('Error', 'Im not in a voice channel!', 'Music'))
+            if author.voice is None:
+                return await ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
+            await ctx.voice_client.disconnect()
+        else:
+            await ctx.send(embed=lib.NoPerm())
 
     #@commands.command()
     #async def skip(self, ctx):

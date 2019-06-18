@@ -173,11 +173,7 @@ class Mod(commands.Cog):
 
     @commands.command(no_pm=True)
     async def unpunish(self, ctx, member: discord.Member=None):
-        if not ctx.author.guild_permissions.manage_roles:
-            msg = await ctx.send(embed=lib.NoPerm())
-            await asyncio.sleep(30)
-            await msg.delete()
-        else:
+        if ctx.author.guild_permissions.manage_roles:
             if member is None:
                 msg2 = await ctx.send(embed=lib.Editable('Punish - Usage', '!punish @user\n!unpunish @user\n!lspunish - Lists all punished users\n!spp - **Warning** Use this command only, if there are channels which do not have the permissions for the punished role.\n\n Mutes or unmutes users from all channels on the server.', 'Moderation'))
                 await asyncio.sleep(30)
@@ -199,6 +195,8 @@ class Mod(commands.Cog):
                         await member.send(embed=lib.Editable('Unpunished!', 'You were unpunished from {} by {}'.format(server, author), 'Moderation'))
                         await ctx.send(embed=lib.Editable('Success!', 'User unpunished by {}'.format(author), 'Moderation'))
                         await member.remove_roles(role)
+        else:
+            await ctx.send(embed=lib.NoPerm())
 
     @commands.command(no_pm=True)
     async def lspunish(self, ctx):
