@@ -114,9 +114,11 @@ class Mod(commands.Cog):
                 if reason is None:
                     user = await self.bot.fetch_user(user_id)
                     await ctx.send(embed=lib.AvatarEdit('{}'.format(author) + ' Just yeeted someone!', '{}'.format(avatar), 'Yeet!', 'UserID {} just got hackbanned!'.format(user_id), 'Moderation'))
+                    await user.send(embed=lib.Editable('You were hackbanned!', 'You got hack banned from {}'.format(server), 'Moderation'))
                 else:
                     user = await self.bot.fetch_user(user_id)
                     await ctx.send(embed=lib.AvatarEdit('{}'.format(author) + ' Just yeeted someone!', '{}'.format(avatar), 'Yeet!', 'UserID {} just got hackbanned for {}!'.format(user_id, reason), 'Moderation'))
+                    await user.send(embed=lib.Editable('You were hackbanned!', 'You got hack banned from {} for {}'.format(server, reason), 'Moderation'))
 
     @commands.command(pass_context=True, no_pm=True)
     async def punish(self, ctx, member: discord.Member=None, *args):
@@ -145,7 +147,7 @@ class Mod(commands.Cog):
                         overwrite.send_messages = False
                         overwrite.send_tts_messages = False
                         overwrite.add_reactions = False
-                        await role.channel.set_permissions(overwrite),
+                        await channel.set_permissions(role , overwrite),
                         await asyncio.sleep(5)
                     await ctx.send(embed=lib.Editable('Done!', 'The role has been created and the permissions set! Now Retry the command.', 'Moderation'))
                 else:

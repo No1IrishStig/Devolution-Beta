@@ -16,6 +16,8 @@ class Fun(commands.Cog):
                 self.insults = json.load(f)
                 with open("./data/nsfw/settings.json") as f:
                     self.settings = json.load(f)
+                    with open("./data/owo/owo.json") as f:
+                        self.owo = json.load(f)
 
     @commands.command(pass_context=True)
     async def ping(self, ctx):
@@ -139,6 +141,10 @@ class Fun(commands.Cog):
                         await ctx.send(embed=lib.Editable('Error!', 'No search results found', 'Giphy'))
                 else:
                     await ctx.send(embed=lib.Editable('Error!', 'There was an error contacting the API! Report this with !bug', 'Giphy'))
+
+    @commands.command(pass_context=True)
+    async def owo(self, ctx, user : discord.Member=None):
+        await ctx.send(ctx.author.mention + ' ' + randchoice(self.owo))
 
 
 def setup(bot):
