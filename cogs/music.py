@@ -109,7 +109,8 @@ class Music(commands.Cog):
                             e.set_author(name=author.name + ' requested a song!', icon_url=avatar)
                             await ctx.send(embed=e)
                 except Exception as e:
-                        print('There was an error with your song request, {}'.format(e), 'Error')
+                    return
+                    #print('There was an error with your song request, {}'.format(e), 'Error')
                 else:
                     if url is None:
                         await ctx.send(embed=lib.Editable('Error', 'Please enter a song name to play', 'Music'))
@@ -131,7 +132,8 @@ class Music(commands.Cog):
                                 e.set_author(name=author.name + ' requested a song!', icon_url=avatar)
                                 await ctx.send(embed=e)
                         except Exception as e:
-                            print('There was an error with your song request, {}'.format(e), 'Error')
+                            return
+                            #print('There was an error with your song request, {}'.format(e), 'Error')
 
     @commands.command()
     async def pause(self, ctx):

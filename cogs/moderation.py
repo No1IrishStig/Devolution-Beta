@@ -276,7 +276,7 @@ class Mod(commands.Cog):
 
         while tries_left and len(to_delete) - 1 < number:
             async for message in channel.history(limit=number, before=tmp):
-                if len(to_delete) - 1 < number:
+                if len(to_delete) - 1 < number and check(message):
                     to_delete.append(message)
                 tmp = message
             tries_left -= 1
