@@ -1,12 +1,12 @@
-import discord
-import datetime
-import json
-import asyncio
-import random
-import aiohttp
 from random import choice as randchoice
 from discord.ext import commands
-from cogs.tools import tools
+from utils.default import lib
+from utils import default
+import datetime
+import discord
+import aiohttp
+import random
+import json
 
 class Main(commands.Cog):
     def __init__(self, bot):
@@ -93,38 +93,35 @@ class Main(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     async def avatar(self, ctx, user:discord.User=None):
-        if ctx.message.author.id == int('439327545557778433'):
-            if user is None:
-                sname = ctx.message.author.name
-                savatar = str(ctx.message.author.avatar_url)
+        if user is None:
+            sname = ctx.message.author.name
+            savatar = str(ctx.message.author.avatar_url)
+            embed = discord.Embed(
+                title = 'Avatar Stealer',
+                description = savatar,
+                colour = 0x9bf442,
+                timestamp=datetime.datetime.utcnow()
+                )
+            embed.set_image(url=savatar)
+            embed.set_thumbnail(url=savatar)
+            embed.set_author(name=sname, icon_url=savatar)
+            embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
+            await ctx.send(embed=embed)
+        else:
+            for user in ctx.message.mentions:
+                avatar = str(user.avatar_url)
+                name = user.name
                 embed = discord.Embed(
                     title = 'Avatar Stealer',
-                    description = savatar,
+                    description = avatar,
                     colour = 0x9bf442,
                     timestamp=datetime.datetime.utcnow()
                     )
-                embed.set_image(url=savatar)
-                embed.set_thumbnail(url=savatar)
-                embed.set_author(name=sname, icon_url=savatar)
+                embed.set_image(url=avatar)
+                embed.set_thumbnail(url=avatar)
+                embed.set_author(name=name, icon_url=avatar)
                 embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
                 await ctx.send(embed=embed)
-            else:
-                for user in ctx.message.mentions:
-                    avatar = str(user.avatar_url)
-                    name = user.name
-                    embed = discord.Embed(
-                        title = 'Avatar Stealer',
-                        description = avatar,
-                        colour = 0x9bf442,
-                        timestamp=datetime.datetime.utcnow()
-                        )
-                    embed.set_image(url=avatar)
-                    embed.set_thumbnail(url=avatar)
-                    embed.set_author(name=name, icon_url=avatar)
-                    embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
-                    await ctx.send(embed=embed)
-        else:
-            await ctx.send(embed=tools.NoPerm())
 
     @commands.command(pass_context=True, no_pm=True)
     async def embed(self, ctx):

@@ -1,14 +1,21 @@
-import discord
-import datetime
-import time
+from collections import namedtuple
 from discord.ext import commands
+import discord
+import json
 
-class tools(commands.Cog):
+def get(file):
+    try:
+        with open(file, encoding='utf8') as data:
+            return json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+    except AttributeError:
+        raise AttributeError("Unknown argument")
+    except FileNotFoundError:
+        raise FileNotFoundError("JSON file wasn't found")
+
+class lib(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    # await bot.say(embed=tools.NoPerm())
-    # await self.bot.say(embed=tools.NoPerm())
     def NoPerm():
         embed = discord.Embed(
             title = 'Error!',
@@ -19,8 +26,7 @@ class tools(commands.Cog):
         embed.set_footer(text='Devolution | Error', icon_url="https://i.imgur.com/BS6YRcT.jpg")
 
         return embed
-    # await bot.say(embed=tools.Editable('title', 'desc', 'footer'))
-    # await self.bot.say(embed=tools.Editable('title', 'desc', 'footer'))
+
     def Editable(title, desc, footer):
         e = discord.Embed(
             title = title,
@@ -55,4 +61,4 @@ class tools(commands.Cog):
         return e
 
 def setup(client):
-    client.add_cog(tools(client))
+    client.add_cog(Lib(client))

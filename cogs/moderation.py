@@ -1,8 +1,9 @@
-import discord
+from discord.ext import commands
+from utils.default import lib
+from utils import default
 import datetime
 import asyncio
-from discord.ext import commands
-from cogs.tools import tools
+import discord
 
 class Mod(commands.Cog):
     def __init__(self, bot):
@@ -10,7 +11,7 @@ class Mod(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     async def say(self, ctx, *args):
-        if not ctx.message.author.guild_permissions.manage_messages:
+        if not ctx.author.guild_permissions.manage_messages:
             await ctx.message.delete()
             msg2 = await ctx.send(embed=tools.NoPerm())
             await asyncio.sleep(30)
@@ -30,7 +31,7 @@ class Mod(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     async def kick(self, ctx, user : discord.User=None, *args):
-        if not ctx.message.author.guild_permissions.kick_members:
+        if not ctx.author.guild_permissions.kick_members:
             msg = await self.bot.say(embed=tools.NoPerm())
             await asyncio.sleep(30)
             await msg.delete()
@@ -41,8 +42,8 @@ class Mod(commands.Cog):
                 await msg2.delete()
             else:
                 try:
-                    server = ctx.message.author.guild.name
-                    author = ctx.message.author.mention
+                    server = ctx.author.guild.name
+                    author = ctx.author.mention
                     reason = ''
                     for word in args:
                         reason += word
@@ -59,7 +60,7 @@ class Mod(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     async def ban(self, ctx, user : discord.User=None, *args):
-        if not ctx.message.author.guild_permissions.ban_members:
+        if not ctx.author.guild_permissions.ban_members:
             msg = await ctx.send(embed=tools.NoPerm())
             await asyncio.sleep(30)
             await msg.delete()
@@ -70,8 +71,8 @@ class Mod(commands.Cog):
                 await msg2.delete()
             else:
                 try:
-                    server = ctx.message.author.guild.name
-                    author = ctx.message.author.mention
+                    server = ctx.author.guild.name
+                    author = ctx.author.mention
                     reason = ''
                     for word in args:
                         reason += word
@@ -90,9 +91,9 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True, pass_context=True)
     async def hackban(self, ctx, user_id: int=None, *, reason: str = None):
 
-        author = ctx.message.author
+        author = ctx.author
         server = author.guild
-        avatar = ctx.message.author.avatar_url
+        avatar = ctx.author.avatar_url
 
         if user_id is None:
             await ctx.send(embed=tools.Editable('Error!', 'Please enter a UserID to yeet.', 'Moderation'))
@@ -123,7 +124,7 @@ class Mod(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     async def punish(self, ctx, member: discord.Member=None, *args):
-        if not ctx.message.author.guild_permissions.manage_roles:
+        if not ctx.author.guild_permissions.manage_roles:
             msg = await ctx.send(embed=tools.NoPerm())
             await asyncio.sleep(30)
             await msg.delete()
@@ -133,8 +134,8 @@ class Mod(commands.Cog):
                 await asyncio.sleep(30)
                 await mg2.delete()
             else:
-                server = ctx.message.author.guild.name
-                author = ctx.message.author.mention
+                server = ctx.author.guild.name
+                author = ctx.author.mention
                 role = discord.utils.get(member.guild.roles, name='punished')
                 if role is None:
                     channel = ctx.message.channel
@@ -172,7 +173,7 @@ class Mod(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     async def unpunish(self, ctx, member: discord.Member=None):
-        if not ctx.message.author.guild_permissions.manage_roles:
+        if not ctx.author.guild_permissions.manage_roles:
             msg = await ctx.send(embed=tools.NoPerm())
             await asyncio.sleep(30)
             await msg.delete()
@@ -182,8 +183,8 @@ class Mod(commands.Cog):
                 await asyncio.sleep(30)
                 await msg2.delete()
             else:
-                server = ctx.message.author.guild.name
-                author = ctx.message.author.mention
+                server = ctx.author.guild.name
+                author = ctx.author.mention
                 role = discord.utils.get(member.guild.roles, name='punished')
                 if member is None:
                     msg2 = await ctx.send(embed=tools.Editable('Punish - Usage', '!punish @user\n!unpunish @user\n!lspunish - Lists all punished users\n!spp - **Warning** Use this command only, if there are channels which do not have the permissions for the punished role.\n\n Mutes or unmutes users from all channels on the server.', 'Moderation'))
@@ -202,7 +203,7 @@ class Mod(commands.Cog):
     @commands.command(pass_context=True, no_pm=True)
     async def lspunish(self, ctx):
         pusers = []
-        if not ctx.message.author.guild_permissions.manage_roles:
+        if not ctx.author.guild_permissions.manage_roles:
             msg = await ctx.send(embed=tools.NoPerm())
             await asyncio.sleep(30)
             await msg.delete()
@@ -216,13 +217,13 @@ class Mod(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     async def rename(self, ctx, user:discord.User=None, *args):
-        if not ctx.message.author.guild_permissions.manage_nicknames:
+        if not ctx.author.guild_permissions.manage_nicknames:
             msg = await ctx.send(embed=tools.NoPerm())
             await asyncio.sleep(30)
             await msg.delete()
         else:
             try:
-                author = ctx.message.author.mention
+                author = ctx.author.mention
                 name = ''
                 for word in args:
                     name += word
@@ -239,7 +240,7 @@ class Mod(commands.Cog):
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def cleanup(self, ctx):
-        if not ctx.message.author.guild_permissions.manage_messages:
+        if not ctx.author.guild_permissions.manage_messages:
             error = await ctx.send(embed=tools.NoPerm())
             await asyncio.sleep(10)
             await ctx.message.delete()
@@ -252,11 +253,11 @@ class Mod(commands.Cog):
 
     @cleanup.group(pass_context=True, invoke_without_command=True)
     async def after(self, ctx, id=None):
-        if not ctx.message.author.guild_permissions.manage_messages:
+        if not ctx.author.guild_permissions.manage_messages:
             await ctx.send(embed=tools.NoPerm())
         else:
             channel = ctx.message.channel
-            author = ctx.message.author
+            author = ctx.author
             server = channel.guild
             to_delete = []
             after = await channel.fetch_message(id)
@@ -266,7 +267,7 @@ class Mod(commands.Cog):
 
     @cleanup.group(pass_context=True, invoke_without_command=True)
     async def messages(self, ctx, num:int=None):
-        if not ctx.message.author.guild_permissions.manage_messages:
+        if not ctx.author.guild_permissions.manage_messages:
             await ctx.send(embed=tools.NoPerm())
         else:
             if num is None:

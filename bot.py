@@ -1,28 +1,24 @@
-import discord
-import sys, traceback
 from discord.ext import commands
-from itertools import cycle
+from utils.default import lib
+from utils import default
+#from itertools import cycle
+import sys, traceback
 import datetime
+import discord
 import asyncio
 import json
-import aiohttp
-from cogs.tools import tools
-import random
 
-token = 'TOKEN HERE'
+config = default.get("./utils/cfg.json")
 
-print(discord.__version__ + '    <---------- If this isnt 1.2.2 your bot wont work!')
-print()
-
-bot = commands.Bot(command_prefix = "!")
+bot = commands.Bot(command_prefix = config.prefix)
 bot.remove_command('help')
 
-initial_extensions = ['cogs.core', 'cogs.main', 'cogs.music', 'cogs.moderation', 'cogs.fun']
+initial_extensions = ['cogs.core', 'cogs.main', 'cogs.music', 'cogs.fun', 'cogs.moderation', 'cogs.admin']
 
 @bot.event
 async def on_ready():
     count = str(len(bot.guilds))
-    await bot.change_presence(status=discord.Status.online, activity=discord.Game(name='with ' + count + ' Guilds'))
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game(name=config.playing))
     print('\nIm ready!')
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -31,22 +27,17 @@ if __name__ == '__main__':
         except Exception as error:
             traceback.print_exc()
 
-@bot.event
-async def on_guild_join():
-    count = str(len(bot.guilds))
-    await bot.change_presence(status=discord.Status.online, activity=discord.Game(name='with ' + count + ' Guilds'))
-
 @bot.command(pass_context=True, no_pm=True)
 async def leave(ctx):
     guild = ctx.message.guild
-    if ctx.message.author == guild.owner:
+    if ctx.author == guild.owner:
         await ctx.guild.leave()
     else:
         await ctx.channel.send(embed=tools.NoPerm())
 
 @bot.command(pass_context=True, aliases=['sp'])
 async def setpresence(ctx, *args):
-    if ctx.author.id == int('439327545557778433'):
+    if ctx.author.id in config.owner:
         count = str(len(bot.guilds))
         output = ''
         for gamename in args:
@@ -57,15 +48,41 @@ async def setpresence(ctx, *args):
             await bot.change_presence(status=discord.Status.online, activity=discord.Game(name='with ' + count + ' Guilds'))
             await ctx.message.delete()
         else:
+            print(output)
             await ctx.channel.send(embed=tools.Editable('Game Presence', 'The bots game has been changed to ' + output, 'Owner'))
             await bot.change_presence(status=discord.Status.online, activity=discord.Game(name=output))
             await ctx.message.delete()
     else:
         await ctx.channel.send(embed=tools.NoPerm())
 
+@bot.command(pass_context=True, aliases=['sa'])
+async def setactivity(ctx, activity:str=None, *args):
+    if ctx.author.id in config.owner:
+        output = ''
+        for gamename in args:
+            output += gamename
+            output += ' '
+        if output == '':
+            await ctx.channel.send(embed=tools.Editable('Error', 'Please enter one of these activities with the name you would like after it!\n\n**playing {name}**, **listening {name}**, **watching {name}**', 'Error'))
+        else:
+            await ctx.message.delete()
+            if activity == 'playing':
+                await bot.change_presence(activity=discord.Game(name=output))
+                await ctx.channel.send(embed=tools.Editable('Activity Presence', 'The bots game has been changed to playing  ' + output, 'Owner'))
+            if activity == 'listening':
+                await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=output))
+                await ctx.channel.send(embed=tools.Editable('Activity Presence', 'The bots game has been changed to listening ' + output, 'Owner'))
+            if activity == 'watching':
+                await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=output))
+                await ctx.channel.send(embed=tools.Editable('Activity Presence', 'The bots game has been changed to watching ' + output, 'Owner'))
+            else:
+                await ctx.channel.send(embed=tools.Editable('Error', 'Please enter one of these activities!\n**playing {name}**, **listening {name}**, **watching {name}**', 'Error'))
+    else:
+        await ctx.channel.send(embed=tools.NoPerm())
+
 @bot.command(pass_context=True)
 async def shutdown(ctx):
-        if ctx.message.author.id == int('439327545557778433'):
+        if ctx.author.id in config.owner:
             await ctx.channel.send(embed=tools.Editable('Shutting Down!', 'I am shutting down in 5 seconds. Goodnight :zzz:', 'Sleep'))
             await asyncio.sleep(5)
             await bot.logout()
@@ -74,14 +91,14 @@ async def shutdown(ctx):
 
 @bot.group(pass_context=True, invoke_without_command=True)
 async def cog(ctx):
-    if ctx.message.author.id == int('439327545557778433'):
+    if ctx.author.id in config.owner:
         await ctx.channel.send(embed=tools.Editable('Cog Commands', '**Load** - loads named cog.\n **Unload** - Unloads named cog.\n **List** - Lists all cogs.', 'Cogs'))
     else:
         await ctx.channel.send(embed=tools.NoPerm())
 
 @cog.group(pass_context=True, invoke_without_command=True)
 async def load(ctx, extension : str=None):
-    if ctx.message.author.id == int('439327545557778433'):
+    if ctx.author.id in config.owner:
         if extension is None:
             await ctx.channel.send(embed=tools.Editable('Error!', 'Enter a cog name to load!', 'Error'))
         else:
@@ -95,7 +112,7 @@ async def load(ctx, extension : str=None):
 
 @cog.group(pass_context=True, invoke_without_command=True)
 async def unload(ctx, extension : str=None):
-    if ctx.message.author.id == int('439327545557778433'):
+    if ctx.author.id in config.owner:
         if extension is None:
             await ctx.channel.send(embed=tools.Editable('Error!', 'Enter a cog name to load!', 'Error'))
         else:
@@ -109,10 +126,9 @@ async def unload(ctx, extension : str=None):
 
 @cog.command(pass_context=True)
 async def list(ctx):
-    if ctx.message.author.id == int('439327545557778433'):
+    if ctx.author.id in config.owner:
         await ctx.channel.send(embed=tools.Editable('Available Cogs', 'cogs.core','cogs.main', 'cogs.fun, cogs.mod', 'Cogs'))
     else:
         await ctx.channel.send(embed=tools.NoPerm())
 
-
-bot.run(token)
+bot.run(config.token)

@@ -1,12 +1,13 @@
-import discord
-import datetime
-import json
-import asyncio
-import random
-import aiohttp
 from random import choice as randchoice
 from discord.ext import commands
-from cogs.tools import tools
+from utils.default import lib
+from utils import default
+import datetime
+import discord
+import asyncio
+import aiohttp
+import random
+import json
 
 class Fun(commands.Cog):
     def __init__(self, bot):
@@ -52,8 +53,8 @@ class Fun(commands.Cog):
                         latitude = res['iss_position']['latitude']
                         longitude = res['iss_position']['longitude']
                         people = res2['number']
-                        name = ctx.message.author.name
-                        avatar = ctx.message.author.avatar_url
+                        name = ctx.author.name
+                        avatar = ctx.author.avatar_url
                         embed = discord.Embed(
                             title = 'International Space Station',
                             colour = 0x9bf442,
@@ -67,7 +68,7 @@ class Fun(commands.Cog):
 
     @commands.command(pass_context=True)
     async def roll(self, ctx, number : int = 100):
-        author = ctx.message.author
+        author = ctx.author
         if number > 1:
             n = random.randint(1, number)
             await ctx.send("{} :game_die: {} :game_die:".format(author.mention, n))
@@ -79,17 +80,17 @@ class Fun(commands.Cog):
         msg = ' '
         if user != None:
             if user.id == self.bot.user.id:
-                user = ctx.message.author
+                user = ctx.author
                 msg = " How original. No one else had thought of trying to get the bot to insult itself. I applaud your creativity. Yawn. Perhaps this is why you don't have friends. You don't add anything new to any conversation. You are more of a bot than me, predictable answers, and absolutely dull to have an actual conversation with."
                 await ctx.send(user.mention + msg)
             else:
                 await ctx.send(user.mention + msg + randchoice(self.insults))
         else:
-                await ctx.send(ctx.message.author.mention + msg + randchoice(self.insults))
+                await ctx.send(ctx.author.mention + msg + randchoice(self.insults))
 
     @commands.command(pass_context=True)
     async def boobs(self, ctx):
-        author = ctx.message.author
+        author = ctx.author
         rdm = random.randint(0, self.settings["ama_boobs"])
         search = ("http://api.oboobs.ru/boobs/{}".format(rdm))
         async with aiohttp.ClientSession() as cs:
@@ -101,7 +102,7 @@ class Fun(commands.Cog):
 
     @commands.command(pass_context=True)
     async def ass(self, ctx):
-        author = ctx.message.author
+        author = ctx.author
         rdm = random.randint(0, self.settings["ama_ass"])
         search = ("http://api.obutts.ru/butts/{}".format(rdm))
         async with aiohttp.ClientSession() as cs:

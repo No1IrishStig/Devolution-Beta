@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/No1IrishStig/DevolutionBeta"><img src="https://i.imgur.com/BS6YRcT.jpg" alt="Devolution Beta"></a>
+  <a href="https://github.com/No1IrishStig/Devolution-Beta"><img src="https://i.imgur.com/BS6YRcT.jpg" alt="Devolution Beta"></a>
 </h1>
 
 <h4 align="center">Music, Moderation, Trivia, Stream Alerts and Fully Modular.</h4>
@@ -27,6 +27,16 @@
 
 Devolution Beta is sleek and clean bot made for moderation in discord. The bot is both self hosted and server hosted, meaning you can host it and maintain it yourself, or rely on us to keep it up and running!
 
+**The base set of modules includes:**
+
+- Provides tons of useful features (userinfo, serverinfo, role management, avatar stealer, rename)
+- Some fun commands to use against your friends. (insult, speak as the bot)
+- Moderation features (kick/ban/hackban/punish, chat cleanup and more)
+- Music features (YouTube, SoundCloud, local files, playlists, queues)
+- Gif search and random gif generator
+- Custom embed generator
+
+
 [Installation](#installation) is easy, and you do **NOT** need to know anything about coding! Aside
 from installation and updating.
 
@@ -49,5 +59,5 @@ If after reading the guide you are still experiencing issues, feel free to join 
 2. Then click 'Copy' where it says Token.
 <img src=https://img.no1irishstig.co.uk/8yceu.png> </img>
 
-3. Open 'bot.py' with notepad and find **token='YOUR TOKEN HERE'**.
-4. Remove **all** the text inside the quotations, and paste your token there. Then save and double click the bot.py file.
+3. Open **cfg.json** inside the **utils** folder.
+4. Paste your bot's token inside the quotations, and your userid where indicated.

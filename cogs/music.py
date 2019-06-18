@@ -1,17 +1,17 @@
-import asyncio
-from cogs.tools import tools
-import discord
-import youtube_dl
 from discord.ext import commands
+from utils.default import lib
+from utils import default
+import youtube_dl
+import asyncio
+import discord
 import datetime
 
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
 
-
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'outtmpl': './data/music/%(extractor)s-%(id)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
@@ -29,6 +29,14 @@ ffmpeg_options = {
 
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
+players = {}
+queues = {}
+
+def check_queues(ctx, id):
+    if queues[id] != []:
+        player = queues[id].pop(0)
+        players[id] = player
+        ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
@@ -56,10 +64,16 @@ class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    #@commands.command()
+    #async def dmusic(self, ctx):
+        #channel = ctx.author.voice.channel
+        #await channel.connect()
+        #await ctx.voice_client.disconnect()
+
     @commands.command()
     async def summon(self, ctx):
         try:
-            member = ctx.message.author
+            member = ctx.author
             if member.voice is None:
                 await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
             else:
@@ -69,52 +83,61 @@ class Music(commands.Cog):
             await ctx.send(embed=tools.Editable('Error', 'Something went wrong, try again!', 'Music'))
 
     @commands.command()
-    async def play(self, ctx, *, url):
-        author = ctx.message.author
-        avatar = ctx.message.author.avatar_url
+    async def play(self, ctx, *, url=None):
+        author = ctx.author
+        avatar = ctx.author.avatar_url
+        server = ctx.guild
         if author.voice is None:
             await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
         else:
-            try:
-                channel = ctx.author.voice.channel
-                if self.bot.user in channel.members:
-                    async with ctx.typing():
-                        player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-                        ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-                        ctx.voice_client.source.volume = 10 / 100
-                        e = discord.Embed(
-                            description = 'Now playing {}'.format(player.title),
-                            colour = 0x9bf442,
-                            timestamp=datetime.datetime.utcnow()
-                            )
-                        e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
-                        e.set_author(name=author.name + ' requested a song!', icon_url=avatar)
-                        await ctx.send(embed=e)
-            except Exception as e:
-                await ctx.send(embed=tools.Editable('Error', 'There was an error with your song request, {}'.format(e), 'Error'))
+            if url is None:
+                await ctx.send(embed=tools.Editable('Error', 'Please enter a song name to play', 'Music'))
             else:
                 try:
                     channel = ctx.author.voice.channel
-                    await channel.connect()
-                    async with ctx.typing():
-                        player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-                        ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-                        ctx.voice_client.source.volume = 10 / 100
-                        e = discord.Embed(
-                            description = 'Now playing {}'.format(player.title),
-                            colour = 0x9bf442,
-                            timestamp=datetime.datetime.utcnow()
-                            )
-                        e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
-                        e.set_author(name=author.name + ' requested a song!', icon_url=avatar)
-                        await ctx.send(embed=e)
+                    if self.bot.user in channel.members:
+                        async with ctx.typing():
+                            player = await YTDLSource.from_url(url, loop=self.bot.loop)
+                            players[server.id] = player
+                            ctx.voice_client.play(player, after=lambda: check_queue(server.id))
+                            ctx.voice_client.source.volume = 10 / 100
+                            e = discord.Embed(
+                                description = 'Now playing {}'.format(player.title),
+                                colour = 0x9bf442,
+                                timestamp=datetime.datetime.utcnow()
+                                )
+                            e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
+                            e.set_author(name=author.name + ' requested a song!', icon_url=avatar)
+                            await ctx.send(embed=e)
                 except Exception as e:
-                    await ctx.send(embed=tools.Editable('Error', 'There was an error with your song request, {}'.format(e), 'Error'))
+                        print('There was an error with your song request, {}'.format(e), 'Error')
+                else:
+                    if url is None:
+                        await ctx.send(embed=tools.Editable('Error', 'Please enter a song name to play', 'Music'))
+                    else:
+                        try:
+                            channel = ctx.author.voice.channel
+                            await channel.connect()
+                            async with ctx.typing():
+                                player = await YTDLSource.from_url(url, loop=self.bot.loop)
+                                players[server.id] = player
+                                ctx.voice_client.play(player, after=lambda: check_queue(server.id))
+                                ctx.voice_client.source.volume = 10 / 100
+                                e = discord.Embed(
+                                    description = 'Now playing {}'.format(player.title),
+                                    colour = 0x9bf442,
+                                    timestamp=datetime.datetime.utcnow()
+                                    )
+                                e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
+                                e.set_author(name=author.name + ' requested a song!', icon_url=avatar)
+                                await ctx.send(embed=e)
+                        except Exception as e:
+                            print('There was an error with your song request, {}'.format(e), 'Error')
 
     @commands.command()
     async def pause(self, ctx):
-        author = ctx.message.author
-        avatar = ctx.message.author.avatar_url
+        author = ctx.author
+        avatar = ctx.author.avatar_url
         if ctx.voice_client is None:
             return await ctx.send(embed=tools.Editable('Error', 'Im not in a voice channel!', 'Music'))
         if author.voice is None:
@@ -132,8 +155,8 @@ class Music(commands.Cog):
 
     @commands.command()
     async def resume(self, ctx):
-        author = ctx.message.author
-        avatar = ctx.message.author.avatar_url
+        author = ctx.author
+        avatar = ctx.author.avatar_url
         if ctx.voice_client is None:
             return await ctx.send(embed=tools.Editable('Error', 'Im not in a voice channel!', 'Music'))
         if author.voice is None:
@@ -151,8 +174,8 @@ class Music(commands.Cog):
 
     @commands.command()
     async def volume(self, ctx, volume:int):
-        author = ctx.message.author
-        avatar = ctx.message.author.avatar_url
+        author = ctx.author
+        avatar = ctx.author.avatar_url
 
         if ctx.voice_client is None:
             return await ctx.send(embed=tools.Editable('Error', 'Im not in a voice channel!', 'Music'))
@@ -175,12 +198,56 @@ class Music(commands.Cog):
 
     @commands.command()
     async def stop(self, ctx):
-        author = ctx.message.author
+        author = ctx.author
         if ctx.voice_client is None:
             return await ctx.send(embed=tools.Editable('Error', 'Im not in a voice channel!', 'Music'))
         if author.voice is None:
             return await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
         await ctx.voice_client.disconnect()
+
+    #@commands.command()
+    #async def skip(self, ctx):
+    #    author = ctx.author
+    #    avatar = author.avatar_url
+    #    server = ctx.guild
+    #    ctx.voice_client.stop()
+    #    e = discord.Embed(
+    #        description = 'The previous song was skipped!',
+    #        colour = 0x9bf442,
+    #        timestamp=datetime.datetime.utcnow()
+    #        )
+    #    e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
+    #    e.set_author(name=author.name + ' skipped the song!', icon_url=avatar)
+    #    await ctx.send(embed=e)
+    #    url = lambda: check_queue(server.id)
+    #    player = await YTDLSource.from_url(url, loop=self.bot.loop)
+    #    players[server.id] = player
+    #    ctx.voice_client.play(player, after=lambda: check_queue(server.id))
+
+    #@commands.command()
+    #async def queue(self, ctx, url):
+    #    server = ctx.guild
+    #    author = ctx.author
+    #    avatar = author.avatar_url
+    #    player = await YTDLSource.from_url(url, loop=self.bot.loop)
+    #    if server.id in queues:
+    #        queues[server.id].append(player)
+    #    else:
+    #        queues[server.id] = [player]
+    #        e = discord.Embed(
+    #            description = 'Enqueud {}'.format(player.title),
+    #            colour = 0x9bf442,
+    #            timestamp=datetime.datetime.utcnow()
+    #            )
+    #        e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
+    #        e.set_author(name=author.name + ' enqueued a song!', icon_url=avatar)
+    #        await ctx.send(embed=e)
+
+    #@commands.command()
+    #async def enqueue(self,ctx):
+    #    await ctx.send(queues)
+
+
 
 def setup(bot):
     bot.add_cog(Music(bot))

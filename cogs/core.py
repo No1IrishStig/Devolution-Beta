@@ -1,11 +1,11 @@
-import discord
 from discord.ext import commands
+from utils.default import lib
+from utils import default
 import datetime
-import time
+import discord
 import asyncio
+import time
 import json
-import aiohttp
-from cogs.tools import tools
 
 start_time = time.time()
 
@@ -16,7 +16,7 @@ class Core(commands.Cog):
     @commands.group(pass_context=True, invoke_without_command=True)
     async def help(self, ctx):
         await ctx.message.add_reaction("📄")
-        user = ctx.message.author
+        user = ctx.author
         e1 = discord.Embed(
             description = "Use command **!help all** to see all the pages in one message\n\n1.) **info** - Gives help on all 'Information' commands\n2.) **fun** - Gives help on all 'Fun' commands\n3.) **mod** - Gives help on all 'Moderation' commands\n4.) **useful** - Gives help on all 'Useful' commands\n5.) **admin** - Gives help on all 'Admin' commands",
             colour = 0x9bf442,
@@ -29,7 +29,7 @@ class Core(commands.Cog):
     @help.group(pass_context=True, invoke_without_command=True)
     async def info(self, ctx):
         await ctx.message.add_reaction("📄")
-        author = ctx.message.author
+        author = ctx.author
         e2 = discord.Embed(
             title = "Help - Information",
             colour = 0x9bf442,
@@ -43,7 +43,7 @@ class Core(commands.Cog):
     @help.group(pass_context=True, invoke_without_command=True)
     async def fun(self, ctx):
         await ctx.message.add_reaction("📄")
-        author = ctx.message.author
+        author = ctx.author
         e3 = discord.Embed(
             title = "Help - Fun",
             colour = 0x9bf442,
@@ -57,7 +57,7 @@ class Core(commands.Cog):
     @help.group(pass_context=True, invoke_without_command=True)
     async def mod(self, ctx):
         await ctx.message.add_reaction("📄")
-        author = ctx.message.author
+        author = ctx.author
         e4 = discord.Embed(
             title = "Help - Moderation",
             colour = 0x9bf442,
@@ -71,7 +71,7 @@ class Core(commands.Cog):
     @help.group(pass_context=True, invoke_without_command=True)
     async def useful(self, ctx):
         await ctx.message.add_reaction("📄")
-        author = ctx.message.author
+        author = ctx.author
         e5 = discord.Embed(
             title = "Help - Useful",
             colour = 0x9bf442,
@@ -85,7 +85,7 @@ class Core(commands.Cog):
     @help.group(pass_context=True, invoke_without_command=True)
     async def admin(self, ctx):
         await ctx.message.add_reaction("📄")
-        author = ctx.message.author
+        author = ctx.author
         e6 = discord.Embed(
             title = "Help - Admin",
             colour = 0x9bf442,
@@ -99,7 +99,7 @@ class Core(commands.Cog):
     @help.group(pass_context=True, invoke_without_command=True)
     async def all(self, ctx):
         await ctx.message.add_reaction("📄")
-        author = ctx.message.author
+        author = ctx.author
         embed = discord.Embed(
             title = "Help",
             colour = 0x9bf442,
@@ -116,7 +116,7 @@ class Core(commands.Cog):
 
     @commands.command(pass_context=True)
     async def changelog(self, ctx):
-        user = ctx.message.author
+        user = ctx.author
         await ctx.message.add_reaction("📄")
         e = discord.Embed(
             description = '__**Changelog (15/12/2018) V0.01 Beta 1**__\n+ Added Help command\n+ Added Ping command\n+ Added Music Cog\n\n__**Changelog (16/12/2018) V0.02 Beta 2**__\n+ Added shutdown command\n\n- Changed some Music messages to embeds, the author will now be embed author for some commands\n\n__**Changelog (18/12/2018) V0.03 Beta 3**__\n- Finished changing all music embeds\n- Updated help command\n\n__**Changelog (21/12/2018) V0.04 Beta 4**__\n+ Added sinfo command\n\n- Edited many embed messages Author will now be the command author for nearly all other music commands\n- Updated Help command\n- Music Cog Work\n\n__**Changelog (21/12/2018  V0.05 Beta 5**__\n+ Added Uptime command\n+ Added Kick command\n\n- Fixed all timestamps to make them actually work\n- Changed set presence command to an embed\n- Updated Help command\n\n__**Changelog (22/12/2018) V0.1**__\n+ Added Cog check, if you arent me, goodluck using that one\n+ Added Cog commands Load, Unload and List\n+ Added Set Presence command (Alias sp)\n\n- Updated Help command\n\n__**Changelog (23/12/2018) V0.12**__\n+ Added Avatar command\n+ Added Avatar command\n+ Added purge command\n+ Added uinfo command\n+ Added ban command\n+ Added say command\n+ Added about command\n+ Added pm Command\n\n- Changed kick embed message, bot sends embed to kicked user {server} {kicked_by} {reason (if there was one)}\n- Kick command now accepts reasons\n- Updated Help command\n\n__**Changelog (29/12/2018) V0.13**__\n+ Added rename command\n+ Added coinflip command\n\n- Updated Help command\n\n__**Changelog (04/01/2019) V0.14**__\n- Changed music play embed again',
@@ -131,7 +131,7 @@ class Core(commands.Cog):
             )
         await user.send(embed=ee)
         eee = discord.Embed(
-            description = '__**Changelog (17/06/2019) V1.02**__\nAdded music command!(Play, Pause, Resume, Volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!',
+            description = '__**Changelog (17/06/2019) V1.02**__\nAdded music command!(Play, Pause, Resume, Volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) V1.03**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added utils folder\n+ Added config file\n\n- Merged tools into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs',
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
@@ -140,12 +140,12 @@ class Core(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     async def todo(self, ctx, *args):
-        user = ctx.message.author
+        user = ctx.author
         await user.send(embed=tools.Editable('Todo List', 'Remake Music, Finish cleanup command', 'Todo'))
 
     @commands.command(pass_context=True)
     async def invite(self, ctx):
-        user = ctx.message.author
+        user = ctx.author
         await user.send('Heres the link to invite me to your guilds!\n\nhttps://discordapp.com/oauth2/authorize?client_id=449328225001406467&scope=bot&permissions=8')
         await ctx.message.delete()
 
@@ -178,62 +178,12 @@ class Core(commands.Cog):
         await ctx.channel.send(embed=embed)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def pm(self, ctx, user : discord.User=None, *args):
-        if ctx.message.author.id == int('439327545557778433'):
-            if user is None:
-                await ctx.channel.send(embed=tools.Editable('Error!', 'Tag a user to PM!', 'Error'))
-            else:
-                message = ''
-                for word in args:
-                    message += word
-                    message += ' '
-                if message is '':
-                    await ctx.channel.send(embed=tools.Editable('Error!', 'Write a message for me to send!', 'Error'))
-                else:
-                    await user.send(message)
-                    await ctx.message.delete()
-        else:
-            await ctx.channel.send(embed=tools.NoPerm())
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def pmid(self, ctx, id=None, *args):
-        if ctx.message.author.id == int('439327545557778433'):
-            if id is None:
-                await ctx.channel.send(embed=tools.Editable('Error!', 'Tag enter an ID to PM!', 'Error'))
-            else:
-                member = ctx.message.author
-                userid = ctx.message.author.id
-                avatar = ctx.message.author.avatar_url
-                message = ''
-                for word in args:
-                    message += word
-                    message += ' '
-                if message is '':
-                    await ctx.channel.send(embed=tools.Editable('Error!', 'Write a message for me to send!', 'Error'))
-                else:
-                    try:
-                        user = await self.bot.fetch_user(id)
-                        embed = discord.Embed(
-                            title = "You've recieved a message from {}".format(member),
-                            colour = 0x9bf442,
-                            )
-                        embed.set_author(name='Message from {}'.format(member), icon_url='{}'.format(avatar))
-                        embed.add_field(name="Message", value=message, inline=True)
-                        embed.set_footer(text='UserID: {}'.format(userid))
-                        await user.send(embed=embed)
-                    except Exception as error:
-                            await ctx.send('I couldnt send your message to {} because of the error: [{}]'.format(member, error))
-                    await ctx.message.delete()
-        else:
-            await ctx.channel.send(embed=tools.NoPerm())
-
-    @commands.command(pass_context=True, no_pm=True)
     async def bug(self, ctx):
         await ctx.message.delete()
         ques = await ctx.channel.send('What would you like to say?')
         msg = await self.bot.wait_for('message', check=lambda message: message.author == ctx.author, timeout = 120)
-        user = ctx.message.author
-        userid = ctx.message.author.id
+        user = ctx.author
+        userid = ctx.author.id
         guild = ctx.message.guild.name
         guildid = ctx.message.guild.id
         me = await self.bot.fetch_user('439327545557778433')
@@ -271,13 +221,13 @@ class Core(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     async def music(self, ctx):
-        user = ctx.message.author
-        await ctx.message.delete()
+        user = ctx.author
+        ctx.message.delete()
         await user.send(embed=tools.Editable('Music Usage', '**play** - Plays a song by name or url from youtube\n**pause** - Pauses the current song\n**resume** - Resumes the current song\n**volume {number}** - Change the volume of the bot\n**stop** - Disconnects the bot ', 'Todo'))
 
     @commands.command(pass_context=True, no_pm=True)
     async def github(self, ctx):
-        user = ctx.message.author
+        user = ctx.author
         ctx.message.delete()
         await user.send(embed=tools.Editable('Github', 'https://github.com/No1IrishStig/Devolution-Beta/', 'Github'))
 
