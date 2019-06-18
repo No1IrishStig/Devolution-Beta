@@ -259,6 +259,16 @@ class Mod(commands.Cog):
         if '' in prefixes:
             prefixes.pop('')
 
+        def check(m):
+            if m.author.id == self.bot.user.id:
+                return True
+            elif m == ctx.message:
+                return True
+            p = discord.utils.find(m.content.startswith, prefixes)
+            if p and len(p) > 0:
+                return m.content[len(p):]
+            return False
+
         to_delete = [ctx.message]
 
         tries_left = 5
@@ -370,6 +380,16 @@ class Mod(commands.Cog):
         if '' in prefixes:
             prefixes.pop('')
 
+        def check(m):
+            if m.author.id == self.bot.user.id:
+                return True
+            elif m == ctx.message:
+                return True
+            p = discord.utils.find(m.content.startswith, prefixes)
+            if p and len(p) > 0:
+                return m.content[len(p):]
+            return False
+
         to_delete = [ctx.message]
 
         tries_left = 5
@@ -377,7 +397,7 @@ class Mod(commands.Cog):
 
         while tries_left and len(to_delete) - 1 < number:
             async for message in channel.history(limit=number, before=tmp):
-                if len(to_delete) - 1 < number:
+                if len(to_delete) - 1 < number and check(message):
                     to_delete.append(message)
                 tmp = message
             tries_left -= 1
