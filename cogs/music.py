@@ -75,19 +75,23 @@ class Music(commands.Cog):
         if author.voice is None:
             await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
         else:
-            channel = ctx.author.voice.channel
-            async with ctx.typing():
-                player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-                ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-                ctx.voice_client.source.volume = 10 / 100
-                e = discord.Embed(
-                    description = 'Now playing {}'.format(player.title),
-                    colour = 0x9bf442,
-                    timestamp=datetime.datetime.utcnow()
-                    )
-                e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
-                e.set_author(name=author.name + ' requested a song!', icon_url=avatar)
-                await ctx.send(embed=e)
+            try:
+                channel = ctx.author.voice.channel
+                await channel.connect()
+                async with ctx.typing():
+                    player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+                    ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+                    ctx.voice_client.source.volume = 10 / 100
+                    e = discord.Embed(
+                        description = 'Now playing {}'.format(player.title),
+                        colour = 0x9bf442,
+                        timestamp=datetime.datetime.utcnow()
+                        )
+                    e.set_footer(text='Devolution | Music', icon_url="https://i.imgur.com/BS6YRcT.jpg")
+                    e.set_author(name=author.name + ' requested a song!', icon_url=avatar)
+                    await ctx.send(embed=e)
+            except Exception as e:
+                    await ctx.send(embed=tools.Editable('Error', 'There was an error with your song request, {}'.format(e), 'Error'))
 
     @commands.command()
     async def pause(self, ctx):
@@ -153,6 +157,10 @@ class Music(commands.Cog):
 
     @commands.command()
     async def stop(self, ctx):
+        if ctx.voice_client is None:
+            return await ctx.send(embed=tools.Editable('Error', 'Im not in a voice channel!', 'Music'))
+        if author.voice is None:
+            return await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
         await ctx.voice_client.disconnect()
 
 def setup(bot):
