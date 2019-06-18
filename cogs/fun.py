@@ -122,9 +122,9 @@ class Fun(commands.Cog):
                     if result["data"]:
                         await ctx.send(result["data"][0]["url"])
                     else:
-                        await ctx.send(embed=tools.Editable('Error!', 'No search results found', 'Giphy'))
+                        await ctx.send(embed=lib.Editable('Error!', 'No search results found', 'Giphy'))
                 else:
-                    await ctx.send(embed=tools.Editable('Error!', 'There was an error contacting the API! Report this with !bug', 'Giphy'))
+                    await ctx.send(embed=lib.Editable('Error!', 'There was an error contacting the API! Report this with !bug', 'Giphy'))
 
     @commands.command(pass_context=True, no_pm=True)
     async def gifr(self, ctx, *keywords):
@@ -136,9 +136,9 @@ class Fun(commands.Cog):
                     if result["data"]:
                         await ctx.send(result["data"]["url"])
                     else:
-                        await ctx.send(embed=tools.Editable('Error!', 'No search results found', 'Giphy'))
+                        await ctx.send(embed=lib.Editable('Error!', 'No search results found', 'Giphy'))
                 else:
-                    await ctx.send(embed=tools.Editable('Error!', 'There was an error contacting the API! Report this with !bug', 'Giphy'))
+                    await ctx.send(embed=lib.Editable('Error!', 'There was an error contacting the API! Report this with !bug', 'Giphy'))
 
 
 def setup(bot):

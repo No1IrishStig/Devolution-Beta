@@ -32,7 +32,7 @@ async def leave(ctx):
     if ctx.author == guild.owner:
         await ctx.guild.leave()
     else:
-        await ctx.channel.send(embed=tools.NoPerm())
+        await ctx.channel.send(embed=lib.NoPerm())
 
 @bot.command(pass_context=True, aliases=['sp'])
 async def setpresence(ctx, *args):
@@ -43,16 +43,16 @@ async def setpresence(ctx, *args):
             output += gamename
             output += ' '
         if output == '':
-            await ctx.channel.send(embed=tools.Editable('Game Presence', 'The bots game has been reset to the default', 'Owner'))
+            await ctx.channel.send(embed=lib.Editable('Game Presence', 'The bots game has been reset to the default', 'Owner'))
             await bot.change_presence(status=discord.Status.online, activity=discord.Game(name='with ' + count + ' Guilds'))
             await ctx.message.delete()
         else:
             print(output)
-            await ctx.channel.send(embed=tools.Editable('Game Presence', 'The bots game has been changed to ' + output, 'Owner'))
+            await ctx.channel.send(embed=lib.Editable('Game Presence', 'The bots game has been changed to ' + output, 'Owner'))
             await bot.change_presence(status=discord.Status.online, activity=discord.Game(name=output))
             await ctx.message.delete()
     else:
-        await ctx.channel.send(embed=tools.NoPerm())
+        await ctx.channel.send(embed=lib.NoPerm())
 
 @bot.command(pass_context=True, aliases=['sa'])
 async def setactivity(ctx, activity:str=None, *args):
@@ -62,72 +62,72 @@ async def setactivity(ctx, activity:str=None, *args):
             output += gamename
             output += ' '
         if output == '':
-            await ctx.channel.send(embed=tools.Editable('Error', 'Please enter one of these activities with the name you would like after it!\n\n**playing {name}**, **listening {name}**, **watching {name}**', 'Error'))
+            await ctx.channel.send(embed=lib.Editable('Error', 'Please enter one of these activities with the name you would like after it!\n\n**playing {name}**, **listening {name}**, **watching {name}**', 'Error'))
         else:
             await ctx.message.delete()
             if activity == 'playing':
                 await bot.change_presence(activity=discord.Game(name=output))
-                await ctx.channel.send(embed=tools.Editable('Activity Presence', 'The bots game has been changed to playing  ' + output, 'Owner'))
+                await ctx.channel.send(embed=lib.Editable('Activity Presence', 'The bots game has been changed to playing  ' + output, 'Owner'))
             if activity == 'listening':
                 await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=output))
-                await ctx.channel.send(embed=tools.Editable('Activity Presence', 'The bots game has been changed to listening ' + output, 'Owner'))
+                await ctx.channel.send(embed=lib.Editable('Activity Presence', 'The bots game has been changed to listening ' + output, 'Owner'))
             if activity == 'watching':
                 await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=output))
-                await ctx.channel.send(embed=tools.Editable('Activity Presence', 'The bots game has been changed to watching ' + output, 'Owner'))
+                await ctx.channel.send(embed=lib.Editable('Activity Presence', 'The bots game has been changed to watching ' + output, 'Owner'))
             else:
-                await ctx.channel.send(embed=tools.Editable('Error', 'Please enter one of these activities!\n**playing {name}**, **listening {name}**, **watching {name}**', 'Error'))
+                await ctx.channel.send(embed=lib.Editable('Error', 'Please enter one of these activities!\n**playing {name}**, **listening {name}**, **watching {name}**', 'Error'))
     else:
-        await ctx.channel.send(embed=tools.NoPerm())
+        await ctx.channel.send(embed=lib.NoPerm())
 
 @bot.command(pass_context=True)
 async def shutdown(ctx):
         if ctx.author.id in config.owner:
-            await ctx.channel.send(embed=tools.Editable('Shutting Down!', 'I am shutting down in 5 seconds. Goodnight :zzz:', 'Sleep'))
+            await ctx.channel.send(embed=lib.Editable('Shutting Down!', 'I am shutting down in 5 seconds. Goodnight :zzz:', 'Sleep'))
             await asyncio.sleep(5)
             await bot.logout()
         else:
-            await ctx.channel.send(embed=tools.NoPerm())
+            await ctx.channel.send(embed=lib.NoPerm())
 
 @bot.group(pass_context=True, invoke_without_command=True)
 async def cog(ctx):
     if ctx.author.id in config.owner:
-        await ctx.channel.send(embed=tools.Editable('Cog Commands', '**Load** - loads named cog.\n **Unload** - Unloads named cog.\n **List** - Lists all cogs.', 'Cogs'))
+        await ctx.channel.send(embed=lib.Editable('Cog Commands', '**Load** - loads named cog.\n **Unload** - Unloads named cog.\n **List** - Lists all cogs.', 'Cogs'))
     else:
-        await ctx.channel.send(embed=tools.NoPerm())
+        await ctx.channel.send(embed=lib.NoPerm())
 
 @cog.group(pass_context=True, invoke_without_command=True)
 async def load(ctx, extension : str=None):
     if ctx.author.id in config.owner:
         if extension is None:
-            await ctx.channel.send(embed=tools.Editable('Error!', 'Enter a cog name to load!', 'Error'))
+            await ctx.channel.send(embed=lib.Editable('Error!', 'Enter a cog name to load!', 'Error'))
         else:
             try:
                 bot.load_extension(extension)
-                await ctx.channel.send(embed=tools.Editable('Success!', '{} has been loaded!'.format(extension), 'Cogs'))
+                await ctx.channel.send(embed=lib.Editable('Success!', '{} has been loaded!'.format(extension), 'Cogs'))
             except Exception as error:
-                await ctx.channel.send(embed=tools.Editable('Error!', '{} cannot be loaded!'.format(extension), 'Cogs'))
+                await ctx.channel.send(embed=lib.Editable('Error!', '{} cannot be loaded!'.format(extension), 'Cogs'))
     else:
-        await ctx.channel.send(embed=tools.NoPerm())
+        await ctx.channel.send(embed=lib.NoPerm())
 
 @cog.group(pass_context=True, invoke_without_command=True)
 async def unload(ctx, extension : str=None):
     if ctx.author.id in config.owner:
         if extension is None:
-            await ctx.channel.send(embed=tools.Editable('Error!', 'Enter a cog name to load!', 'Error'))
+            await ctx.channel.send(embed=lib.Editable('Error!', 'Enter a cog name to load!', 'Error'))
         else:
             try:
                 bot.unload_extension(extension)
-                await ctx.channel.send(embed=tools.Editable('Success!', '{} has been unloaded!'.format(extension), 'Cogs'))
+                await ctx.channel.send(embed=lib.Editable('Success!', '{} has been unloaded!'.format(extension), 'Cogs'))
             except Exception as error:
-                await ctx.channel.send(embed=tools.Editable('Error!', '{} cannot be unloaded!'.format(extension), 'Cogs'))
+                await ctx.channel.send(embed=lib.Editable('Error!', '{} cannot be unloaded!'.format(extension), 'Cogs'))
     else:
-        await ctx.channel.send(embed=tools.NoPerm())
+        await ctx.channel.send(embed=lib.NoPerm())
 
 @cog.command(pass_context=True)
 async def list(ctx):
     if ctx.author.id in config.owner:
-        await ctx.channel.send(embed=tools.Editable('Available Cogs', 'cogs.core','cogs.main', 'cogs.fun, cogs.mod', 'Cogs'))
+        await ctx.channel.send(embed=lib.Editable('Available Cogs', 'cogs.core','cogs.main', 'cogs.fun, cogs.mod', 'Cogs'))
     else:
-        await ctx.channel.send(embed=tools.NoPerm())
+        await ctx.channel.send(embed=lib.NoPerm())
 
 bot.run(config.token)

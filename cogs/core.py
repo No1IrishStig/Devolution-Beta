@@ -131,7 +131,7 @@ class Core(commands.Cog):
             )
         await user.send(embed=ee)
         eee = discord.Embed(
-            description = '__**Changelog (17/06/2019) V1.02**__\nAdded music command!(Play, Pause, Resume, Volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) V1.03**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added amiadmin command\n+ Added utils folder\n+ Added config file\n\n- Merged tools into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs',
+            description = '__**Changelog (17/06/2019) V1.02**__\nAdded music command!(Play, Pause, Resume, Volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) V1.03**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added amiadmin command\n+ Added utils folder\n+ Added config file\n\n- Merged lib into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs',
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
@@ -141,7 +141,7 @@ class Core(commands.Cog):
     @commands.command(pass_context=True, no_pm=True)
     async def todo(self, ctx, *args):
         user = ctx.author
-        await user.send(embed=tools.Editable('Todo List', 'Remake Music, Finish cleanup command', 'Todo'))
+        await user.send(embed=lib.Editable('Todo List', 'Remake Music, Finish cleanup command', 'Todo'))
 
     @commands.command(pass_context=True)
     async def invite(self, ctx):
@@ -212,10 +212,10 @@ class Core(commands.Cog):
             overwrite.send_tts_messages = False
             overwrite.add_reactions = False
             await channel.set_permissions(role, overwrite=overwrite),
-        msg = await ctx.send(embed=tools.Editable('Setting Permissions', 'This may take a while, Ill tell you when im done.', 'Moderation'))
+        msg = await ctx.send(embed=lib.Editable('Setting Permissions', 'This may take a while, Ill tell you when im done.', 'Moderation'))
         await asyncio.sleep(5)
         await msg.delete()
-        msg2 = await ctx.send(embed=tools.Editable('Im Finished!', 'Depending on how many channels you have, all permissions should be set.', 'Moderation'))
+        msg2 = await ctx.send(embed=lib.Editable('Im Finished!', 'Depending on how many channels you have, all permissions should be set.', 'Moderation'))
         await asyncio.sleep(5)
         await msg2.delete()
 
@@ -223,13 +223,13 @@ class Core(commands.Cog):
     async def music(self, ctx):
         user = ctx.author
         ctx.message.delete()
-        await user.send(embed=tools.Editable('Music Usage', '**play** - Plays a song by name or url from youtube\n**pause** - Pauses the current song\n**resume** - Resumes the current song\n**volume {number}** - Change the volume of the bot\n**stop** - Disconnects the bot ', 'Todo'))
+        await user.send(embed=lib.Editable('Music Usage', '**play** - Plays a song by name or url from youtube\n**pause** - Pauses the current song\n**resume** - Resumes the current song\n**volume {number}** - Change the volume of the bot\n**stop** - Disconnects the bot ', 'Todo'))
 
     @commands.command(pass_context=True, no_pm=True)
     async def github(self, ctx):
         user = ctx.author
         ctx.message.delete()
-        await user.send(embed=tools.Editable('Github', 'https://github.com/No1IrishStig/Devolution-Beta/', 'Github'))
+        await user.send(embed=lib.Editable('Github', 'https://github.com/No1IrishStig/Devolution-Beta/', 'Github'))
 
 
 def setup(bot):

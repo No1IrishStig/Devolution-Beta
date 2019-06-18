@@ -138,7 +138,7 @@ class Main(commands.Cog):
             ans = await ctx.send('Generating Embed...')
             footer = msgg.content
             await asyncio.sleep(2)
-            await ctx.send(embed=tools.Editable(title, desc, footer))
+            await ctx.send(embed=lib.Editable(title, desc, footer))
             await ques.delete()
             await msg.delete()
             await ques1.delete()
@@ -147,17 +147,17 @@ class Main(commands.Cog):
             await msgg.delete()
             await ans.delete()
         else:
-            await ctx.send(embed=tools.NoPerm())
+            await ctx.send(embed=lib.NoPerm())
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def role(self, ctx):
         if not ctx.message.author.guild_permissions.manage_roles:
-            error = await ctx.send(embed=tools.NoPerm())
+            error = await ctx.send(embed=lib.NoPerm())
             await asyncio.sleep(30)
             await ctx.message.delete()
             await error.delete()
         else:
-            usage = await ctx.send(embed=tools.Editable('Role Usage', '**Add** - Adds a user to a role.\n **List** - List all roles in the server\n **Remove** - Removes a user from a role\n **Create** - Creates a role\n **Delete** - Deletes a role\n **Edit** - **Warning** This will ask to edit every part of the role, including colour.', 'Roles'))
+            usage = await ctx.send(embed=lib.Editable('Role Usage', '**Add** - Adds a user to a role.\n **List** - List all roles in the server\n **Remove** - Removes a user from a role\n **Create** - Creates a role\n **Delete** - Deletes a role\n **Edit** - **Warning** This will ask to edit every part of the role, including colour.', 'Roles'))
             await asyncio.sleep(30)
             await ctx.message.delete()
             await usage.delete()
@@ -165,40 +165,40 @@ class Main(commands.Cog):
     @role.group(pass_context=True, invoke_without_command=True)
     async def list(self, ctx):
         if not ctx.message.author.guild_permissions.manage_roles:
-            await ctx.send(embed=tools.NoPerm())
+            await ctx.send(embed=lib.NoPerm())
         else:
             roles = []
             for role in ctx.guild.roles:
                 roles.append(role.name)
             roles.remove('@everyone')
-            await ctx.send(embed=tools.Editable('Role List', '{}'.format(', '.join(roles)), 'Roles'))
+            await ctx.send(embed=lib.Editable('Role List', '{}'.format(', '.join(roles)), 'Roles'))
 
     @role.group(pass_context=True, invoke_without_command=True)
     async def add(self, ctx, rolename=None, member: discord.Member=None):
         if not ctx.message.author.guild_permissions.manage_roles:
-            await ctx.send(embed=tools.NoPerm())
+            await ctx.send(embed=lib.NoPerm())
         else:
             if rolename is None:
-                usage = await ctx.send(embed=tools.Editable('Role Add Usage', 'You forgot something!\n\n!role add {role} {@user}\n\n This will add the role to the user.', 'Roles'))
+                usage = await ctx.send(embed=lib.Editable('Role Add Usage', 'You forgot something!\n\n!role add {role} {@user}\n\n This will add the role to the user.', 'Roles'))
                 await asyncio.sleep(30)
                 await ctx.message.delete()
                 await usage.delete()
             else:
                 if member is None:
-                    usage1 = await ctx.send(embed=tools.Editable('Role Add Usage', 'You forgot to mention a user!\n\n!role add {role} {@user}\n\n This will add the role to the user.', 'Roles'))
+                    usage1 = await ctx.send(embed=lib.Editable('Role Add Usage', 'You forgot to mention a user!\n\n!role add {role} {@user}\n\n This will add the role to the user.', 'Roles'))
                     await asyncio.sleep(30)
                     await ctx.message.delete()
                     await usage1.delete()
                 else:
                     role = discord.utils.get(ctx.message.guild.roles, name=rolename)
                     if role in member.roles:
-                        error = await ctx.send(embed=tools.Editable('Error', '{} already has the role {}'.format(member, role), 'Roles'))
+                        error = await ctx.send(embed=lib.Editable('Error', '{} already has the role {}'.format(member, role), 'Roles'))
                         await asyncio.sleep(30)
                         await ctx.message.delete()
                         await error.delete()
                     else:
                         await member.add_roles(role)
-                        done = await ctx.send(embed=tools.Editable('Role Added', '{} added to {}'.format(role, member), 'Roles'))
+                        done = await ctx.send(embed=lib.Editable('Role Added', '{} added to {}'.format(role, member), 'Roles'))
                         await asyncio.sleep(30)
                         await ctx.message.delete()
                         await done.delete()
@@ -206,16 +206,16 @@ class Main(commands.Cog):
     @role.group(pass_context=True, invoke_without_command=True)
     async def remove(self, ctx, rolename=None, member: discord.Member=None):
         if not ctx.message.author.guild_permissions.manage_roles:
-            await ctx.send(embed=tools.NoPerm())
+            await ctx.send(embed=lib.NoPerm())
         else:
             if rolename is None:
-                usage1 = await ctx.send(embed=tools.Editable('Role Remove Usage', 'You forgot something!\n\n!role remove {role} {@user}\n\n This will remove the role from the user.', 'Roles'))
+                usage1 = await ctx.send(embed=lib.Editable('Role Remove Usage', 'You forgot something!\n\n!role remove {role} {@user}\n\n This will remove the role from the user.', 'Roles'))
                 await asyncio.sleep(30)
                 await ctx.message.delete()
                 await usage1.delete()
             else:
                 if member is None:
-                    usage = await ctx.send(embed=tools.Editable('Role Remove Usage', 'You forgot to mention a user!\n\n!role remove {role} {@user}\n\n This will remove the role from the user.', 'Roles'))
+                    usage = await ctx.send(embed=lib.Editable('Role Remove Usage', 'You forgot to mention a user!\n\n!role remove {role} {@user}\n\n This will remove the role from the user.', 'Roles'))
                     await asyncio.sleep(30)
                     await ctx.message.delete()
                     await usage.delete()
@@ -223,12 +223,12 @@ class Main(commands.Cog):
                     role = discord.utils.get(ctx.message.guild.roles, name=rolename)
                     if role in member.roles:
                         await member.remove_roles(role)
-                        done = await ctx.send(embed=tools.Editable('Role Removed', '{} removed from {}'.format(role, member), 'Roles'))
+                        done = await ctx.send(embed=lib.Editable('Role Removed', '{} removed from {}'.format(role, member), 'Roles'))
                         await asyncio.sleep(30)
                         await ctx.message.delete()
                         await done.delete()
                     else:
-                        error = await ctx.send(embed=tools.Editable('Error', '{} doesnt have the role {}'.format(member, role), 'Roles'))
+                        error = await ctx.send(embed=lib.Editable('Error', '{} doesnt have the role {}'.format(member, role), 'Roles'))
                         await asyncio.sleep(30)
                         await ctx.message.delete()
                         await error.delete()
@@ -236,23 +236,23 @@ class Main(commands.Cog):
     @role.group(pass_context=True, invoke_without_command=True)
     async def create(self, ctx, rolename=None):
         if not ctx.message.author.guild_permissions.manage_roles:
-            await ctx.send(embed=tools.NoPerm())
+            await ctx.send(embed=lib.NoPerm())
         else:
             if rolename is None:
-                usage = await ctx.send(embed=tools.Editable('Role Create Usage', 'You forgot something!\n\n!role create {role}\n\n This will create a role with the specified name.', 'Roles'))
+                usage = await ctx.send(embed=lib.Editable('Role Create Usage', 'You forgot something!\n\n!role create {role}\n\n This will create a role with the specified name.', 'Roles'))
                 await asyncio.sleep(30)
                 await ctx.message.delete()
                 await usage.delete()
             else:
                 role = discord.utils.get(ctx.message.guild.roles, name=rolename)
                 if role in ctx.message.guild.roles:
-                    error = await ctx.send(embed=tools.Editable('Error', 'The role {} already exists!'.format(rolename), 'Roles'))
+                    error = await ctx.send(embed=lib.Editable('Error', 'The role {} already exists!'.format(rolename), 'Roles'))
                     await asyncio.sleep(30)
                     await ctx.message.delete()
                     await error.delete()
                 else:
                     await ctx.guild.create_role(name=rolename)
-                    done = await ctx.send(embed=tools.Editable('Role Created', 'The role {} has been created!'.format(rolename), 'Roles'))
+                    done = await ctx.send(embed=lib.Editable('Role Created', 'The role {} has been created!'.format(rolename), 'Roles'))
                     await asyncio.sleep(30)
                     await ctx.message.delete()
                     await done.delete()
@@ -260,10 +260,10 @@ class Main(commands.Cog):
     @role.group(pass_context=True, invoke_without_command=True)
     async def delete(self, ctx, rolename=None):
         if not ctx.message.author.guild_permissions.manage_roles:
-            await ctx.send(embed=tools.NoPerm())
+            await ctx.send(embed=lib.NoPerm())
         else:
             if rolename is None:
-                usage = await ctx.send(embed=tools.Editable('Role delete Usage', 'You forgot something!\n\n!role delete {role}\n\n This will delete the role with the specified name.', 'Roles'))
+                usage = await ctx.send(embed=lib.Editable('Role delete Usage', 'You forgot something!\n\n!role delete {role}\n\n This will delete the role with the specified name.', 'Roles'))
                 await asyncio.sleep(30)
                 await ctx.message.delete()
                 await usage.delete()
@@ -271,12 +271,12 @@ class Main(commands.Cog):
                 role = discord.utils.get(ctx.message.guild.roles, name=rolename)
                 if role in ctx.message.guild.roles:
                     await role.delete()
-                    done = await ctx.send(embed=tools.Editable('Role Deleted', 'The role {} has been deleted!'.format(rolename), 'Roles'))
+                    done = await ctx.send(embed=lib.Editable('Role Deleted', 'The role {} has been deleted!'.format(rolename), 'Roles'))
                     await asyncio.sleep(30)
                     await ctx.message.delete()
                     await done.delete()
                 else:
-                    error = await ctx.send(embed=tools.Editable('Error', 'The role {} doesnt exist!'.format(rolename), 'Roles'))
+                    error = await ctx.send(embed=lib.Editable('Error', 'The role {} doesnt exist!'.format(rolename), 'Roles'))
                     await asyncio.sleep(30)
                     await ctx.message.delete()
                     await error.delete()

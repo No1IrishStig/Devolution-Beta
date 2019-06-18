@@ -75,12 +75,12 @@ class Music(commands.Cog):
         try:
             member = ctx.author
             if member.voice is None:
-                await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
+                await ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
             else:
                 channel = ctx.author.voice.channel
                 await channel.connect()
         except Exception as error:
-            await ctx.send(embed=tools.Editable('Error', 'Something went wrong, try again!', 'Music'))
+            await ctx.send(embed=lib.Editable('Error', 'Something went wrong, try again!', 'Music'))
 
     @commands.command()
     async def play(self, ctx, *, url=None):
@@ -88,10 +88,10 @@ class Music(commands.Cog):
         avatar = ctx.author.avatar_url
         server = ctx.guild
         if author.voice is None:
-            await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
+            await ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
         else:
             if url is None:
-                await ctx.send(embed=tools.Editable('Error', 'Please enter a song name to play', 'Music'))
+                await ctx.send(embed=lib.Editable('Error', 'Please enter a song name to play', 'Music'))
             else:
                 try:
                     channel = ctx.author.voice.channel
@@ -113,7 +113,7 @@ class Music(commands.Cog):
                         print('There was an error with your song request, {}'.format(e), 'Error')
                 else:
                     if url is None:
-                        await ctx.send(embed=tools.Editable('Error', 'Please enter a song name to play', 'Music'))
+                        await ctx.send(embed=lib.Editable('Error', 'Please enter a song name to play', 'Music'))
                     else:
                         try:
                             channel = ctx.author.voice.channel
@@ -139,9 +139,9 @@ class Music(commands.Cog):
         author = ctx.author
         avatar = ctx.author.avatar_url
         if ctx.voice_client is None:
-            return await ctx.send(embed=tools.Editable('Error', 'Im not in a voice channel!', 'Music'))
+            return await ctx.send(embed=lib.Editable('Error', 'Im not in a voice channel!', 'Music'))
         if author.voice is None:
-            await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
+            await ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
         else:
             ctx.voice_client.pause()
             e = discord.Embed(
@@ -158,9 +158,9 @@ class Music(commands.Cog):
         author = ctx.author
         avatar = ctx.author.avatar_url
         if ctx.voice_client is None:
-            return await ctx.send(embed=tools.Editable('Error', 'Im not in a voice channel!', 'Music'))
+            return await ctx.send(embed=lib.Editable('Error', 'Im not in a voice channel!', 'Music'))
         if author.voice is None:
-            await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
+            await ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
         else:
             ctx.voice_client.resume()
             e = discord.Embed(
@@ -178,14 +178,14 @@ class Music(commands.Cog):
         avatar = ctx.author.avatar_url
 
         if ctx.voice_client is None:
-            return await ctx.send(embed=tools.Editable('Error', 'Im not in a voice channel!', 'Music'))
+            return await ctx.send(embed=lib.Editable('Error', 'Im not in a voice channel!', 'Music'))
         if author.voice is None:
-            return await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
+            return await ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
 
         if volume > 100:
-            return await ctx.send(embed=tools.Editable('Error', 'Please enter a volume between 0 and 100!', 'Music'))
+            return await ctx.send(embed=lib.Editable('Error', 'Please enter a volume between 0 and 100!', 'Music'))
         if volume < 0:
-            return await ctx.send(embed=tools.Editable('Error', 'Please enter a volume between 0 and 100!', 'Music'))
+            return await ctx.send(embed=lib.Editable('Error', 'Please enter a volume between 0 and 100!', 'Music'))
             ctx.voice_client.source.volume = volume / 100
             e = discord.Embed(
                 description = 'The volume is now {}'.format(volume),
@@ -200,9 +200,9 @@ class Music(commands.Cog):
     async def stop(self, ctx):
         author = ctx.author
         if ctx.voice_client is None:
-            return await ctx.send(embed=tools.Editable('Error', 'Im not in a voice channel!', 'Music'))
+            return await ctx.send(embed=lib.Editable('Error', 'Im not in a voice channel!', 'Music'))
         if author.voice is None:
-            return await ctx.send(embed=tools.Editable('Error', 'You arent in a voice channel!', 'Music'))
+            return await ctx.send(embed=lib.Editable('Error', 'You arent in a voice channel!', 'Music'))
         await ctx.voice_client.disconnect()
 
     #@commands.command()

@@ -24,25 +24,25 @@ class Admin(commands.Cog):
     async def pm(self, ctx, user : discord.User=None, *args):
         if ctx.author.id in self.config.owner:
             if user is None:
-                await ctx.channel.send(embed=tools.Editable('Error!', 'Tag a user to PM!', 'Error'))
+                await ctx.channel.send(embed=lib.Editable('Error!', 'Tag a user to PM!', 'Error'))
             else:
                 message = ''
                 for word in args:
                     message += word
                     message += ' '
                 if message is '':
-                    await ctx.channel.send(embed=tools.Editable('Error!', 'Write a message for me to send!', 'Error'))
+                    await ctx.channel.send(embed=lib.Editable('Error!', 'Write a message for me to send!', 'Error'))
                 else:
                     await user.send(message)
                     await ctx.message.delete()
         else:
-            await ctx.channel.send(embed=tools.NoPerm())
+            await ctx.channel.send(embed=lib.NoPerm())
 
     @commands.command(pass_context=True, no_pm=True)
     async def pmid(self, ctx, id=None, *args):
         if ctx.author.id in self.config.owner:
             if id is None:
-                await ctx.channel.send(embed=tools.Editable('Error!', 'Tag enter an ID to PM!', 'Error'))
+                await ctx.channel.send(embed=lib.Editable('Error!', 'Tag enter an ID to PM!', 'Error'))
             else:
                 member = ctx.author
                 userid = ctx.author.id
@@ -52,7 +52,7 @@ class Admin(commands.Cog):
                     message += word
                     message += ' '
                 if message is '':
-                    await ctx.channel.send(embed=tools.Editable('Error!', 'Write a message for me to send!', 'Error'))
+                    await ctx.channel.send(embed=lib.Editable('Error!', 'Write a message for me to send!', 'Error'))
                 else:
                     try:
                         user = await self.bot.fetch_user(id)
@@ -68,7 +68,7 @@ class Admin(commands.Cog):
                             await ctx.send('I couldnt send your message to {} because of the error: [{}]'.format(member, error))
                     await ctx.message.delete()
         else:
-            await ctx.channel.send(embed=tools.NoPerm())
+            await ctx.channel.send(embed=lib.NoPerm())
 
 def setup(bot):
     bot.add_cog(Admin(bot))
