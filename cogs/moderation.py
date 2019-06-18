@@ -100,27 +100,23 @@ class Mod(commands.Cog):
         else:
             user_id = str(user_id)
             ban_list = await ctx.guild.bans()
-            is_banned = discord.utils.get(ban_list, id=user_id)
-            if is_banned:
-                await ctx.send(embed=lib.Editable('Error!', 'That user is already banned!', 'Moderation'))
+            user = ctx.guild.get_member(user_id)
+            if user is not None:
+                await ctx.invoke(self.ban, user=user, reason=reason)
                 return
-                user = ctx.guild.get_member(user_id)
-                if user is not None:
-                    await ctx.invoke(self.ban, user=user, reason=reason)
-                    return
-                try:
-                    await self.bot.http.ban(user_id, server.id, 0)
-                except discord.NotFound:
-                    await ctx.send(embed=lib.Editable('Error!', 'Cant find anyone with that ID try again!', 'Moderation'))
-                except discord.Forbidden:
-                    await ctx.send(embed=lib.Editable('Error!', 'I dont have permission to do this!', 'Moderation'))
+            try:
+                await self.bot.http.ban(user_id, server.id, 0)
+            except discord.NotFound:
+                await ctx.send(embed=lib.Editable('Error!', 'Cant find anyone with that ID try again!', 'Moderation'))
+            except discord.Forbidden:
+                await ctx.send(embed=lib.Editable('Error!', 'I dont have permission to do this!', 'Moderation'))
+            else:
+                if reason is None:
+                    user = await self.bot.fetch_user(user_id)
+                    await ctx.send(embed=lib.AvatarEdit('{}'.format(author) + ' Just yeeted someone!', '{}'.format(avatar), 'Yeet!', 'UserID {} just got hackbanned!'.format(user_id), 'Moderation'))
                 else:
-                    if reason is None:
-                        user = await self.bot.fetch_user(user_id)
-                        await ctx.send(embed=lib.AvatarEdit('{}'.format(author) + ' Just yeeted someone!', '{}'.format(avatar), 'Yeet!', 'UserID {} just got hackbanned!'.format(user_id), 'Moderation'))
-                    else:
-                        user = await self.bot.fetch_user(user_id)
-                        await ctx.send(embed=lib.AvatarEdit('{}'.format(author) + ' Just yeeted someone!', '{}'.format(avatar), 'Yeet!', 'UserID {} just got hackbanned for {}!'.format(user_id, reason), 'Moderation'))
+                    user = await self.bot.fetch_user(user_id)
+                    await ctx.send(embed=lib.AvatarEdit('{}'.format(author) + ' Just yeeted someone!', '{}'.format(avatar), 'Yeet!', 'UserID {} just got hackbanned for {}!'.format(user_id, reason), 'Moderation'))
 
     @commands.command(pass_context=True, no_pm=True)
     async def punish(self, ctx, member: discord.Member=None, *args):
