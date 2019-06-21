@@ -16,7 +16,7 @@ def get(file):
     except FileNotFoundError:
         raise FileNotFoundError("JSON file wasn't found")
 
-version = "Stable v1.2"
+version = "Stable v1.3"
 invite = "https://discord.gg/frcc5vF"
 config = default.get("./utils/cfg.json")
 

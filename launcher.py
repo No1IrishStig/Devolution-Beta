@@ -196,10 +196,10 @@ def requirements_menu():
             print("Updating requirements...")
             if IS_WINDOWS:
                 os.chdir('utils/install/')
-                subprocess.call([r'install_requirements_no_voice.bat'])
+                subprocess.call([r'install_requirements_voice.bat'])
             else:
                 os.chdir('utils/install/')
-                shellscript = subprocess.Popen(["install_requirements_no_voice.sh"], stdin=subprocess.PIPE)
+                shellscript = subprocess.Popen(["install_requirements_voice.sh"], stdin=subprocess.PIPE)
             wait()
         if choice == "2":
             clear_screen()

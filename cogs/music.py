@@ -181,14 +181,7 @@ class Music(commands.Cog):
                         await lib.erase(ctx, 20, e3)
                     else:
                         ctx.voice_client.source.volume = volume / 100
-                        e = discord.Embed(
-                            description = "The volume is now {}".format(volume),
-                            colour = 0x9bf442,
-                            timestamp=datetime.datetime.utcnow()
-                            )
-                        e.set_footer(text="Devolution | Music", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-                        e.set_author(name=author.name + " changed the volume!", icon_url=avatar)
-                        s = await ctx.send(embed=e)
+                        s = await ctx.send(embed=lib.AvatarEdit(author.name, avatar, " ", f"The volume is now {volume}", Music))
                         await lib.erase(ctx, 20, s)
 
     @commands.command()

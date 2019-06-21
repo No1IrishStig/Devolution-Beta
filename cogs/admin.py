@@ -24,15 +24,15 @@ class Admin(commands.Cog):
     async def load(self, ctx, cog : str=None):
         if ctx.author.id in self.config.owner:
             if cog is None:
-                e = await ctx.send(embed=lib.Editable("Error!", "Enter a cog name to load!", "Error"))
+                e = await ctx.send(embed=lib.Editable("Error", "Enter a cog name to load!", "Error"))
                 await lib.erase(ctx, 20, e)
             else:
                 try:
                     self.bot.load_extension(cog)
-                    s = await ctx.send(embed=lib.Editable("Success!", f"{cog} has been loaded!", "Cogs"))
+                    s = await ctx.send(embed=lib.Editable("Success", f"{cog} has been loaded!", "Cogs"))
                     await lib.erase(ctx, 20, s)
                 except Exception as error:
-                    ee = await ctx.send(embed=lib.Editable("Error!", f"{cog} cannot be loaded because {error}!", "Cogs"))
+                    ee = await ctx.send(embed=lib.Editable("Error", f"{cog} cannot be loaded because {error}!", "Cogs"))
                     await lib.erase(ctx, 20, ee)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
@@ -42,15 +42,15 @@ class Admin(commands.Cog):
     async def unload(self, ctx, cog : str=None):
         if ctx.author.id in self.config.owner:
             if cog is None:
-                e = await ctx.send(embed=lib.Editable("Error!", "Enter a cog name to unload!", "Error"))
+                e = await ctx.send(embed=lib.Editable("Error", "Enter a cog name to unload!", "Error"))
                 await lib.erase(ctx, 20, e)
             else:
                 try:
                     self.bot.unload_extension(cog)
-                    s = await ctx.send(embed=lib.Editable("Success!", "{cog} has been unloaded!", "Cogs"))
+                    s = await ctx.send(embed=lib.Editable("Success", "{cog} has been unloaded!", "Cogs"))
                     await lib.erase(ctx, 20, s)
                 except Exception as error:
-                    ee = await ctx.send(embed=lib.Editable("Error!", "{cog} cannot be unloaded because {error}!", "Cogs"))
+                    ee = await ctx.send(embed=lib.Editable("Error", "{cog} cannot be unloaded because {error}!", "Cogs"))
                     await lib.erase(ctx, 20, ee)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
@@ -108,6 +108,20 @@ class Admin(commands.Cog):
         guild = ctx.message.guild
         if ctx.author == guild.owner:
             await ctx.guild.leave()
+        else:
+            noperm = await ctx.send(embed=lib.NoPerm())
+            await lib.erase(ctx, 20, noperm)
+
+    @commands.command(no_pm=True)
+    async def leaveid(self, ctx, id:int=None):
+        if ctx.author.id in self.config.owner:
+            if id is None:
+                e = await ctx.send(embed=lib.Editable("Error", "Please enter a serverid for me to leave", "Error"))
+                await lib.erase(ctx, 20, e)
+            else:
+                guild = self.bot.get_guild(id)
+                await ctx.send(embed=lib.Editable("Success", f"I left the server **{guild}**", "Owner"))
+
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.erase(ctx, 20, noperm)

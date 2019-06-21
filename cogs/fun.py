@@ -23,8 +23,7 @@ class Fun(commands.Cog):
     @commands.command(no_pm=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def ping(self, ctx):
-        p = await ctx.send("Pong")
-        await lib.erase(ctx, 20, p)
+        await ctx.send("Pong")
 
     @commands.command(no_pm=True, aliases=["cf"])
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -33,8 +32,7 @@ class Fun(commands.Cog):
         await asyncio.sleep(2)
         choices = ["Heads", "Tails"]
         rancoin = random.choice(choices)
-        f = await ctx.send("You flipped a " + rancoin)
-        await lib.erase(ctx, 20, f)
+        await ctx.send("You flipped a " + rancoin)
 
     @commands.command(aliases=["color"])
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -48,8 +46,7 @@ class Fun(commands.Cog):
                     title = "#" + colour,
                     colour = embedcolour
                     )
-                c = await ctx.send(embed=embed)
-                await lib.erase(ctx, 45, c)
+                await ctx.send(embed=embed)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -73,8 +70,7 @@ class Fun(commands.Cog):
                         embed.add_field(name="Latitude", value=f"{latitude}", inline=True)
                         embed.add_field(name="People in Space", value=f"{people}", inline=True)
                         embed.set_footer(text="Devolution | Space", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-                        e = await ctx.send(embed=embed)
-                        await lib.erase(ctx, 45, e)
+                        await ctx.send(embed=embed)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -82,13 +78,11 @@ class Fun(commands.Cog):
         author = ctx.author
         if number > 1:
             n = random.randint(1, number)
-            r = await ctx.send(f"{author.mention} :game_die: {n} :game_die:")
-            await lib.erase(ctx, 45, r)
+            await ctx.send(f"{author.mention} :game_die: {n} :game_die:")
         else:
             number = 69
             n = random.randint(1, number)
-            rr = await ctx.send(f"{author.mention} :game_die: {n} :game_die:")
-            await lib.erase(ctx, 45, rr)
+            await ctx.send(f"{author.mention} :game_die: {n} :game_die:")
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -98,14 +92,11 @@ class Fun(commands.Cog):
         if user != None:
             if user.id == self.bot.user.id:
                 msg = " How original. No one else had thought of trying to get the bot to insult itself. I applaud your creativity. Yawn. Perhaps this is why you don't have friends. You don't add anything new to any conversation. You are more of a bot than me, predictable answers, and absolutely dull to have an actual conversation with."
-                u = await ctx.send(author.mention + msg)
-                await lib.erase(ctx, 45, u)
+                await ctx.send(author.mention + msg)
             else:
-                i = await ctx.send(user.mention + msg + randchoice(self.insults))
-                await lib.erase(ctx, 45, i)
+                await ctx.send(user.mention + msg + randchoice(self.insults))
         else:
-                ii = await ctx.send(author.mention + msg + randchoice(self.insults))
-                await lib.erase(ctx, 45, ii)
+                await ctx.send(author.mention + msg + randchoice(self.insults))
 
     @commands.command(no_pm=True, aliases=["tits"])
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -143,12 +134,11 @@ class Fun(commands.Cog):
                 if r.status == 200:
                     if result["data"]:
                         g = await ctx.send(result["data"][0]["url"])
-                        await lib.erase(ctx, 30, g)
                     else:
-                        e = await ctx.send(embed=lib.Editable("Error!", "No search results found", "Giphy"))
+                        e = await ctx.send(embed=lib.Editable("Error", "No search results found", "Giphy"))
                         await lib.erase(ctx, 20, e)
                 else:
-                    ee = await ctx.send(embed=lib.Editable("Error!", "There was an error contacting the API! Report this with !bug", "Giphy"))
+                    ee = await ctx.send(embed=lib.Editable("Error", "There was an error contacting the API! Report this with !bug", "Giphy"))
                     await lib.erase(ctx, 20, ee)
 
     @commands.command(no_pm=True)
@@ -161,19 +151,17 @@ class Fun(commands.Cog):
                 if r.status == 200:
                     if result["data"]:
                         g = await ctx.send(result["data"]["url"])
-                        await lib.erase(ctx, 20, g)
                     else:
-                        e = await ctx.send(embed=lib.Editable("Error!", "No search results found", "Giphy"))
+                        e = await ctx.send(embed=lib.Editable("Error", "No search results found", "Giphy"))
                         await lib.erase(ctx, 20, e)
                 else:
-                    ee = await ctx.send(embed=lib.Editable("Error!", "There was an error contacting the API! Report this with !bug", "Giphy"))
+                    ee = await ctx.send(embed=lib.Editable("Error", "There was an error contacting the API! Report this with !bug", "Giphy"))
                     await lib.erase(ctx, 20, ee)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def owo(self, ctx, user : discord.Member=None):
         o = await ctx.send(ctx.author.mention + " " + randchoice(self.owo))
-        await lib.erase(ctx, 45, o)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

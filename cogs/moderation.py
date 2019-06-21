@@ -20,7 +20,7 @@ class Mod(commands.Cog):
                 output += word
                 output += " "
             if output is " ":
-                e = await ctx.send(embed=lib.Editable("Error!", "Please enter a message to send!", "Moderation"))
+                e = await ctx.send(embed=lib.Editable("Error", "Please enter a message to send!", "Moderation"))
                 await lib.erase(ctx, 20, e)
             else:
                 await ctx.message.delete()
@@ -47,12 +47,12 @@ class Mod(commands.Cog):
                         reason += " "
                     if reason == "":
                         await user.send(embed=lib.Editable("You were kicked", f"You were kicked from **{server}** by **{author}**", "Moderation"))
-                        s = await ctx.send(embed=lib.Editable("Success!", f"User has been kicked by **{author.name}**", "Moderation"))
+                        s = await ctx.send(embed=lib.Editable("Success", f"User has been kicked by **{author.name}**", "Moderation"))
                         await ctx.guild.kick(user)
                         await lib.erase(ctx, 20, s)
                     else:
                         await user.send(embed=lib.Editable("You were kicked", f"You were kicked from **{server}** by **{author}** for **{reason}**", "Moderation"))
-                        s1 = await ctx.send(embed=lib.Editable("Success!", f"User has been kicked by **{author.name}** for **{reason}**", "Moderation"))
+                        s1 = await ctx.send(embed=lib.Editable("Success", f"User has been kicked by **{author.name}** for **{reason}**", "Moderation"))
                         await ctx.guild.kick(user)
                         await lib.erase(ctx, 20, s1)
                 except Exception as error:
@@ -79,12 +79,12 @@ class Mod(commands.Cog):
                         reason += " "
                     if reason == "":
                         await user.send(embed=lib.Editable("You were banned", f"You were banned from **{server}** by **{author}**", "Moderation"))
-                        s = await ctx.send(embed=lib.Editable("Success!", f"User has been banned by **{author.name}**", "Moderation"))
+                        s = await ctx.send(embed=lib.Editable("Success", f"User has been banned by **{author.name}**", "Moderation"))
                         await ctx.guild.ban(user)
                         await lib.erase(ctx, 20, s)
                     else:
                         await user.send(embed=lib.Editable("You were banned", f"You were banned from **{server}** by **{author}** for **{reason}**", "Moderation"))
-                        s1 = await ctx.send(embed=lib.Editable("Success!", f"User has been banned by **{author.name}** for **{reason}**", "Moderation"))
+                        s1 = await ctx.send(embed=lib.Editable("Success", f"User has been banned by **{author.name}** for **{reason}**", "Moderation"))
                         await ctx.guild.ban(user)
                         await lib.erase(ctx, 20, s1)
                 except Exception as error:
@@ -114,7 +114,7 @@ class Mod(commands.Cog):
                 try:
                     await self.bot.http.ban(user_id, server.id, 0)
                 except discord.NotFound:
-                    e1 = await ctx.send(embed=lib.Editable("Error!", "Cant find anyone with that ID try again!", "Moderation"))
+                    e1 = await ctx.send(embed=lib.Editable("Error", "Cant find anyone with that ID try again!", "Moderation"))
                     await lib.erase(ctx, 20, e1)
                 else:
                     if reason is None:
@@ -163,7 +163,7 @@ class Mod(commands.Cog):
                     await lib.erase(ctx, 20, d)
                 else:
                     if role in member.roles:
-                        e1 = await ctx.send(embed=lib.Editable("Error!", f"**{member.name}** is already punished!", "Error"))
+                        e1 = await ctx.send(embed=lib.Editable("Error", f"**{member.name}** is already punished!", "Error"))
                         await lib.erase(ctx, 20, e1)
                     else:
                         reason = ""
@@ -172,12 +172,12 @@ class Mod(commands.Cog):
                             reason += " "
                         if reason == "":
                             await member.send(embed=lib.Editable("Punished!", f"You were punished from **{server}** by **{author}**", "Moderation"))
-                            s = await ctx.send(embed=lib.Editable("Success!", f"**{member.name}** has been punished by **{author}**", "Moderation"))
+                            s = await ctx.send(embed=lib.Editable("Success", f"**{member.name}** has been punished by **{author}**", "Moderation"))
                             await member.add_roles(role)
                             await lib.erase(ctx, 20, s)
                         else:
                             await member.send(embed=lib.Editable("Punished!", f"You were punished from **{server}** by **{author}** for **{reason}**", "Moderation"))
-                            s1 = await ctx.send(embed=lib.Editable("Success!", f"**{member.name}** has been punished by **{author}** for **{reason}**", "Moderation"))
+                            s1 = await ctx.send(embed=lib.Editable("Success", f"**{member.name}** has been punished by **{author}** for **{reason}**", "Moderation"))
                             await member.add_roles(role)
                             await lib.erase(ctx, 20, s1)
         else:
@@ -196,11 +196,11 @@ class Mod(commands.Cog):
                 author = ctx.author.name
                 role = discord.utils.get(member.guild.roles, name="punished")
                 if not role in member.roles:
-                    e = await ctx.send(embed=lib.Editable("Error!", f"**{member.name}** is not punished", "Error"))
+                    e = await ctx.send(embed=lib.Editable("Error", f"**{member.name}** is not punished", "Error"))
                     await lib.erase(ctx, 20, e)
                 else:
                     await member.send(embed=lib.Editable("Unpunished!", f"You were unpunished from {server} by {author}", "Moderation"))
-                    s = await ctx.send(embed=lib.Editable("Success!", f"**{member.name}** unpunished by {author}", "Moderation"))
+                    s = await ctx.send(embed=lib.Editable("Success", f"**{member.name}** unpunished by {author}", "Moderation"))
                     await member.remove_roles(role)
                     await lib.erase(ctx, 20, s)
         else:
@@ -239,7 +239,7 @@ class Mod(commands.Cog):
                         e1 = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!rename user {name}\n\nRenames the mentioned user to a specified nickname", "Rename Usage"))
                         await lib.erase(ctx, 20, e1)
                     else:
-                        await ctx.send(embed=lib.Editable("Success!", f"**{member.name}** has been renamed by **{author}** to **{name}**", "Moderation"))
+                        await ctx.send(embed=lib.Editable("Success", f"**{member.name}** has been renamed by **{author}** to **{name}**", "Moderation"))
                         await member.edit(nick=name)
             except Exception as error:
                 ex = await ctx.send(f"Uh oh.. I could not rename **{user}**")
@@ -428,6 +428,8 @@ class Mod(commands.Cog):
                 await channel.delete_messages(to_delete)
         else:
             await ctx.send(embed=lib.NoPerm())
+
+
 
 
 def setup(bot):
