@@ -1,17 +1,24 @@
-from collections import namedtuple
-from discord.ext import commands
 import datetime
+import asyncio
 import discord
 import json
 
+from utils import default
+from discord.ext import commands
+from collections import namedtuple
+
 def get(file):
     try:
-        with open(file, encoding='utf8') as data:
-            return json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        with open(file, encoding="utf8") as data:
+            return json.load(data, object_hook=lambda d: namedtuple("X", d.keys())(*d.values()))
     except AttributeError:
         raise AttributeError("Unknown argument")
     except FileNotFoundError:
         raise FileNotFoundError("JSON file wasn't found")
+
+version = "Stable v1.2"
+invite = "https://discord.gg/frcc5vF"
+config = default.get("./utils/cfg.json")
 
 class lib(commands.Cog):
     def __init__(self, client):
@@ -19,12 +26,12 @@ class lib(commands.Cog):
 
     def NoPerm():
         embed = discord.Embed(
-            title = 'Error!',
-            description = 'You dont have permission to do that!',
+            title = "Error!",
+            description = "You dont have permission to do that!",
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        embed.set_footer(text='Devolution | Error', icon_url="https://i.imgur.com/BS6YRcT.jpg")
+        embed.set_footer(text="Devolution - Error", icon_url="https://i.imgur.com/BS6YRcT.jpg")
 
         return embed
 
@@ -35,8 +42,8 @@ class lib(commands.Cog):
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        e.set_footer(text='Devolution | {}'.format(footer), icon_url='https://i.imgur.com/BS6YRcT.jpg')
-        e.set_author(name='Devolution', icon_url='https://i.imgur.com/BS6YRcT.jpg')
+        e.set_footer(text=f"Devolution - {footer}", icon_url="https://i.imgur.com/BS6YRcT.jpg")
+        e.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
         return e
 
     def AvatarEdit(author, avatar, title, desc, footer):
@@ -46,7 +53,7 @@ class lib(commands.Cog):
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        e.set_footer(text='Devolution | {}'.format(footer))
+        e.set_footer(text=f"Devolution - {footer}")
         e.set_author(name=author, icon_url=avatar)
         return e
 
@@ -57,9 +64,29 @@ class lib(commands.Cog):
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        e.set_footer(text='Devolution | {}'.format(footer))
-        e.set_author(name='Stig', icon_url='https://cdn.discordapp.com/avatars/439327545557778433/a_09b7d5d0f8ecbd826fe3f7b15ee2fb93.gif?size=1024')
+        e.set_footer(text=f"Devolution - {footer}")
+        e.set_author(name="Stig", icon_url="https://cdn.discordapp.com/avatars/439327545557778433/a_09b7d5d0f8ecbd826fe3f7b15ee2fb93.gif?size=1024")
         return e
+
+    async def erase(ctx, duration, name):
+        erase = (
+            await asyncio.sleep(duration),
+            await ctx.message.delete(),
+            await name.delete()
+            )
+        return erase
+
+    async def sp(self, ctx, game):
+        sp = (
+        await self.bot.change_presence(activity=discord.Game(name=game)),
+        )
+        return sp
+
+    async def sa(self, ctx, type, game):
+        sa = (
+        await self.bot.change_presence(activity=discord.Activity(type=type, name=game)),
+        )
+        return sa
 
 def setup(client):
     client.add_cog(Lib(client))

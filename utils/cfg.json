@@ -1,6 +1,6 @@
 {
-  "token": "TOKEN HERE",
-  "owner": [USERID HERE],
+  "token": "TOKEN",
+  "owner": [USERID],
   "prefix": "!",
-  "playing": "Devolution Beta Framework"
+  "playing": "Stable v1.2"
 }

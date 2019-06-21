@@ -1,18 +1,17 @@
-from random import choice as randchoice
-from discord.ext import commands
-from utils.default import lib
-from utils import default
 import datetime
 import discord
-import aiohttp
-import random
+import asyncio
 import json
+
+from utils.default import lib
+from discord.ext import commands
 
 class Main(commands.Cog):
     def __init__(self, bot):
             self.bot = bot
 
     @commands.command(no_pm=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def sinfo(self, ctx):
         name = ctx.message.guild.name
         id = ctx.message.guild.id
@@ -24,47 +23,50 @@ class Main(commands.Cog):
         channels = ctx.message.guild.channels
         afk = ctx.message.guild.afk_channel
         embed = discord.Embed(
-            title = 'Server Information for ' + name,
+            title = "Server Information for " + name,
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        embed.add_field(name='Creation Date', value=created.strftime('%d/%m/%Y at %H:%M:%S (GMT)'), inline=False)
-        embed.add_field(name='Owner', value=owner, inline=True)
-        embed.add_field(name='Region', value=region, inline=True)
-        embed.add_field(name='Roles', value=len(roles), inline=True)
-        embed.add_field(name='Users', value=members, inline=True)
-        embed.add_field(name='Channels', value=len(channels), inline=True)
-        embed.add_field(name='AFK Channel', value=afk, inline=True)
-        embed.set_author(name='Devolution                                                                              ID: {}'.format(id), icon_url='https://i.imgur.com/BS6YRcT.jpg', )
-        embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
-        await ctx.send(embed=embed)
+        embed.add_field(name="Creation Date", value=created.strftime("%d/%m/%Y at %H:%M:%S (GMT)"), inline=False)
+        embed.add_field(name="Owner", value=owner, inline=True)
+        embed.add_field(name="Region", value=region, inline=True)
+        embed.add_field(name="Roles", value=len(roles), inline=True)
+        embed.add_field(name="Users", value=members, inline=True)
+        embed.add_field(name="Channels", value=len(channels), inline=True)
+        embed.add_field(name="AFK Channel", value=afk, inline=True)
+        embed.set_author(name=f"Devolution                                                                              ID: {id}", icon_url="https://i.imgur.com/BS6YRcT.jpg", )
+        embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
+        e = await ctx.send(embed=embed)
+        await lib.erase(ctx, 20, e)
 
     @commands.command(no_pm=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def uinfo(self, ctx, user:discord.User=None):
         if user is None:
-            name = ctx.message.author.name
-            id = ctx.message.author.id
-            avatar = ctx.message.author.avatar_url
-            joined = ctx.message.author.joined_at
-            created = ctx.message.author.created_at
-            status = ctx.message.author.status
-            playing = ctx.message.author.activity
-            roles = ctx.message.author.roles
-            display = ctx.message.author.nick
+            name = ctx.author.name
+            id = ctx.author.id
+            avatar = ctx.author.avatar_url
+            joined = ctx.author.joined_at
+            created = ctx.author.created_at
+            status = ctx.author.status
+            playing = ctx.author.activity
+            roles = ctx.author.roles
+            display = ctx.author.nick
             embed = discord.Embed(
-                title = 'User Information',
+                title = "User Information",
                 colour = 0x9bf442,
                 timestamp=datetime.datetime.utcnow()
                 )
-            embed.add_field(name='Status', value=status, inline=True)
-            embed.add_field(name='Playing', value=playing, inline=True)
-            embed.add_field(name='Nickname', value=display, inline=True)
-            embed.add_field(name='Role Count', value=len(roles), inline=True)
-            embed.add_field(name='Account Creation', value=created.strftime('Since %d/%m/%Y'), inline=True)
-            embed.add_field(name='Joined guild', value=joined.strftime('Since %d/%m/%Y'), inline=True)
-            embed.set_author(name=name + 's User Information', icon_url=avatar)
-            embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
-            await ctx.send(embed=embed)
+            embed.add_field(name="Status", value=status, inline=True)
+            embed.add_field(name="Playing", value=playing, inline=True)
+            embed.add_field(name="Nickname", value=display, inline=True)
+            embed.add_field(name="Role Count", value=len(roles), inline=True)
+            embed.add_field(name="Account Creation", value=created.strftime("Since %d/%m/%Y"), inline=True)
+            embed.add_field(name="Joined guild", value=joined.strftime("Since %d/%m/%Y"), inline=True)
+            embed.set_author(name=name + "s User Information", icon_url=avatar)
+            embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
+            e = await ctx.send(embed=embed)
+            await lib.erase(ctx, 20, e)
         else:
             for user in ctx.message.mentions:
                 name = user.name
@@ -77,27 +79,29 @@ class Main(commands.Cog):
                 roles = user.roles
                 display = user.nick
                 embed = discord.Embed(
-                    title = 'User Information',
+                    title = "User Information",
                     colour = 0x9bf442,
                     timestamp=datetime.datetime.utcnow()
                     )
-                embed.add_field(name='Status', value=status, inline=True)
-                embed.add_field(name='Playing', value=playing, inline=True)
-                embed.add_field(name='Nickname', value=display, inline=True)
-                embed.add_field(name='Role Count', value=len(roles), inline=True)
-                embed.add_field(name='Account Creation', value=created.strftime('Since %d/%m/%Y'), inline=True)
-                embed.add_field(name='Joined guild', value=joined.strftime('Since %d/%m/%Y'), inline=True)
-                embed.set_author(name=name + 's User Information', icon_url=avatar)
-                embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
-                await ctx.send(embed=embed)
+                embed.add_field(name="Status", value=status, inline=True)
+                embed.add_field(name="Playing", value=playing, inline=True)
+                embed.add_field(name="Nickname", value=display, inline=True)
+                embed.add_field(name="Role Count", value=len(roles), inline=True)
+                embed.add_field(name="Account Creation", value=created.strftime("Since %d/%m/%Y"), inline=True)
+                embed.add_field(name="Joined guild", value=joined.strftime("Since %d/%m/%Y"), inline=True)
+                embed.set_author(name=name + "s User Information", icon_url=avatar)
+                embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
+                ee = await ctx.send(embed=embed)
+                await lib.erase(ctx, 20, ee)
 
     @commands.command(no_pm=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def avatar(self, ctx, user:discord.User=None):
         if user is None:
-            sname = ctx.message.author.name
-            savatar = str(ctx.message.author.avatar_url)
+            sname = ctx.author.name
+            savatar = str(ctx.author.avatar_url)
             embed = discord.Embed(
-                title = 'Avatar Stealer',
+                title = "Avatar Stealer",
                 description = savatar,
                 colour = 0x9bf442,
                 timestamp=datetime.datetime.utcnow()
@@ -105,14 +109,15 @@ class Main(commands.Cog):
             embed.set_image(url=savatar)
             embed.set_thumbnail(url=savatar)
             embed.set_author(name=sname, icon_url=savatar)
-            embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
-            await ctx.send(embed=embed)
+            embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
+            e = await ctx.send(embed=embed)
+            await lib.erase(ctx, 20, e)
         else:
             for user in ctx.message.mentions:
                 avatar = str(user.avatar_url)
                 name = user.name
                 embed = discord.Embed(
-                    title = 'Avatar Stealer',
+                    title = "Avatar Stealer",
                     description = avatar,
                     colour = 0x9bf442,
                     timestamp=datetime.datetime.utcnow()
@@ -120,25 +125,26 @@ class Main(commands.Cog):
                 embed.set_image(url=avatar)
                 embed.set_thumbnail(url=avatar)
                 embed.set_author(name=name, icon_url=avatar)
-                embed.set_footer(icon_url='https://i.imgur.com/BS6YRcT.jpg', text='Devolution | Info')
-                await ctx.send(embed=embed)
+                embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
+                e = await ctx.send(embed=embed)
+                await lib.erase(ctx, 20, e)
 
     @commands.command(no_pm=True)
+    @commands.cooldown(1, 15, commands.BucketType.user)
     async def embed(self, ctx):
-        if ctx.message.author.guild_permissions.manage_messages:
-            await ctx.message.delete()
-            ques = await ctx.send('What title?')
-            msg = await self.bot.wait_for('message', check=lambda message: message.author == ctx.author, timeout = 120)
-            ques1 = await ctx.send('What would you like to say?')
+        if ctx.author.guild_permissions.manage_messages:
+            ques = await ctx.send("What title?")
+            msg = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
+            ques1 = await ctx.send("What would you like to say?")
             title = msg.content
-            msg1 = await self.bot.wait_for('message', check=lambda message: message.author == ctx.author, timeout = 120)
-            ques2 = await ctx.send('Ok.. What footer text?')
+            msg1 = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
+            ques2 = await ctx.send("Ok.. What footer text?")
             desc = msg1.content
-            msgg = await self.bot.wait_for('message', check=lambda message: message.author == ctx.author, timeout = 120)
-            ans = await ctx.send('Generating Embed...')
+            msgg = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
+            ans = await ctx.send("Generating Embed...")
             footer = msgg.content
             await asyncio.sleep(2)
-            await ctx.send(embed=lib.Editable(title, desc, footer))
+            r = await ctx.send(embed=lib.Editable(title, desc, footer))
             await ques.delete()
             await msg.delete()
             await ques1.delete()
@@ -146,141 +152,131 @@ class Main(commands.Cog):
             await ques2.delete()
             await msgg.delete()
             await ans.delete()
+            await lib.erase(ctx, 20, r)
         else:
-            await ctx.send(embed=lib.NoPerm())
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.erase(ctx, 20, p)
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, no_pm=True)
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def role(self, ctx):
-        if not ctx.message.author.guild_permissions.manage_roles:
-            error = await ctx.send(embed=lib.NoPerm())
-            await asyncio.sleep(30)
-            await ctx.message.delete()
-            await error.delete()
+        if ctx.author.guild_permissions.manage_roles:
+            u = await ctx.send(embed=lib.Editable("Role Usage!", "**Add** - Adds a user to a role.\n**List** - List all roles in the server\n**Remove** - Removes a user from a role\n**Create** - Creates a role\n**Delete** - Deletes a role", "Role Usage"))
+            await lib.erase(ctx, 20, u)
         else:
-            usage = await ctx.send(embed=lib.Editable('Role Usage', '**Add** - Adds a user to a role.\n **List** - List all roles in the server\n **Remove** - Removes a user from a role\n **Create** - Creates a role\n **Delete** - Deletes a role\n **Edit** - **Warning** This will ask to edit every part of the role, including colour.', 'Roles'))
-            await asyncio.sleep(30)
-            await ctx.message.delete()
-            await usage.delete()
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.erase(ctx, 20, p)
 
-    @role.group(invoke_without_command=True)
+    @role.group(invoke_without_command=True, no_pm=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def list(self, ctx):
-        if not ctx.message.author.guild_permissions.manage_roles:
-            await ctx.send(embed=lib.NoPerm())
-        else:
+        if ctx.author.guild_permissions.manage_roles:
             roles = []
             for role in ctx.guild.roles:
                 roles.append(role.name)
-            roles.remove('@everyone')
-            await ctx.send(embed=lib.Editable('Role List', '{}'.format(', '.join(roles)), 'Roles'))
+            roles.remove("@everyone")
+            l = await ctx.send(embed=lib.Editable("Role List", "{}".format(", ".join(roles)), "Roles"))
+            await lib.erase(ctx, 45, l)
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.erase(ctx, 20, p)
 
-    @role.group(invoke_without_command=True)
+    @role.group(invoke_without_command=True, no_pm=True)
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def add(self, ctx, rolename=None, member: discord.Member=None):
-        if not ctx.message.author.guild_permissions.manage_roles:
-            await ctx.send(embed=lib.NoPerm())
-        else:
+        if ctx.author.guild_permissions.manage_roles:
             if rolename is None:
-                usage = await ctx.send(embed=lib.Editable('Role Add Usage', 'You forgot something!\n\n!role add {role} {@user}\n\n This will add the role to the user.', 'Roles'))
-                await asyncio.sleep(30)
-                await ctx.message.delete()
-                await usage.delete()
+                u = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!role add {role} {@user}\n\n This will add the role to the user.", "Role Usage"))
+                await lib.erase(ctx, 20, u)
             else:
                 if member is None:
-                    usage1 = await ctx.send(embed=lib.Editable('Role Add Usage', 'You forgot to mention a user!\n\n!role add {role} {@user}\n\n This will add the role to the user.', 'Roles'))
-                    await asyncio.sleep(30)
-                    await ctx.message.delete()
-                    await usage1.delete()
+                    u1 = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!role add {role} {@user}\n\n This will add the role to the user.", "Role Usage"))
+                    await lib.erase(ctx, 20, u1)
                 else:
                     role = discord.utils.get(ctx.message.guild.roles, name=rolename)
-                    if role in member.roles:
-                        error = await ctx.send(embed=lib.Editable('Error', '{} already has the role {}'.format(member, role), 'Roles'))
-                        await asyncio.sleep(30)
-                        await ctx.message.delete()
-                        await error.delete()
+                    if role in ctx.guild.roles:
+                        if role in member.roles:
+                            e = await ctx.send(embed=lib.Editable("Error", f"**{member.name}** already has the role **{role}**", "Roles"))
+                            await lib.erase(ctx, 20, e)
+                        else:
+                            await member.add_roles(role)
+                            d = await ctx.send(embed=lib.Editable("Role Added", f"The role **{role}** was added to **{member.name}**", "Roles"))
+                            await lib.erase(ctx, 20, d)
                     else:
-                        await member.add_roles(role)
-                        done = await ctx.send(embed=lib.Editable('Role Added', '{} added to {}'.format(role, member), 'Roles'))
-                        await asyncio.sleep(30)
-                        await ctx.message.delete()
-                        await done.delete()
+                        e = await ctx.send(embed=lib.Editable("Error", f"The role **{rolename}** doesnt exist!", "Roles"))
+                        await lib.erase(ctx, 20, e)
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.erase(ctx, 20, p)
 
-    @role.group(invoke_without_command=True)
+    @role.group(invoke_without_command=True, no_pm=True)
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def remove(self, ctx, rolename=None, member: discord.Member=None):
-        if not ctx.message.author.guild_permissions.manage_roles:
-            await ctx.send(embed=lib.NoPerm())
-        else:
+        if ctx.author.guild_permissions.manage_roles:
             if rolename is None:
-                usage1 = await ctx.send(embed=lib.Editable('Role Remove Usage', 'You forgot something!\n\n!role remove {role} {@user}\n\n This will remove the role from the user.', 'Roles'))
-                await asyncio.sleep(30)
-                await ctx.message.delete()
-                await usage1.delete()
+                u = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!role remove {role} {@user}\n\n This will remove the role from the user.", "Roles"))
+                await lib.erase(ctx, 20, u)
             else:
                 if member is None:
-                    usage = await ctx.send(embed=lib.Editable('Role Remove Usage', 'You forgot to mention a user!\n\n!role remove {role} {@user}\n\n This will remove the role from the user.', 'Roles'))
-                    await asyncio.sleep(30)
-                    await ctx.message.delete()
-                    await usage.delete()
+                    u1 = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!role remove {role} {@user}\n\n This will remove the role from the user.", "Roles"))
+                    await lib.erase(ctx, 20, u1)
                 else:
                     role = discord.utils.get(ctx.message.guild.roles, name=rolename)
-                    if role in member.roles:
-                        await member.remove_roles(role)
-                        done = await ctx.send(embed=lib.Editable('Role Removed', '{} removed from {}'.format(role, member), 'Roles'))
-                        await asyncio.sleep(30)
-                        await ctx.message.delete()
-                        await done.delete()
+                    if role in ctx.guild.roles:
+                        if role in member.roles:
+                            await member.remove_roles(role)
+                            d = await ctx.send(embed=lib.Editable("Role Removed", f"The role **{role}** was removed from **{member.name}**", "Roles"))
+                            await lib.erase(ctx, 20, d)
+                        else:
+                            e = await ctx.send(embed=lib.Editable("Error", f"**{member.name}** does not have the role **{role}**", "Roles"))
+                            await lib.erase(ctx, 20, e)
                     else:
-                        error = await ctx.send(embed=lib.Editable('Error', '{} doesnt have the role {}'.format(member, role), 'Roles'))
-                        await asyncio.sleep(30)
-                        await ctx.message.delete()
-                        await error.delete()
+                        e = await ctx.send(embed=lib.Editable("Error", f"The role **{rolename}** doesnt exist!", "Roles"))
+                        await lib.erase(ctx, 20, e)
 
-    @role.group(invoke_without_command=True)
-    async def create(self, ctx, rolename=None):
-        if not ctx.message.author.guild_permissions.manage_roles:
-            await ctx.send(embed=lib.NoPerm())
         else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.erase(ctx, 20, p)
+
+    @role.group(invoke_without_command=True, no_pm=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def create(self, ctx, rolename=None):
+        if ctx.author.guild_permissions.manage_roles:
             if rolename is None:
-                usage = await ctx.send(embed=lib.Editable('Role Create Usage', 'You forgot something!\n\n!role create {role}\n\n This will create a role with the specified name.', 'Roles'))
-                await asyncio.sleep(30)
-                await ctx.message.delete()
-                await usage.delete()
+                u = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!role create {role}\n\n This will create a role with the specified name.", "Role Usage"))
+                await lib.erase(ctx, 20, u)
             else:
                 role = discord.utils.get(ctx.message.guild.roles, name=rolename)
                 if role in ctx.message.guild.roles:
-                    error = await ctx.send(embed=lib.Editable('Error', 'The role {} already exists!'.format(rolename), 'Roles'))
-                    await asyncio.sleep(30)
-                    await ctx.message.delete()
-                    await error.delete()
+                    e = await ctx.send(embed=lib.Editable("Error", f"The role **{rolename}** already exists!", "Roles"))
+                    await lib.erase(ctx, 20, e)
                 else:
                     await ctx.guild.create_role(name=rolename)
-                    done = await ctx.send(embed=lib.Editable('Role Created', 'The role {} has been created!'.format(rolename), 'Roles'))
-                    await asyncio.sleep(30)
-                    await ctx.message.delete()
-                    await done.delete()
-
-    @role.group(invoke_without_command=True)
-    async def delete(self, ctx, rolename=None):
-        if not ctx.message.author.guild_permissions.manage_roles:
-            await ctx.send(embed=lib.NoPerm())
+                    d = await ctx.send(embed=lib.Editable("Role Created", f"The role **{rolename}** has been created!", "Roles"))
+                    await lib.erase(ctx, 20, d)
         else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.erase(ctx, 20, p)
+
+    @role.group(invoke_without_command=True, no_pm=True)
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    async def delete(self, ctx, rolename=None):
+        if ctx.author.guild_permissions.manage_roles:
             if rolename is None:
-                usage = await ctx.send(embed=lib.Editable('Role delete Usage', 'You forgot something!\n\n!role delete {role}\n\n This will delete the role with the specified name.', 'Roles'))
-                await asyncio.sleep(30)
-                await ctx.message.delete()
-                await usage.delete()
+                u = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!role delete {role}\n\n This will delete the role with the specified name.", "Role Usage"))
+                await lib.erase(ctx, 20, u)
             else:
                 role = discord.utils.get(ctx.message.guild.roles, name=rolename)
                 if role in ctx.message.guild.roles:
                     await role.delete()
-                    done = await ctx.send(embed=lib.Editable('Role Deleted', 'The role {} has been deleted!'.format(rolename), 'Roles'))
-                    await asyncio.sleep(30)
-                    await ctx.message.delete()
-                    await done.delete()
+                    d = await ctx.send(embed=lib.Editable("Role Deleted", f"The role **{rolename}** has been deleted!", "Roles"))
+                    await lib.erase(ctx, 20, d)
                 else:
-                    error = await ctx.send(embed=lib.Editable('Error', 'The role {} doesnt exist!'.format(rolename), 'Roles'))
-                    await asyncio.sleep(30)
-                    await ctx.message.delete()
-                    await error.delete()
+                    e = await ctx.send(embed=lib.Editable("Error", f"The role **{rolename}** doesnt exist!", "Roles"))
+                    await lib.erase(ctx, 20, e)
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.erase(ctx, 20, p)
 
 def setup(bot):
     bot.add_cog(Main(bot))
-    print('Main - Initialized')
