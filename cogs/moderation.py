@@ -317,7 +317,7 @@ class Mod(commands.Cog):
                 e = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!cleanup after {message_id}\n\nDeletes all messages after a specified message ID.", "Cleanup After Usage"))
                 await lib.erase(ctx, 20, e)
             else:
-                to_delete = [ctx.message]
+                to_delete = []
                 after = await channel.fetch_message(id)
                 async for message in channel.history(limit=100, after=after):
                     to_delete.append(message)

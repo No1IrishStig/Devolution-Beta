@@ -37,7 +37,7 @@ class Logs(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def set(self, ctx):
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.send(embed=lib.Editable("Logs - Usage", "!logs set {channel}\n!logs toggle\n\n Enable logs for this server.", "Logs"))
+            await ctx.send(embed=lib.Editable("Logs - Usage", "!logs set channel\n!logs toggle\n\n Enable logs for this server.", "Logs"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.erase(ctx, 20, p)

@@ -1,6 +1,6 @@
 {
   "token": "TOKEN",
-  "owner": [USERID],
+  "owner": [UserID],
   "prefix": "!",
   "playing": "Stable v1.3"
 }
