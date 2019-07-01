@@ -336,7 +336,8 @@ class Mod(commands.Cog):
             else:
                  await ctx.channel.purge(limit=num + 1)
                  s = await ctx.send(embed=lib.Editable("Success", f"{num} messages were deleted!", "Moderation"))
-                 await lib.erase(ctx, 20, s)
+                 await asyncio.sleep(20)
+                 await s.delete()
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.erase(ctx, 20, p)
@@ -380,6 +381,7 @@ class Mod(commands.Cog):
                         await channel.delete_messages(to_delete)
         else:
             await ctx.send(embed=lib.NoPerm())
+            await lib.erase(ctx, 20, p)
 
     @cleanup.group(pass_context=True, no_pm=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
