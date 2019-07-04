@@ -339,10 +339,14 @@ class Mod(commands.Cog):
                 e = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!cleanup messages {amount}\n\nDeletes the specified number of messages.", "Cleanup Messages Usage"))
                 await lib.eraset(self, ctx, e)
             else:
-                 await ctx.channel.purge(limit=num + 1)
-                 s = await ctx.send(embed=lib.Editable("Success", f"{num} messages were deleted!", "Moderation"))
-                 await asyncio.sleep(20)
-                 await s.delete()
+                db = self.deltimer
+                guild = ctx.guild
+                gid = str(guild.id)
+                timer = db[gid]["timer"]
+                await ctx.channel.purge(limit=num + 1)
+                s = await ctx.send(embed=lib.Editable("Success", f"{num} messages were deleted!", "Moderation"))
+                await asyncio.sleep(timer)
+                await s.delete()
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
