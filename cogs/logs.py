@@ -14,6 +14,8 @@ class Logs(commands.Cog):
             self.bot = bot
             with open("./data/logs/settings.json") as f:
                 self.logs = json.load(f)
+                with open("./utils/essentials/deltimer.json") as f:
+                    self.deltimer = json.load(f)
 
     @commands.group(invoke_without_command=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -31,7 +33,7 @@ class Logs(commands.Cog):
                     json.dump(db, f)
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @logs.group(invoke_without_command=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -40,7 +42,7 @@ class Logs(commands.Cog):
             await ctx.send(embed=lib.Editable("Logs - Usage", "!logs set channel\n!logs toggle\n\n Enable logs for this server.", "Logs"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @set.group(name="channel", invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -59,7 +61,7 @@ class Logs(commands.Cog):
                 await ctx.send(embed=lib.Editable("Uh oh", "To set the logs channel you first need to enable them!\nTry this command:\n\n!logs enable", "Logs"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @logs.group(invoke_without_command=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -82,7 +84,7 @@ class Logs(commands.Cog):
                 return
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @logs.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -104,7 +106,7 @@ class Logs(commands.Cog):
                     await ctx.send("I will no longer send log notifications here.")
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     #toggles
 
@@ -127,7 +129,7 @@ class Logs(commands.Cog):
                     await ctx.send("Delete logs disabled")
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -148,7 +150,7 @@ class Logs(commands.Cog):
                     await ctx.send("Edit logs disabled")
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -169,7 +171,7 @@ class Logs(commands.Cog):
                     await ctx.send("User logs disabled")
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -190,7 +192,7 @@ class Logs(commands.Cog):
                     await ctx.send("Join logs disabled")
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -211,7 +213,7 @@ class Logs(commands.Cog):
                     await ctx.send("Leave logs disabled")
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -232,7 +234,7 @@ class Logs(commands.Cog):
                     await ctx.send("Server logs disabled")
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     #events
 
@@ -245,7 +247,7 @@ class Logs(commands.Cog):
             if db[gid]['delete'] == True:
                 if not message.author is message.author.bot:
                     channel = db[gid]["Channel"]
-                    time = datetime.datetime.now()
+                    time = datetime.datetime.utcnow()
                     cleanmsg = message.content
                     for i in message.mentions:
                         cleanmsg = cleanmsg.replace(i.mention, str(i))
@@ -257,7 +259,7 @@ class Logs(commands.Cog):
                     delmessage.add_field(name="Info:", value=infomessage, inline=False)
                     delmessage.add_field(name="Message:", value=cleanmsg)
                     delmessage.set_footer(text="User ID: {}".format(message.author.id))
-                    delmessage.set_author(name=time.strftime(fmt) + " - Deleted Message", url="http://i.imgur.com/fJpAFgN.png")
+                    delmessage.set_author(name=datetime.datetime.utcnow() + " - Deleted Message", url="http://i.imgur.com/fJpAFgN.png")
                     delmessage.set_thumbnail(url="http://i.imgur.com/fJpAFgN.png")
                     try:
                         sendto = guild.get_channel(int(channel))
@@ -285,7 +287,7 @@ class Logs(commands.Cog):
                 for i in after.mentions:
                     cleanafter = cleanafter.replace(i.mention, str(i))
                 channel = db[gid]["Channel"]
-                time = datetime.datetime.now()
+                time = datetime.datetime.utcnow()
                 fmt = '%H:%M:%S'
                 name = before.author
                 name = " ~ ".join((name.name, name.nick)) if name.nick else name.name
@@ -296,7 +298,7 @@ class Logs(commands.Cog):
                     edit.add_field(name="Before Message:", value=cleanbefore, inline=False)
                     edit.add_field(name="After Message:", value=cleanafter)
                     edit.set_footer(text="User ID: {}".format(before.author.id))
-                    edit.set_author(name=time.strftime(fmt) + " - Edited Message", url="http://i.imgur.com/Q8SzUdG.png")
+                    edit.set_author(name=datetime.datetime.utcnow() + " - Edited Message", url="http://i.imgur.com/Q8SzUdG.png")
                     edit.set_thumbnail(url="http://i.imgur.com/Q8SzUdG.png")
                     send_to = guild.get_channel(channel)
                     await send_to.send(embed=edit)
@@ -315,7 +317,7 @@ class Logs(commands.Cog):
         if gid in db:
             if db[gid]['join'] == True:
                 channel = db[gid]["Channel"]
-                time = datetime.datetime.now()
+                time = datetime.datetime.utcnow()
                 fmt = '%H:%M:%S'
                 users = len([e.name for e in guild.members])
                 name = member
@@ -324,7 +326,7 @@ class Logs(commands.Cog):
                 infomessage = "__{}__ has joined the server.".format(member.nick if member.nick else member.name)
                 joinmsg.add_field(name="Info:", value=infomessage, inline=False)
                 joinmsg.set_footer(text="User ID: {}".format(member.id))
-                joinmsg.set_author(name=time.strftime(fmt) + " - Joined User", url="http://www.emoji.co.uk/files/twitter-emojis/objects-twitter/11031-inbox-tray.png")
+                joinmsg.set_author(name=datetime.datetime.utcnow() + " - Joined User", url="http://www.emoji.co.uk/files/twitter-emojis/objects-twitter/11031-inbox-tray.png")
                 joinmsg.set_thumbnail(url="http://www.emoji.co.uk/files/twitter-emojis/objects-twitter/11031-inbox-tray.png")
                 send_to = guild.get_channel(channel)
                 await send_to.send(embed=joinmsg)
@@ -341,7 +343,7 @@ class Logs(commands.Cog):
         if gid in db:
             if db[gid]['leave'] == True:
                 channel = db[gid]["Channel"]
-                time = datetime.datetime.now()
+                time = datetime.datetime.utcnow()
                 fmt = "%H:%M:%S"
                 users = len([e.name for e in guild.members])
                 name = member
@@ -350,7 +352,7 @@ class Logs(commands.Cog):
                 infomessage = "__{}__ has left the server.".format(member.nick if member.nick else member.name)
                 leave.add_field(name="Info:", value=infomessage, inline=False)
                 leave.set_footer(text="User ID: {}".format(member.id))
-                leave.set_author(name=time.strftime(fmt) + " - Leaving User", url="http://www.emoji.co.uk/files/mozilla-emojis/objects-mozilla/11928-outbox-tray.png")
+                leave.set_author(name=datetime.datetime.utcnow() + " - Leaving User", url="http://www.emoji.co.uk/files/mozilla-emojis/objects-mozilla/11928-outbox-tray.png")
                 leave.set_thumbnail(url="http://www.emoji.co.uk/files/mozilla-emojis/objects-mozilla/11928-outbox-tray.png")
                 send_to = guild.get_channel(channel)
                 await send_to.send(embed=leave)
@@ -367,7 +369,7 @@ class Logs(commands.Cog):
         if gid in db:
             if db[gid]['server'] == True:
                 channel = db[gid]["Channel"]
-                time = datetime.datetime.now()
+                time = datetime.datetime.utcnow()
                 fmt = '%H:%M:%S'
                 try:
                     if before.name != after.name:
@@ -377,7 +379,7 @@ class Logs(commands.Cog):
                         sname.add_field(name="Before:", value=before, inline=False)
                         sname.add_field(name="After:", value=after, inline=False)
                         sname.set_footer(text="Server ID: {}".format(gid))
-                        sname.set_author(name=time.strftime(fmt) + " - Server Name Changed")
+                        sname.set_author(name=datetime.datetime.utcnow() + " - Server Name Changed")
                         send_to = guild.get_channel(channel)
                         await send_to.send(embed=sname)
                     if before.region != after.region:
@@ -387,7 +389,7 @@ class Logs(commands.Cog):
                         rname.add_field(name="Before:", value=before, inline=False)
                         rname.add_field(name="After:", value=after, inline=False)
                         rname.set_footer(text="Server ID: {}".format(gid))
-                        rname.set_author(name=time.strftime(fmt) + " - Server Region Changed")
+                        rname.set_author(name=datetime.datetime.utcnow() + " - Server Region Changed")
                         send_to = guild.get_channel(channel)
                         await send_to.send(embed=rname)
                 except Exception as e:
@@ -405,7 +407,7 @@ class Logs(commands.Cog):
         if gid in db:
             if db[gid]['user'] == True:
                 channel = db[gid]["Channel"]
-                time = datetime.datetime.now()
+                time = datetime.datetime.utcnow()
                 fmt = '%H:%M:%S'
                 if not before.nick == after.nick:
                     name = before
@@ -416,7 +418,7 @@ class Logs(commands.Cog):
                     updmessage.add_field(name="Nickname Before:", value=before.nick)
                     updmessage.add_field(name="Nickname After:", value=after.nick)
                     updmessage.set_footer(text="User ID: {}".format(before.id))
-                    updmessage.set_author(name=time.strftime(fmt) + " - Nickname Changed")
+                    updmessage.set_author(name=datetime.datetime.utcnow() + " - Nickname Changed")
                     send_to = guild.get_channel(channel)
                     await send_to.send(embed=updmessage)
             else:

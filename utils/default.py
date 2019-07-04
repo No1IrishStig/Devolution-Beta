@@ -16,13 +16,15 @@ def get(file):
     except FileNotFoundError:
         raise FileNotFoundError("JSON file wasn't found")
 
-version = "Stable v1.3.2"
+version = "Stable v1.4"
 invite = "https://discord.gg/V9DhKbW"
 config = default.get("./utils/cfg.json")
 
 class lib(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
+        with open("./utils/essentials/deltimer.json") as f:
+            self.deltimer = json.load(f)
 
     def NoPerm():
         embed = discord.Embed(
@@ -75,6 +77,27 @@ class lib(commands.Cog):
             await name.delete()
             )
         return erase
+
+    async def eraset(self, ctx, name):
+        db = self.deltimer
+        guild = ctx.guild
+        gid = str(guild.id)
+        if not gid in db:
+            timer = 20
+            eraset = (
+                await asyncio.sleep(timer),
+                await ctx.message.delete(),
+                await name.delete()
+                )
+            return eraset
+        else:
+            timer = db[gid]["timer"]
+            eraset = (
+                await asyncio.sleep(timer),
+                await ctx.message.delete(),
+                await name.delete()
+                )
+            return eraset
 
     async def sp(self, ctx, game):
         sp = (

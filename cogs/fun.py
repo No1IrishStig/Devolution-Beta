@@ -19,6 +19,8 @@ class Fun(commands.Cog):
                     self.settings = json.load(f)
                     with open("./data/owo/owo.json") as f:
                         self.owo = json.load(f)
+                        with open("./utils/essentials/deltimer.json") as f:
+                            self.deltimer = json.load(f)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -136,10 +138,10 @@ class Fun(commands.Cog):
                         g = await ctx.send(result["data"][0]["url"])
                     else:
                         e = await ctx.send(embed=lib.Editable("Error", "No search results found", "Giphy"))
-                        await lib.erase(ctx, 20, e)
+                        await lib.eraset(self, ctx, e)
                 else:
                     ee = await ctx.send(embed=lib.Editable("Error", "There was an error contacting the API! Report this with !bug", "Giphy"))
-                    await lib.erase(ctx, 20, ee)
+                    await lib.eraset(self, ctx, ee)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -153,10 +155,10 @@ class Fun(commands.Cog):
                         g = await ctx.send(result["data"]["url"])
                     else:
                         e = await ctx.send(embed=lib.Editable("Error", "No search results found", "Giphy"))
-                        await lib.erase(ctx, 20, e)
+                        await lib.eraset(self, ctx, e)
                 else:
                     ee = await ctx.send(embed=lib.Editable("Error", "There was an error contacting the API! Report this with !bug", "Giphy"))
-                    await lib.erase(ctx, 20, ee)
+                    await lib.eraset(self, ctx, ee)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 2, commands.BucketType.user)

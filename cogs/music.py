@@ -1,10 +1,12 @@
-from discord.ext import commands
-from utils.default import lib
-from utils import default
 import youtube_dl
 import asyncio
 import discord
 import datetime
+import json
+
+from utils import default
+from utils.default import lib
+from discord.ext import commands
 
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ""
@@ -55,6 +57,8 @@ class Music(commands.Cog):
         self.bot = bot
         self.config = default.get("utils/cfg.json")
         song_requester = None
+        with open("./utils/essentials/deltimer.json") as f:
+            self.deltimer = json.load(f)
 
     @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -63,7 +67,7 @@ class Music(commands.Cog):
             member = ctx.author
             if member.voice is None:
                 e = await ctx.send(embed=lib.Editable("Error", "You arent in a voice channel!", "Music"))
-                await lib.erase(ctx, 20, e1)
+                await lib.eraset(self, ctx, e1)
             else:
                 channel = ctx.author.voice.channel
                 await channel.connect()
@@ -71,7 +75,7 @@ class Music(commands.Cog):
                 await ctx.message.delete()
         except Exception as error:
             e1 = await ctx.send(embed=lib.Editable("Error", "Something went wrong, try again!", "Music"))
-            await lib.erase(ctx, 20, e1)
+            await lib.eraset(self, ctx, e1)
 
     @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.guild)
@@ -82,11 +86,11 @@ class Music(commands.Cog):
         server = ctx.guild
         if author.voice is None:
             e = await ctx.send(embed=lib.Editable("Error", "You arent in a voice channel!", "Music"))
-            await lib.erase(ctx, 20, e)
+            await lib.eraset(self, ctx, e)
         else:
             if url is None:
                 e1 = await ctx.send(embed=lib.Editable("Error", "Please enter a song name to play", "Music"))
-                await lib.erase(ctx, 20, e1)
+                await lib.eraset(self, ctx, e1)
             else:
                 try:
                     channel = ctx.author.voice.channel
@@ -106,7 +110,7 @@ class Music(commands.Cog):
                             e.set_author(name=author.name + " requested a song!", icon_url=avatar)
                             np = await ctx.send(embed=e)
                             song_requester = author
-                            await lib.erase(ctx, 20, np)
+                            await lib.eraset(self, ctx, np)
                     else:
                         await channel.connect()
                         await ctx.reinvoke()
@@ -120,11 +124,11 @@ class Music(commands.Cog):
         avatar = ctx.author.avatar_url
         if ctx.voice_client is None:
             e = await ctx.send(embed=lib.Editable("Error", "Im not in a voice channel!", "Music"))
-            await lib.erase(ctx, 20, e)
+            await lib.eraset(self, ctx, e)
         else:
             if author.voice is None:
                 e1 = await ctx.send(embed=lib.Editable("Error", "You arent in a voice channel!", "Music"))
-                await lib.erase(ctx, 20, e1)
+                await lib.eraset(self, ctx, e1)
             else:
                 ctx.voice_client.pause()
                 e = discord.Embed(
@@ -135,7 +139,7 @@ class Music(commands.Cog):
                 e.set_footer(text="Devolution | Music", icon_url="https://i.imgur.com/BS6YRcT.jpg")
                 e.set_author(name=author.name + " paused the music!", icon_url=avatar)
                 p = await ctx.send(embed=e)
-                await lib.erase(ctx, 20, p)
+                await lib.eraset(self, ctx, p)
 
     @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -157,7 +161,7 @@ class Music(commands.Cog):
                 e.set_footer(text="Devolution | Music", icon_url="https://i.imgur.com/BS6YRcT.jpg")
                 e.set_author(name=author.name + " resumed the music!", icon_url=avatar)
                 r = await ctx.send(embed=e)
-                await lib.erase(ctx, 20, r)
+                await lib.eraset(self, ctx, r)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -166,23 +170,23 @@ class Music(commands.Cog):
         avatar = ctx.author.avatar_url
         if ctx.voice_client is None:
             e = await ctx.send(embed=lib.Editable("Error", "Im not in a voice channel!", "Music"))
-            await lib.erase(ctx, 20, e)
+            await lib.eraset(self, ctx, e)
         else:
             if author.voice is None:
                 e1 = ctx.send(embed=lib.Editable("Error", "You arent in a voice channel!", "Music"))
-                await lib.erase(ctx, 20, e1)
+                await lib.eraset(self, ctx, e1)
             else:
                 if volume > 100:
                     e2 = await ctx.send(embed=lib.Editable("Error", "Please enter a volume between 0 and 100!", "Music"))
-                    await lib.erase(ctx, 20, e2)
+                    await lib.eraset(self, ctx, e2)
                 else:
                     if volume < 0:
                         e3 = await ctx.send(embed=lib.Editable("Error", "Please enter a volume between 0 and 100!", "Music"))
-                        await lib.erase(ctx, 20, e3)
+                        await lib.eraset(self, ctx, e3)
                     else:
                         ctx.voice_client.source.volume = volume / 100
                         s = await ctx.send(embed=lib.AvatarEdit(author.name, avatar, " ", f"The volume is now {volume}", Music))
-                        await lib.erase(ctx, 20, s)
+                        await lib.eraset(self, ctx, s)
 
     @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -191,11 +195,11 @@ class Music(commands.Cog):
         author = ctx.author
         if ctx.voice_client is None:
             e = await ctx.send(embed=lib.Editable("Error", "Im not in a voice channel!", "Music"))
-            await lib.erase(ctx, 20, e)
+            await lib.eraset(self, ctx, e)
         else:
             if author.voice is None:
                 e1 = await ctx.send(embed=lib.Editable("Error", "You arent in a voice channel!", "Music"))
-                await lib.erase(ctx, 20, e1)
+                await lib.eraset(self, ctx, e1)
             else:
                 if author is song_requester:
                     await ctx.voice_client.disconnect()
@@ -203,7 +207,7 @@ class Music(commands.Cog):
                     await ctx.message.delete()
                 else:
                     e2 = await ctx.send(embed=lib.Editable("Error", "Only the song requester can stop the current track!", "Music"))
-                    await lib.erase(ctx, 20, e2)
+                    await lib.eraset(self, ctx, e2)
 
     @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.guild)
@@ -212,11 +216,11 @@ class Music(commands.Cog):
             author = ctx.author
             if ctx.voice_client is None:
                 e = await ctx.send(embed=lib.Editable("Error", "Im not in a voice channel!", "Music"))
-                await lib.erase(ctx, 20, e)
+                await lib.eraset(self, ctx, e)
             else:
                 if author.voice is None:
                     e1 = await ctx.send(embed=lib.Editable("Error", "You arent in a voice channel!", "Music"))
-                    await lib.erase(ctx, 20, e1)
+                    await lib.eraset(self, ctx, e1)
                 else:
                     await ctx.voice_client.disconnect()
                     await asyncio.sleep(5)

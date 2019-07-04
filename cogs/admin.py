@@ -1,15 +1,20 @@
 import sys, traceback
 import discord
 import asyncio
+import json
 
 from utils.default import lib
 from discord.ext import commands
 from utils import default
 
+db_timer = {"timer": 20}
+
 class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = default.get("./utils/cfg.json")
+        with open("./utils/essentials/deltimer.json") as f:
+            self.deltimer = json.load(f)
 
     @commands.group(invoke_without_command=True, no_pm=True)
     async def cog(self, ctx):
@@ -18,14 +23,14 @@ class Admin(commands.Cog):
             await lib.erase(ctx, 20, usage)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, noperm)
+            await lib.eraset(self, ctx, noperm)
 
     @cog.group(invoke_without_command=True, no_pm=True)
     async def load(self, ctx, cog : str=None):
         if ctx.author.id in self.config.owner:
             if cog is None:
                 e = await ctx.send(embed=lib.Editable("Error", "Enter a cog name to load!", "Error"))
-                await lib.erase(ctx, 20, e)
+                await lib.eraset(self, ctx, e)
             else:
                 try:
                     self.bot.load_extension(cog)
@@ -36,14 +41,14 @@ class Admin(commands.Cog):
                     await lib.erase(ctx, 20, ee)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, noperm)
+            await lib.eraset(self, ctx, noperm)
 
     @cog.group(invoke_without_command=True, no_pm=True)
     async def unload(self, ctx, cog : str=None):
         if ctx.author.id in self.config.owner:
             if cog is None:
                 e = await ctx.send(embed=lib.Editable("Error", "Enter a cog name to unload!", "Error"))
-                await lib.erase(ctx, 20, e)
+                await lib.eraset(self, ctx, e)
             else:
                 try:
                     self.bot.unload_extension(cog)
@@ -54,7 +59,7 @@ class Admin(commands.Cog):
                     await lib.erase(ctx, 20, ee)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, noperm)
+            await lib.eraset(self, ctx, noperm)
 
     @cog.command(no_pm=True)
     async def list(self, ctx):
@@ -63,7 +68,7 @@ class Admin(commands.Cog):
             await lib.erase(ctx, 20, u)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, noperm)
+            await lib.eraset(self, ctx, noperm)
 
     @commands.command(aliases=["sp"], no_pm=True)
     async def setpresence(self, ctx, activity:str=None, *args):
@@ -76,23 +81,23 @@ class Admin(commands.Cog):
                 game += " "
             if game == "":
                 e = await ctx.send(embed=lib.Editable("Error", "Please enter one of these activities with the name you would like after it!\n\n**playing {name}**\n**listening {name}**\n**watching {name}**", "Usage"))
-                await lib.erase(ctx, 20, e)
+                await lib.eraset(self, ctx, e)
             else:
                 if activity == "playing":
                     await lib.sp(self, ctx, game)
                     p = await ctx.send(embed=lib.Editable("Activity Presence", f"The bots status has been set to **Playing** {game} ", "Owner"))
-                    await lib.erase(ctx, 20, p)
+                    await lib.eraset(self, ctx, p)
                 if activity == "listening":
                     await lib.sa(self, ctx, listening, game)
                     l = await ctx.send(embed=lib.Editable("Activity Presence", f"The bots status has been set to **Listening to** {game}", "Owner"))
-                    await lib.erase(ctx, 20, l)
+                    await lib.eraset(self, ctx, l)
                 if activity == "watching":
                     await lib.sa(self, ctx, watching, game)
                     w = await ctx.send(embed=lib.Editable("Activity Presence", f"The bots status has been set to **Watching** {game}", "Owner"))
-                    await lib.erase(ctx, 20, w)
+                    await lib.eraset(self, ctx, w)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, noperm)
+            await lib.eraset(self, ctx, noperm)
 
     @commands.command(no_pm=True)
     async def shutdown(self, ctx):
@@ -101,7 +106,7 @@ class Admin(commands.Cog):
                 await self.bot.logout()
             else:
                 noperm = await ctx.send(embed=lib.NoPerm())
-                await lib.erase(ctx, 20, noperm)
+                await lib.eraset(self, ctx, noperm)
 
     @commands.command(no_pm=True)
     async def leave(self, ctx):
@@ -110,30 +115,30 @@ class Admin(commands.Cog):
             await ctx.guild.leave()
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, noperm)
+            await lib.eraset(self, ctx, noperm)
 
     @commands.command(no_pm=True)
     async def leaveid(self, ctx, id:int=None):
         if ctx.author.id in self.config.owner:
             if id is None:
                 e = await ctx.send(embed=lib.Editable("Error", "Please enter a serverid for me to leave", "Error"))
-                await lib.erase(ctx, 20, e)
+                await lib.eraset(self, ctx, e)
             else:
                 guild = self.bot.get_guild(id)
                 await ctx.send(embed=lib.Editable("Success", f"I left the server **{guild}**", "Owner"))
 
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, noperm)
+            await lib.eraset(self, ctx, noperm)
 
     @commands.command(no_pm=True)
     async def amiadmin(self, ctx):
         if ctx.author.id in self.config.owner:
             y = await ctx.send(f"Yes **{ctx.author.name}**, you're an admin!")
-            await lib.erase(ctx, 20, y)
+            await lib.eraset(self, ctx, y)
         else:
             n = await ctx.send(f"You arent an admin, {ctx.author.name}")
-            await lib.erase(ctx, 20, n)
+            await lib.eraset(self, ctx, n)
 
     @commands.command(no_pm=True)
     async def pm(self, ctx, user : discord.User=None, *args):
@@ -162,14 +167,14 @@ class Admin(commands.Cog):
                     await ctx.message.delete()
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, noperm)
+            await lib.eraset(self, ctx, noperm)
 
     @commands.command(no_pm=True)
     async def pmid(self, ctx, id=None, *args):
         if ctx.author.id in self.config.owner:
             if id is None:
                 e = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!pmid {userid} {message}\n\n This will send a dm to the user with that ID", "PMID Usage"))
-                await lib.erase(ctx, 20, e)
+                await lib.eraset(self, ctx, e)
             else:
                 member = ctx.author
                 userid = ctx.author.id
@@ -180,7 +185,7 @@ class Admin(commands.Cog):
                     message += " "
                 if message is "":
                     e1 = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!pmid {userid} {message}\n\n This will send a dm to the user with that ID.", "PMID Usage"))
-                    await lib.erase(ctx, 20, e1)
+                    await lib.eraset(self, ctx, e1)
                 else:
                     try:
                         user = await self.bot.fetch_user(id)
@@ -194,11 +199,10 @@ class Admin(commands.Cog):
                         await user.send(embed=embed)
                     except Exception as error:
                             er = await ctx.send(f"I couldnt send your message to {member} because of the error: {error}")
-                            await lib.erase(ctx, 20, er)
+                            await lib.eraset(self, ctx, er)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, noperm)
-
+            await lib.eraset(self, ctx, noperm)
 
 
 def setup(bot):

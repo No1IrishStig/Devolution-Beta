@@ -17,6 +17,8 @@ class Core(commands.Cog):
         self.bot = bot
         with open("./data/customcommands/commands.json") as f:
             self.cc = json.load(f)
+            with open("./utils/essentials/deltimer.json") as f:
+                self.deltimer = json.load(f)
 
     @commands.group(invoke_without_command=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -33,7 +35,7 @@ class Core(commands.Cog):
         embed.add_field(name="Information", value="**help** - Gives help!\n**help permissions** - Gives a list of permissions the bot requires to function\n**bug** - Use it to report bugs.\n**suggest** - Suggest something to the dev\n**sinfo** - Displays guild information.\n**uinfo** - Displays user information\n**uptime** - Displays the bots uptime\n**about** - Displays stuff about the bot\n**changelog** - Displays the entire bots changelog\n**github** - Provides github link", inline=False)
         embed.add_field(name="Fun", value="**coinflip** - Flip a coin\n**space** - Get live information about the ISS\n**colour** - Get a random colour\n**roll** - Roles a dice\n**insult** - Insult people you dislike!\n**boobs** - See some melons!\n**ass** - See some peaches!\n**gif** - Search up a gif on giphy by name\n**gifr** - Gives a random gif from giphy\n**owo** - Get random responses", inline=False)
         embed.add_field(name="Useful", value="**say** - Speak as the bot\n**rename** - Change a users nickname\n**invite** - Gives usage details\n**embed** - Creates an embed message\n**role** - Gives role options\n**music** - Gives music help\n**customcommand** - Add customcommands to your server", inline=False)
-        embed.add_field(name="Moderation", value="**kick** - Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives mute options\n**cleanup** - Gives message moderation options\n**clean** - Deletes the last 100 command messages and bot messages\nlogs - Get logs on nearly everything", inline=False)
+        embed.add_field(name="Moderation", value="**kick** - Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives mute options\n**cleanup** - Gives message moderation options\n**clean** - Deletes the last 100 command messages and bot messages\n**logs** - Get logs on nearly everything\n**deltimer** - Change the timer at which the bot auto deletes its messages", inline=False)
         embed.add_field(name="Admin", value="**leave** - Makes the bot leave the guild\n**leaveid** - Leaves a server by ID\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**todo** - Displays List of shit todo\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.", inline=False)
         await author.send(embed=embed)
         await asyncio.sleep(10)
@@ -74,7 +76,7 @@ class Core(commands.Cog):
             )
         await user.send(embed=ee)
         eee = discord.Embed(
-            description = "__**Changelog (17/06/2019) v1.0.2**__\nAdded music command!(Play, Pause, Resume, volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) v1.1**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added amiadmin command\n+ Added utils folder\n+ Added config file\n\n- Merged lib into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs\n\n__**Changelog (18/06/2019) v1.1.1**__\n+ Added owo command (944)\n\n- Fixed Punish not setting channel permissions\n - Finished Cleanup command\n- Fixed volume command\n- Updated help command\n- Added clean command\n- Bug Fixes\n\n__**Changelog (21/06/2019) v1.2**__\n+ Added Error handler (catches and resolves errors automatically)\n+ Added help command for bot required permissions\n+ Added self delete function to every command\n+ Added 'role exist' check to remove and add\n+ Added sstop command (Force stop song)\n+ Added command cooldowns\n\n- Updated 'Forgot Something' errors to add more detail and to give a similar appearance\n- Reworked invite command (Invite ClientID is now based on the bots ID)\n- Changed stop command so only the song player can stop the song\n- Rewrote every command and optimized a lot of code\n- Rearranged and removed unused imports\n- Tweaked and tidied changelog output\n- Reverted and updated help command\n- Placed all commands into cogs\n- Reworked Cog loading system\n- Removed todo command\n- Reworked every cog\n- Reworked bot.py file\n- Bug Fixes\n\n__**Changelog (21/06/2019) v1.3**__\n+Added customcommands\n+ Added leaveid\n+ Added logs\n\n- Added permission check to spp\n- Updated help command\n- Updated changelog\n- Bug fixes\n\n__**Changelog (23/06/2019) v1.3.1**__\n- Fixed cleanup after\n- Bug fixes\n\n__**Changelog (1/07/2019) v1.3.2**__\n+ Added suggest command \n- Fixed a bug with cleanup messages not deleting its confirmation message.",
+            description = "__**Changelog (17/06/2019) v1.0.2**__\nAdded music command!(Play, Pause, Resume, volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) v1.1**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added amiadmin command\n+ Added utils folder\n+ Added config file\n\n- Merged lib into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs\n\n__**Changelog (18/06/2019) v1.1.1**__\n+ Added owo command (944)\n\n- Fixed Punish not setting channel permissions\n- Finished Cleanup command\n- Fixed volume command\n- Updated help command\n- Added clean command\n- Bug Fixes\n\n__**Changelog (21/06/2019) v1.2**__\n+ Added Error handler (catches and resolves errors automatically)\n+ Added help command for bot required permissions\n+ Added self delete function to every command\n+ Added 'role exist' check to remove and add\n+ Added sstop command (Force stop song)\n+ Added command cooldowns\n\n- Updated 'Forgot Something' errors to add more detail and to give a similar appearance\n- Reworked invite command (Invite ClientID is now based on the bots ID)\n- Changed stop command so only the song player can stop the song\n- Rewrote every command and optimized a lot of code\n- Rearranged and removed unused imports\n- Tweaked and tidied changelog output\n- Reverted and updated help command\n- Placed all commands into cogs\n- Reworked Cog loading system\n- Removed todo command\n- Reworked every cog\n- Reworked bot.py file\n- Bug Fixes\n\n__**Changelog (21/06/2019) v1.3**__\n+ Added customcommands\n+ Added leaveid\n+ Added logs\n\n- Added permission check to spp\n- Updated help command\n- Updated changelog\n- Bug fixes\n\n__**Changelog (23/06/2019) v1.3.1**__\n- Fixed cleanup after\n- Bug fixes\n\n__**Changelog (1/07/2019) v1.3.2**__\n+ Added suggest command \n- Fixed a bug with cleanup messages not deleting its confirmation message.\n\n__**Changelog (04/07/2019) v1.4**__\n+ Added !deltimer\n- Fixed time being off in logs\n- Bug Fixes\n- Updated help command",
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
@@ -106,7 +108,7 @@ class Core(commands.Cog):
         embed.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
         embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Core")
         u = await ctx.send(embed=embed)
-        await lib.erase(ctx, 20, u)
+        await lib.eraset(self, ctx, u)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -143,7 +145,7 @@ class Core(commands.Cog):
         embed.add_field(name="Message", value=msg.content, inline=True)
         await me.send(embed=embed)
         f = await ctx.send(embed=lib.Editable("Success", f"Thanks to you another bug is about to be squished! Thank you for your feedback **{ctx.author.name}** :smile:", "Bug Report"))
-        await lib.erase(ctx, 20, f)
+        await lib.eraset(self, ctx, f)
         await ques.delete()
         await msg.delete()
 
@@ -167,7 +169,7 @@ class Core(commands.Cog):
         embed.add_field(name="Message", value=msg.content, inline=True)
         await me.send(embed=embed)
         f = await ctx.send(embed=lib.Editable("Success", f"Thank you for your suggestion! It's been sent to our dev, **{ctx.author.name}** :smile:", "Suggestion"))
-        await lib.erase(ctx, 20, f)
+        await lib.eraset(self, ctx, f)
         await ques.delete()
         await msg.delete()
 
@@ -190,13 +192,13 @@ class Core(commands.Cog):
             await msg2.delete()
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def music(self, ctx):
         m = await ctx.send(embed=lib.Editable("Music Usage", "**play {song/link}** - Plays a song by name or url from youtube\n**pause** - Pauses the current song\n**resume** - Resumes the current song\n**volume {number}** - Change the volume of the bot\n**stop** - Disconnects the bot\n**sstop** - Force disconnects the bot ", "Todo"))
-        await lib.erase(ctx, 20, m)
+        await lib.eraset(self, ctx, m)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -214,7 +216,7 @@ class Core(commands.Cog):
             await ctx.send(embed=lib.Editable("Custom Commands - Usage", "!cc add {name} {text}\n!cc edit {name} {text}\n!cc delete {name}\n!cc list\n\nAllows for the use of custom commands.", "Custom Commands"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @customcommand.command(invoke_without_command=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -243,7 +245,7 @@ class Core(commands.Cog):
                     await ctx.send(embed=lib.Editable("Error", "This customcommand already exists. Use `!customcommand edit` to edit it.", "Error"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @customcommand.command(invoke_without_command=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -270,7 +272,7 @@ class Core(commands.Cog):
                     await ctx.send(embed=lib.Editable("Error", "There are no custom commands in this server. Use `!customcom add` to start adding some.", "Error"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @customcommand.command(invoke_without_command=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -297,7 +299,7 @@ class Core(commands.Cog):
                     await ctx.send(embed=lib.Editable("Error", "There are no custom commands in this server. Use `!customcom add` to start adding some.", "Error"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @customcommand.command(invoke_without_command=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -323,7 +325,7 @@ class Core(commands.Cog):
                     await ctx.author.send(page)
         else:
             p = await ctx.send(embed=lib.NoPerm())
-            await lib.erase(ctx, 20, p)
+            await lib.eraset(self, ctx, p)
 
     @commands.Cog.listener()
     async def on_message(self, message):
