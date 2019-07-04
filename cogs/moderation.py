@@ -7,6 +7,8 @@ from utils import default
 from utils.default import lib
 from discord.ext import commands
 
+db_timer = {"timer": 20}
+
 class Mod(commands.Cog):
     def __init__(self, bot):
             self.bot = bot
