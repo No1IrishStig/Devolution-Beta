@@ -7,12 +7,16 @@ from utils.default import lib
 from discord.ext import commands
 from utils import default
 
+adminset = {"admins": []}
+
 class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = default.get("./utils/cfg.json")
         with open("./utils/essentials/deltimer.json") as f:
             self.deltimer = json.load(f)
+            with open("./utils/essentials/admins.json") as f:
+                self.admindb = json.load(f)
 
     @commands.group(invoke_without_command=True, no_pm=True)
     async def cog(self, ctx):
@@ -131,12 +135,22 @@ class Admin(commands.Cog):
 
     @commands.command(no_pm=True)
     async def amiadmin(self, ctx):
-        if ctx.author.id in self.config.owner:
-            y = await ctx.send(f"Yes **{ctx.author.name}**, you're an admin!")
-            await lib.eraset(self, ctx, y)
-        else:
-            n = await ctx.send(f"You arent an admin, {ctx.author.name}")
-            await lib.eraset(self, ctx, n)
+        gid = str(ctx.guild.id)
+        userid = ctx.author.id
+        try:
+            if userid in self.admindb[gid]["admins"]:
+                y = await ctx.send(f"Yes {ctx.author.mention}, you're an admin!")
+                await lib.eraset(self, ctx, y)
+            else:
+                n = await ctx.send(f"You arent an admin, {ctx.author.mention}")
+                await lib.eraset(self, ctx, n)
+        except:
+            if userid in self.config.owner:
+                y = await ctx.send(f"Yes {ctx.author.mention}, you're an admin!")
+                await lib.eraset(self, ctx, y)
+            else:
+                n = await ctx.send(f"You arent an admin, {ctx.author.mention}")
+                await lib.eraset(self, ctx, n)
 
     @commands.command(no_pm=True)
     async def pm(self, ctx, user : discord.User=None, *args):
@@ -201,6 +215,123 @@ class Admin(commands.Cog):
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
+
+    @commands.group(invoke_without_command=True, no_pm=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def admin(self, ctx):
+        if ctx.author.id in self.config.owner:
+            db = self.admindb
+            guild = ctx.guild
+            author = str(ctx.author.id)
+            gid = str(guild.id)
+            if not gid in db:
+                await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
+                db[gid] = adminset
+                with open("./utils/essentials/admins.json", "w") as f:
+                    json.dump(db, f)
+            else:
+                await ctx.send(embed=lib.Editable("Uh oh", "Admin access is enabled.\n\nHeres a list of commands you can try!\n**!admin add {userid}**\n**!admin remove {userid}**", "Admin Access"))
+        else:
+            noperm = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, noperm)
+
+    @admin.group(invoke_without_command=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def add(self, ctx, id:int = None):
+        if ctx.author.id in self.config.owner:
+            db = self.admindb
+            guild = ctx.guild
+            gid = str(guild.id)
+            if gid in db:
+                if id is None:
+                    e = await ctx.send(embed=lib.Editable("Error", f"{ctx.author.mention} Please enter a UserID!", "Error"))
+                    await lib.eraset(self, ctx, e)
+                else:
+                    db[gid]["admins"].append(str(id))
+                    name = await self.bot.fetch_user(id)
+                    with open("./utils/essentials/admins.json", "w") as f:
+                        json.dump(db, f)
+                    s = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} Added the UserID **{id}, ({name})** to the admins list!", "Admin Access"))
+                    await lib.eraset(self, ctx, s)
+            else:
+                e = await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
+                db[gid] = adminset
+                with open("./utils/essentials/admins.json", "w") as f:
+                    json.dump(db, f)
+                await asyncio.sleep(5)
+                await e.delete()
+                r = await ctx.send(embed=lib.Editable("Success", "Alright all set up now. Retrying your command!", "Admin Access"))
+                await ctx.reinvoke()
+                await lib.eraset(self, ctx, r)
+        else:
+            noperm = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, noperm)
+
+    @admin.group(invoke_without_command=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def remove(self, ctx, id:str = None):
+        if ctx.author.id in self.config.owner:
+            db = self.admindb
+            guild = ctx.guild
+            gid = str(guild.id)
+            if gid in db:
+                if id is None:
+                    e = await ctx.send(embed=lib.Editable("Error", f"{ctx.author.mention} Please enter a UserID!", "Error"))
+                    await lib.eraset(self, ctx, e)
+                else:
+                    name = await self.bot.fetch_user(id)
+                    if id in db[gid]["admins"]:
+                        db[gid]["admins"].remove(id)
+                        with open("./utils/essentials/admins.json", "w") as f:
+                            json.dump(db, f)
+                        s = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} Removed the UserID **{id}, ({name})** from the admins list!", "Admin Access"))
+                        await lib.eraset(self, ctx, s)
+                    else:
+                        await ctx.send(embed=lib.Editable("Uh oh", "That UserID doesnt have admin access!", "Admin Access"))
+            else:
+                await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
+                db[gid] = adminset
+                with open("./utils/essentials/admins.json", "w") as f:
+                    json.dump(db, f)
+                await asyncio.sleep(5)
+                await e.delete()
+                r = await ctx.send(embed=lib.Editable("Success", "Alright all set up now. Retrying your command!", "Admin Access"))
+                await ctx.reinvoke()
+                await lib.eraset(self, ctx, r)
+
+        else:
+            noperm = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, noperm)
+
+    @admin.group(invoke_without_command=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def list(self, ctx):
+        if ctx.author.id in self.config.owner:
+            db = self.admindb
+            guild = ctx.guild
+            gid = str(guild.id)
+            names = []
+            admin_list = db[gid]["admins"]
+            if gid in db:
+                for id in admin_list:
+                    user = await self.bot.fetch_user(id)
+                    names.append(user.name)
+                await ctx.send(embed=lib.Editable("Admin List", "{} \n\n{}".format(", ".join(db[gid]["admins"]), ", ".join(names)), "Admin Access"))
+            else:
+                await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
+                db[gid] = adminset
+                with open("./utils/essentials/admins.json", "w") as f:
+                    json.dump(db, f)
+                await asyncio.sleep(5)
+                await e.delete()
+                r = await ctx.send(embed=lib.Editable("Success", "Alright all set up now. Retrying your command!", "Admin Access"))
+                await ctx.reinvoke()
+                await lib.eraset(self, ctx, r)
+
+        else:
+            noperm = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, noperm)
+
 
 
 def setup(bot):

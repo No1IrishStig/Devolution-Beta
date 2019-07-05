@@ -1,10 +1,10 @@
 import os, sys, traceback
 import discord
+import json
 
 from utils.default import lib
 from discord.ext import commands
 from utils import default
-
 
 config = default.get("utils/cfg.json")
 
@@ -24,6 +24,6 @@ for file in os.listdir("cogs"):
         except Exception as error:
             traceback.print_exc()
 
-#bot.load_extension("utils.errorhandler")
+bot.load_extension("utils.errorhandler")
 print('Boot Successful!')
 bot.run(config.token, reconnect=True)
