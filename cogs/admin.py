@@ -21,7 +21,7 @@ class Admin(commands.Cog):
     @commands.group(invoke_without_command=True, no_pm=True)
     async def cog(self, ctx):
         if ctx.author.id in self.config.owner:
-            usage = await ctx.send(embed=lib.Editable("Cog Commands", "**Load** - loads named cog.\n **Unload** - Unloads named cog.\n **List** - Lists all cogs.", "Cogs"))
+            usage = await ctx.send(embed=lib.Editable("Cog Commands", "**load** - loads named cog.\n **unload** - Unloads named cog.\n **names** - Lists all cogs.", "Cogs"))
             await lib.erase(ctx, 20, usage)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
@@ -63,8 +63,8 @@ class Admin(commands.Cog):
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
 
-    @cog.command(no_pm=True)
-    async def list(self, ctx):
+    @cog.group(invoke_without_command=True)
+    async def names(self, ctx):
         if ctx.author.id in self.config.owner:
             u = await ctx.send(embed=lib.Editable("Available Cogs", "cogs.core, cogs.main, cogs.fun, cogs.music, cogs.moderation, cogs.admin", "Cogs"))
             await lib.erase(ctx, 20, u)
