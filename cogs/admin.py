@@ -54,10 +54,10 @@ class Admin(commands.Cog):
             else:
                 try:
                     self.bot.unload_extension(cog)
-                    s = await ctx.send(embed=lib.Editable("Success", "{cog} has been unloaded!", "Cogs"))
+                    s = await ctx.send(embed=lib.Editable("Success", f"{cog} has been unloaded!", "Cogs"))
                     await lib.erase(ctx, 20, s)
                 except Exception as error:
-                    ee = await ctx.send(embed=lib.Editable("Error", "{cog} cannot be unloaded because {error}!", "Cogs"))
+                    ee = await ctx.send(embed=lib.Editable("Error", f"{cog} cannot be unloaded because {error}!", "Cogs"))
                     await lib.erase(ctx, 20, ee)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
