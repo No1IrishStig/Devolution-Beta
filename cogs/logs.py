@@ -254,12 +254,15 @@ class Logs(commands.Cog):
                     fmt = '%H:%M:%S'
                     name = message.author
                     name = " ~ ".join((name.name, name.nick)) if name.nick else name.name
-                    delmessage = discord.Embed(colour=0x9bf442)
+                    delmessage = discord.Embed(
+                    colour=0x9bf442,
+                    timestamp=datetime.datetime.utcnow()
+                    )
                     infomessage = "A message by __{}__, was deleted in {}".format(message.author.nick if message.author.nick else message.author.name, message.channel.mention)
                     delmessage.add_field(name="Info:", value=infomessage, inline=False)
                     delmessage.add_field(name="Message:", value=cleanmsg)
                     delmessage.set_footer(text="User ID: {}".format(message.author.id))
-                    delmessage.set_author(name=datetime.datetime.utcnow() + " - Deleted Message", url="http://i.imgur.com/fJpAFgN.png")
+                    delmessage.set_author(name="Deleted Message", url="http://i.imgur.com/fJpAFgN.png")
                     delmessage.set_thumbnail(url="http://i.imgur.com/fJpAFgN.png")
                     try:
                         sendto = guild.get_channel(int(channel))
@@ -292,13 +295,16 @@ class Logs(commands.Cog):
                 name = before.author
                 name = " ~ ".join((name.name, name.nick)) if name.nick else name.name
                 try:
-                    edit = discord.Embed(colour=0x9bf442)
+                    edit = discord.Embed(
+                    colour=0x9bf442,
+                    timestamp=datetime.datetime.utcnow()
+                    )
                     infomessage = "A message by __{}__, was edited in {}".format(before.author.nick if before.author.nick else before.author.name, before.channel.mention)
                     edit.add_field(name="Info:", value=infomessage, inline=False)
                     edit.add_field(name="Before Message:", value=cleanbefore, inline=False)
                     edit.add_field(name="After Message:", value=cleanafter)
                     edit.set_footer(text="User ID: {}".format(before.author.id))
-                    edit.set_author(name=datetime.datetime.utcnow() + " - Edited Message", url="http://i.imgur.com/Q8SzUdG.png")
+                    edit.set_author(name="Edited Message", url="http://i.imgur.com/Q8SzUdG.png")
                     edit.set_thumbnail(url="http://i.imgur.com/Q8SzUdG.png")
                     send_to = guild.get_channel(channel)
                     await send_to.send(embed=edit)
@@ -322,11 +328,13 @@ class Logs(commands.Cog):
                 users = len([e.name for e in guild.members])
                 name = member
                 name = " ~ ".join((name.name, name.nick)) if name.nick else name.name
-                joinmsg = discord.Embed(colour=0x9bf442)
+                joinmsg = discord.Embed(colour=0x9bf442,
+                timestamp=datetime.datetime.utcnow()
+                )
                 infomessage = "__{}__ has joined the server.".format(member.nick if member.nick else member.name)
                 joinmsg.add_field(name="Info:", value=infomessage, inline=False)
                 joinmsg.set_footer(text="User ID: {}".format(member.id))
-                joinmsg.set_author(name=datetime.datetime.utcnow() + " - Joined User", url="http://www.emoji.co.uk/files/twitter-emojis/objects-twitter/11031-inbox-tray.png")
+                joinmsg.set_author(name="Someone Joined")
                 joinmsg.set_thumbnail(url="http://www.emoji.co.uk/files/twitter-emojis/objects-twitter/11031-inbox-tray.png")
                 send_to = guild.get_channel(channel)
                 await send_to.send(embed=joinmsg)
@@ -348,11 +356,13 @@ class Logs(commands.Cog):
                 users = len([e.name for e in guild.members])
                 name = member
                 name = " ~ ".join((name.name, name.nick)) if name.nick else name.name
-                leave = discord.Embed(colour=0x9bf442)
+                leave = discord.Embed(colour=0x9bf442,
+                timestamp=datetime.datetime.utcnow()
+                )
                 infomessage = "__{}__ has left the server.".format(member.nick if member.nick else member.name)
                 leave.add_field(name="Info:", value=infomessage, inline=False)
                 leave.set_footer(text="User ID: {}".format(member.id))
-                leave.set_author(name=datetime.datetime.utcnow() + " - Leaving User", url="http://www.emoji.co.uk/files/mozilla-emojis/objects-mozilla/11928-outbox-tray.png")
+                leave.set_author(name="Someone Left")
                 leave.set_thumbnail(url="http://www.emoji.co.uk/files/mozilla-emojis/objects-mozilla/11928-outbox-tray.png")
                 send_to = guild.get_channel(channel)
                 await send_to.send(embed=leave)
@@ -373,23 +383,27 @@ class Logs(commands.Cog):
                 fmt = '%H:%M:%S'
                 try:
                     if before.name != after.name:
-                        sname = discord.Embed(colour=0x9bf442)
+                        sname = discord.Embed(colour=0x9bf442,
+                        timestamp=datetime.datetime.utcnow()
+                        )
                         before = f"**{before.name}**"
                         after = f"**{after.name}**"
                         sname.add_field(name="Before:", value=before, inline=False)
                         sname.add_field(name="After:", value=after, inline=False)
                         sname.set_footer(text="Server ID: {}".format(gid))
-                        sname.set_author(name=datetime.datetime.utcnow() + " - Server Name Changed")
+                        sname.set_author(name="Server Name Changed")
                         send_to = guild.get_channel(channel)
                         await send_to.send(embed=sname)
                     if before.region != after.region:
-                        rname = discord.Embed(colour=0x9bf442)
+                        rname = discord.Embed(colour=0x9bf442,
+                        timestamp=datetime.datetime.utcnow()
+                        )
                         before = f"**{before.region}**"
                         after = f"**{after.region}**"
                         rname.add_field(name="Before:", value=before, inline=False)
                         rname.add_field(name="After:", value=after, inline=False)
                         rname.set_footer(text="Server ID: {}".format(gid))
-                        rname.set_author(name=datetime.datetime.utcnow() + " - Server Region Changed")
+                        rname.set_author(name="Server Region Changed")
                         send_to = guild.get_channel(channel)
                         await send_to.send(embed=rname)
                 except Exception as e:
@@ -412,13 +426,15 @@ class Logs(commands.Cog):
                 if not before.nick == after.nick:
                     name = before
                     name = " ~ ".join((name.name, name.nick)) if name.nick else name.name
-                    updmessage = discord.Embed(colour=0x9bf442)
+                    updmessage = discord.Embed(colour=0x9bf442,
+                    timestamp=datetime.datetime.utcnow()
+                    )
                     infomessage = "__{}__'s nickname has changed".format(before.name)
                     updmessage.add_field(name="Info:", value=infomessage, inline=False)
                     updmessage.add_field(name="Nickname Before:", value=before.nick)
                     updmessage.add_field(name="Nickname After:", value=after.nick)
                     updmessage.set_footer(text="User ID: {}".format(before.id))
-                    updmessage.set_author(name=datetime.datetime.utcnow() + " - Nickname Changed")
+                    updmessage.set_author(name="Nickname Changed")
                     send_to = guild.get_channel(channel)
                     await send_to.send(embed=updmessage)
             else:
