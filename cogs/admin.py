@@ -137,20 +137,16 @@ class Admin(commands.Cog):
     async def amiadmin(self, ctx):
         gid = str(ctx.guild.id)
         userid = ctx.author.id
-        try:
-            if userid in self.admindb[gid]["admins"]:
+        if not userid in self.config.owner:
+            if str(userid) in self.admindb[gid]["admins"]:
                 y = await ctx.send(f"Yes {ctx.author.mention}, you're an admin!")
                 await lib.eraset(self, ctx, y)
             else:
                 n = await ctx.send(f"You arent an admin, {ctx.author.mention}")
                 await lib.eraset(self, ctx, n)
-        except:
-            if userid in self.config.owner:
-                y = await ctx.send(f"Yes {ctx.author.mention}, you're an admin!")
-                await lib.eraset(self, ctx, y)
-            else:
-                n = await ctx.send(f"You arent an admin, {ctx.author.mention}")
-                await lib.eraset(self, ctx, n)
+        else:
+            y = await ctx.send(f"Yes {ctx.author.mention}, you're an admin!")
+            await lib.eraset(self, ctx, y)
 
     @commands.command(no_pm=True)
     async def pm(self, ctx, user : discord.User=None, *args):
