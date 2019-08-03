@@ -205,6 +205,7 @@ class Economy(commands.Cog):
 
     @commands.group(pass_context=True, no_pm=True)
     async def economyset(self, ctx):
+        user = ctx.author
         if user.id in self.config.owner:
             msg = "```"
             for k, v in self.settings.items():
