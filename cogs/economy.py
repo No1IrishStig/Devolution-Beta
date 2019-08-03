@@ -64,10 +64,12 @@ class Economy(commands.Cog):
                 await ctx.send(embed=lib.Editable("Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
 
     @bank.group(invoke_without_command=True)
-    async def transfer(self, ctx, user: discord.Member, amount : int):
+    async def transfer(self, ctx, user: discord.Member=None, amount : int=None):
         author = ctx.author
-        if not user:
-            ctx.send(embed=lib.Editable("Uh oh", "You'll need to mention a user to use that command properly.", "Devo Bank",))
+        if user is None:
+            ctx.send(embed=lib.Editable("Uh oh", "Please mention a user to transfer to.", "Devo Bank"))
+        if amount is None:
+            ctx.send(embed=lib.Editable("Oops", "Please specify an amount of credits to set.", "Devo Bank"))
         if author == user:
             await ctx.send(f"{ctx.author}, Bitch, do I look like a joke to you?")
             return
@@ -86,12 +88,11 @@ class Economy(commands.Cog):
 
     @bank.group(invoke_without_command=True)
     async def set(self, ctx, user: discord.Member=None, amount : int=None):
-        if not user:
+        if user is None:
             ctx.send(embed=lib.Editable("Uh oh", "Please mention a users bank to set.", "Devo Bank"))
-        if not amount:
+        if amount is None:
             ctx.send(embed=lib.Editable("Oops", "Please specify an amount of credits to set.", "Devo Bank"))
         if ctx.author.id in self.config.owner:
-            author = ctx.author
             done = self.set_money(user.id, amount)
             if done:
                 await ctx.send(embed=lib.Editable("Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
