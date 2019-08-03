@@ -29,6 +29,8 @@ class Economy(commands.Cog):
             self.bank = json.load(f)
             with open("./data/economy/settings.json") as s:
                 self.settings = json.load(s)
+                with open("./utils/essentials/deltimer.json") as f:
+                    self.deltimer = json.load(f)
 
     @commands.group(invoke_without_command=True)
     async def bank(self, ctx):
