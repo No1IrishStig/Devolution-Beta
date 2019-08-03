@@ -84,7 +84,7 @@ class Economy(commands.Cog):
 
     @bank.group(invoke_without_command=True)
     async def set(self, ctx, user: discord.Member, amount : int):
-        if user.id in self.config.owner:
+        if ctx.author.id in self.config.owner:
             author = ctx.author
             done = self.set_money(user.id, amount)
             if done:
