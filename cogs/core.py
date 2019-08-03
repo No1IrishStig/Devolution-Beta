@@ -220,7 +220,7 @@ class Core(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def customcommand(self, ctx):
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.send(embed=lib.Editable("Custom Commands - Usage", f"{ctx.prefix}cc add (name) (text}\n{ctx.prefix}cc edit (name} (text}\n{ctx.prefix}cc delete (name}\n!cc list\n\nAllows for the use of custom commands.", "Custom Commands"))
+            await ctx.send(embed=lib.Editable("Custom Commands - Usage", f"{ctx.prefix}cc add (name) (text)\n{ctx.prefix}cc edit (name) (text)\n{ctx.prefix}cc delete (name)\n{ctx.prefix}cc list\n\nAllows for the use of custom commands.", "Custom Commands"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -233,7 +233,7 @@ class Core(commands.Cog):
             gid = str(server.id)
             cc = self.cc
             if command is None:
-                await ctx.send(embed=lib.Editable("Custom Commands - Usage", "!cc add {name} {text}\n\nCreate a custom command on this server.", "Custom Commands"))
+                await ctx.send(embed=lib.Editable("Custom Commands - Usage", f"{ctx.prefix}cc add (name) (text)\n\nCreate a custom command on this server.", "Custom Commands"))
             else:
                 command = command.lower()
                 if command in self.bot.commands:
@@ -249,7 +249,7 @@ class Core(commands.Cog):
                         json.dump(cc, f)
                         await ctx.send(embed=lib.Editable("Success", "Custom command successfully added.", "Custom Commands"))
                 else:
-                    await ctx.send(embed=lib.Editable("Error", "This customcommand already exists. Use `!customcommand edit` to edit it.", "Error"))
+                    await ctx.send(embed=lib.Editable("Error", f"This customcommand already exists. Use `{ctx.prefix}customcommand edit` to edit it.", "Error"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -289,7 +289,7 @@ class Core(commands.Cog):
             cc = self.cc
             gid = str(server.id)
             if command is None:
-                await ctx.send(embed=lib.Editable("Custom Commands - Usage", "!cc delete {name}\n\nDelete a custom command on this server.", "Custom Commands"))
+                await ctx.send(embed=lib.Editable("Custom Commands - Usage", f"!{ctx.prefix} delete (name)\n\nDelete a custom command on this server.", "Custom Commands"))
             else:
                 command = command.lower()
                 if gid in cc:
@@ -303,7 +303,7 @@ class Core(commands.Cog):
                     else:
                         await ctx.send(embed=lib.Editable("Error", "That command doesn't exist.", "Error"))
                 else:
-                    await ctx.send(embed=lib.Editable("Error", "There are no custom commands in this server. Use `!customcom add` to start adding some.", "Error"))
+                    await ctx.send(embed=lib.Editable("Error", f"There are no custom commands in this server. Use `{ctx.prefix}customcom add` to start adding some.", "Error"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -319,7 +319,7 @@ class Core(commands.Cog):
             commands = cc.get(gid, {})
 
             if not commands:
-                await ctx.send(embed=lib.Editable("Error", "There are no custom commands for this server. Use `!customcommand add` to start adding some.", "Error"))
+                await ctx.send(embed=lib.Editable("Error", f"There are no custom commands for this server. Use `{ctx.prefix}customcommand add` to start adding some.", "Error"))
                 return
 
             commands = ", ".join([ctx.prefix + c for c in sorted(commands)])
@@ -340,7 +340,7 @@ class Core(commands.Cog):
             server = message.guild
             gid = str(server.id)
             cc = self.cc
-            prefix = "!"
+            prefix = ctx.prefix
 
             if not prefix:
                 return
