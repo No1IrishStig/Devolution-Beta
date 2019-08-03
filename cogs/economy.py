@@ -252,7 +252,7 @@ class Economy(commands.Cog):
             json.dump(self.settings, s)
 
     @economyset.command(invoke_without_command=True)
-    async def paydaycredits(self, ctx, credits : int):
+    async def benefitscredits(self, ctx, credits : int):
         self.settings["BENEFITS_CREDITS"] = credits
         await ctx.send("Every payday will now give " + str(credits) + " credits.")
         with open("./data/economy/settings.json", "w") as s:
