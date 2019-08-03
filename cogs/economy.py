@@ -239,7 +239,7 @@ class Economy(commands.Cog):
 
     @economyset.command(invoke_without_command=True)
     async def paydaytime(self, ctx, seconds : int):
-        self.settings["PAYDAY_TIME"] = seconds
+        self.settings["BENEFITS_TIME"] = seconds
         await ctx.send("Value modified. At least " + str(seconds) + " seconds must pass between each payday.")
         with open("./data/economy/settings.json", "w") as s:
             json.dump(self.settings, s)
