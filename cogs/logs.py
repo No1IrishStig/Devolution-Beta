@@ -24,7 +24,7 @@ class Logs(commands.Cog):
             db = self.logs
             guild = ctx.guild
             gid = str(guild.id)
-            await ctx.send(embed=lib.Editable("Logs - Usage", "!logs set {channel}\n!logs toggle\n\n Enable logs for this server.", "Logs"))
+            await ctx.send(embed=lib.Editable("Logs - Usage", f"{ctx.prefix}logs set channel\n{ctx.prefix}logs toggle\n\n Enable logs for this server.", "Logs"))
             if not gid in db:
                 print(type(self.logs))
                 db[gid] = inv_settings
@@ -39,7 +39,7 @@ class Logs(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def set(self, ctx):
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.send(embed=lib.Editable("Logs - Usage", "!logs set channel\n!logs toggle\n\n Enable logs for this server.", "Logs"))
+            await ctx.send(embed=lib.Editable("Logs - Usage", f"!logs set channel\n!logs toggle\n\n Enable logs for this server.", "Logs"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -113,128 +113,104 @@ class Logs(commands.Cog):
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def delete(self, ctx):
-        if ctx.author.guild_permissions.manage_messages:
-            db = self.logs
-            guild = ctx.guild
-            gid = str(guild.id)
-            if db[gid]["delete"] == False:
-                db[gid]["delete"] = True
-                with open("./data/logs/settings.json", "w") as f:
-                    json.dump(db, f)
-                    await ctx.send("Delete logs enabled")
-            elif db[gid]["delete"] == True:
-                db[gid]["delete"] = False
-                with open("./data/logs/settings.json", "w") as e:
-                    json.dump(db, e)
-                    await ctx.send("Delete logs disabled")
-        else:
-            p = await ctx.send(embed=lib.NoPerm())
-            await lib.eraset(self, ctx, p)
+        db = self.logs
+        guild = ctx.guild
+        gid = str(guild.id)
+        if db[gid]["delete"] == False:
+            db[gid]["delete"] = True
+            with open("./data/logs/settings.json", "w") as f:
+                json.dump(db, f)
+                await ctx.send("Delete logs enabled")
+        elif db[gid]["delete"] == True:
+            db[gid]["delete"] = False
+            with open("./data/logs/settings.json", "w") as e:
+                json.dump(db, e)
+                await ctx.send("Delete logs disabled")
 
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def edit(self, ctx):
-        if ctx.author.guild_permissions.manage_messages:
-            db = self.logs
-            guild = ctx.guild
-            gid = str(guild.id)
-            if db[gid]["edit"] == False:
-                db[gid]["edit"] = True
-                with open("./data/logs/settings.json", "w") as f:
-                    json.dump(db, f)
-                    await ctx.send("Edit logs enabled")
-            elif db[gid]["edit"] == True:
-                db[gid]["edit"] = False
-                with open("./data/logs/settings.json", "w") as e:
-                    json.dump(db, e)
-                    await ctx.send("Edit logs disabled")
-        else:
-            p = await ctx.send(embed=lib.NoPerm())
-            await lib.eraset(self, ctx, p)
+        db = self.logs
+        guild = ctx.guild
+        gid = str(guild.id)
+        if db[gid]["edit"] == False:
+            db[gid]["edit"] = True
+            with open("./data/logs/settings.json", "w") as f:
+                json.dump(db, f)
+                await ctx.send("Edit logs enabled")
+        elif db[gid]["edit"] == True:
+            db[gid]["edit"] = False
+            with open("./data/logs/settings.json", "w") as e:
+                json.dump(db, e)
+                await ctx.send("Edit logs disabled")
 
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def user(self, ctx):
-        if ctx.author.guild_permissions.manage_messages:
-            db = self.logs
-            guild = ctx.guild
-            gid = str(guild.id)
-            if db[gid]["user"] == False:
-                db[gid]["user"] = True
-                with open("./data/logs/settings.json", "w") as f:
-                    json.dump(db, f)
-                    await ctx.send("User logs enabled")
-            elif db[gid]["user"] == True:
-                db[gid]["user"] = False
-                with open("./data/logs/settings.json", "w") as e:
-                    json.dump(db, e)
-                    await ctx.send("User logs disabled")
-        else:
-            p = await ctx.send(embed=lib.NoPerm())
-            await lib.eraset(self, ctx, p)
+        db = self.logs
+        guild = ctx.guild
+        gid = str(guild.id)
+        if db[gid]["user"] == False:
+            db[gid]["user"] = True
+            with open("./data/logs/settings.json", "w") as f:
+                json.dump(db, f)
+                await ctx.send("User logs enabled")
+        elif db[gid]["user"] == True:
+            db[gid]["user"] = False
+            with open("./data/logs/settings.json", "w") as e:
+                json.dump(db, e)
+                await ctx.send("User logs disabled")
 
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def join(self, ctx):
-        if ctx.author.guild_permissions.manage_messages:
-            db = self.logs
-            guild = ctx.guild
-            gid = str(guild.id)
-            if db[gid]["join"] == False:
-                db[gid]["join"] = True
-                with open("./data/logs/settings.json", "w") as f:
-                    json.dump(db, f)
-                    await ctx.send("Join logs enabled")
-            elif db[gid]["join"] == True:
-                db[gid]["join"] = False
-                with open("./data/logs/settings.json", "w") as e:
-                    json.dump(db, e)
-                    await ctx.send("Join logs disabled")
-        else:
-            p = await ctx.send(embed=lib.NoPerm())
-            await lib.eraset(self, ctx, p)
+        db = self.logs
+        guild = ctx.guild
+        gid = str(guild.id)
+        if db[gid]["join"] == False:
+            db[gid]["join"] = True
+            with open("./data/logs/settings.json", "w") as f:
+                json.dump(db, f)
+                await ctx.send("Join logs enabled")
+        elif db[gid]["join"] == True:
+            db[gid]["join"] = False
+            with open("./data/logs/settings.json", "w") as e:
+                json.dump(db, e)
+                await ctx.send("Join logs disabled")
 
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def leave(self, ctx):
-        if ctx.author.guild_permissions.manage_messages:
-            db = self.logs
-            guild = ctx.guild
-            gid = str(guild.id)
-            if db[gid]["leave"] == False:
-                db[gid]["leave"] = True
-                with open("./data/logs/settings.json", "w") as f:
-                    json.dump(db, f)
-                    await ctx.send("Leave logs enabled")
-            elif db[gid]["leave"] == True:
-                db[gid]["leave"] = False
-                with open("./data/logs/settings.json", "w") as e:
-                    json.dump(db, e)
-                    await ctx.send("Leave logs disabled")
-        else:
-            p = await ctx.send(embed=lib.NoPerm())
-            await lib.eraset(self, ctx, p)
+        db = self.logs
+        guild = ctx.guild
+        gid = str(guild.id)
+        if db[gid]["leave"] == False:
+            db[gid]["leave"] = True
+            with open("./data/logs/settings.json", "w") as f:
+                json.dump(db, f)
+                await ctx.send("Leave logs enabled")
+        elif db[gid]["leave"] == True:
+            db[gid]["leave"] = False
+            with open("./data/logs/settings.json", "w") as e:
+                json.dump(db, e)
+                await ctx.send("Leave logs disabled")
 
     @toggle.group(invoke_without_command=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def server(self, ctx):
-        if ctx.author.guild_permissions.manage_messages:
-            db = self.logs
-            guild = ctx.guild
-            gid = str(guild.id)
-            if db[gid]["server"] == False:
-                db[gid]["server"] = True
-                with open("./data/logs/settings.json", "w") as f:
-                    json.dump(db, f)
-                    await ctx.send("Server logs enabled")
-            elif db[gid]["server"] == True:
-                db[gid]["server"] = False
-                with open("./data/logs/settings.json", "w") as e:
-                    json.dump(db, e)
-                    await ctx.send("Server logs disabled")
-        else:
-            p = await ctx.send(embed=lib.NoPerm())
-            await lib.eraset(self, ctx, p)
+        db = self.logs
+        guild = ctx.guild
+        gid = str(guild.id)
+        if db[gid]["server"] == False:
+            db[gid]["server"] = True
+            with open("./data/logs/settings.json", "w") as f:
+                json.dump(db, f)
+                await ctx.send("Server logs enabled")
+        elif db[gid]["server"] == True:
+            db[gid]["server"] = False
+            with open("./data/logs/settings.json", "w") as e:
+                json.dump(db, e)
+                await ctx.send("Server logs disabled")
 
     #events
 

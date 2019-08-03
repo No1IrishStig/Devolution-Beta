@@ -40,7 +40,7 @@ class Mod(commands.Cog):
     async def kick(self, ctx, user : discord.User=None, *args):
         if ctx.author.guild_permissions.kick_members:
             if user is None:
-                e = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!kick {@user} {reason}\n\nKicks mentioned user from the server, with or without a reason.", "Kick Usage"))
+                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}kick (@user) (reason)\n\nKicks mentioned user from the server, with or without a reason.", "Kick Usage"))
                 await lib.eraset(self, ctx, e)
             else:
                 try:
@@ -72,7 +72,7 @@ class Mod(commands.Cog):
     async def ban(self, ctx, user : discord.User=None, *args):
         if ctx.author.guild_permissions.ban_members:
             if user is None:
-                e = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!ban @user\n!ban @user (reason)\n\nBans mentioned user from the server, with or without a reason.", "Ban Usage"))
+                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}ban (@user)\n{ctx.prefix}ban (@user) (reason)\n\nBans mentioned user from the server, with or without a reason.", "Ban Usage"))
                 await lib.eraset(self, ctx, e)
             else:
                 try:
@@ -107,7 +107,7 @@ class Mod(commands.Cog):
             server = author.guild
             avatar = ctx.author.avatar_url
             if user_id is None:
-                e = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!hackban {userid} {reason}\n\nBans the UserID, with or without a reason.", "Hackban Usage"))
+                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}hackban (userid) (reason)\n\nBans the UserID, with or without a reason.", "Hackban Usage"))
                 await lib.eraset(self, ctx, e)
             else:
                 user_id = str(user_id)
@@ -141,7 +141,7 @@ class Mod(commands.Cog):
     async def punish(self, ctx, member: discord.Member=None, *args):
         if ctx.author.guild_permissions.manage_roles:
             if member is None:
-                u = await ctx.send(embed=lib.Editable("Punish Usage", "!punish {@user}\n!unpunish {@user}\n!lspunish - Lists all punished users\n!spp - **Warning** Use this command only, if there are channels which do not have the permissions for the punished role.\n\n Mutes or unmutes mentioned user from all channels on the server.", "Moderation"))
+                u = await ctx.send(embed=lib.Editable("Punish Usage", f"{ctx.prefix}punish (@user)\n{ctx.prefix}unpunish (@user)\n{ctx.prefix}lspunish - Lists all punished users\n{ctx.prefix}spp - **Warning** Use this command only, if there are channels which do not have the permissions for the punished role.\n\n Mutes or unmutes mentioned user from all channels on the server.", "Moderation"))
                 await lib.eraset(self, ctx, u)
             else:
                 server = ctx.guild.name
@@ -194,7 +194,7 @@ class Mod(commands.Cog):
     async def unpunish(self, ctx, member: discord.Member=None):
         if ctx.author.guild_permissions.manage_roles:
             if member is None:
-                u = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!unpunish {@user}\n\nUnmutes mentioned user.", "Punish Usage"))
+                u = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}unpunish (@user)\n\nUnmutes mentioned user.", "Punish Usage"))
                 await lib.eraset(self, ctx, u)
             else:
                 server = ctx.guild.name
@@ -232,7 +232,7 @@ class Mod(commands.Cog):
         if ctx.author.guild_permissions.manage_nicknames:
             try:
                 if member is None:
-                    e = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!rename user {name}\n\nRenames the mentioned user to a specified nickname.", "Rename Usage"))
+                    e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}rename user (name)\n\nRenames the mentioned user to a specified nickname.", "Rename Usage"))
                     await lib.eraset(self, ctx, e)
                 else:
                     author = ctx.author.name
@@ -241,7 +241,7 @@ class Mod(commands.Cog):
                         name += word
                         name += " "
                     if name is "":
-                        e1 = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!rename user {name}\n\nRenames the mentioned user to a specified nickname", "Rename Usage"))
+                        e1 = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}rename user (name)\n\nRenames the mentioned user to a specified nickname", "Rename Usage"))
                         await lib.eraset(self, ctx, e1)
                     else:
                         await ctx.send(embed=lib.Editable("Success", f"**{member.name}** has been renamed by **{author}** to **{name}**", "Moderation"))
@@ -319,7 +319,7 @@ class Mod(commands.Cog):
             author = ctx.author
             server = channel.guild
             if id is None:
-                e = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!cleanup after {message_id}\n\nDeletes all messages after a specified message ID.", "Cleanup After Usage"))
+                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}cleanup after (message_id)\n\nDeletes all messages after a specified message ID.", "Cleanup After Usage"))
                 await lib.eraset(self, ctx, e)
             else:
                 to_delete = []
@@ -336,7 +336,7 @@ class Mod(commands.Cog):
     async def messages(self, ctx, num:int=None):
         if ctx.author.guild_permissions.manage_messages:
             if num is None:
-                e = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!cleanup messages {amount}\n\nDeletes the specified number of messages.", "Cleanup Messages Usage"))
+                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}cleanup messages (amount)\n\nDeletes the specified number of messages.", "Cleanup Messages Usage"))
                 await lib.eraset(self, ctx, e)
             else:
                 db = self.deltimer
@@ -362,11 +362,11 @@ class Mod(commands.Cog):
             self_delete = user == self.bot.user
 
             if user is None:
-                e1 = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!cleanup user {@user} {amount}\n\nDeletes the a specified number of messages for a specified user.", "Cleanup User Usage"))
+                e1 = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}cleanup user (@user) (amount)\n\nDeletes the a specified number of messages for a specified user.", "Cleanup User Usage"))
                 await lib.eraset(self, ctx, e1)
             else:
                 if number is None:
-                    e1 = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!cleanup user {@user} {amount}\n\nDeletes the a specified number of messages for a specified user.", "Cleanup User Usage"))
+                    e1 = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}cleanup user (@user) (amount)\n\nDeletes the a specified number of messages for a specified user.", "Cleanup User Usage"))
                     await lib.eraset(self, ctx, e2)
                 else:
                     def check(m):
@@ -448,10 +448,10 @@ class Mod(commands.Cog):
             guild = ctx.guild
             gid = str(guild.id)
             if not gid in db:
-                await ctx.send(embed=lib.Editable("Uh oh", "The Custom Deletion timer is not enabled for this server!\n\nTry this command:\n**!deltimer enable**", "Deletion Timer"))
+                await ctx.send(embed=lib.Editable("Uh oh", f"The Custom Deletion timer is not enabled for this server!\n\nTry this command:\n**{ctx.prefix}deltimer enable**", "Deletion Timer"))
             else:
                 timert = db[gid]["timer"]
-                await ctx.send(embed=lib.Editable("Uh oh", f"Deltimer is enabled and is currently set at **{timert}** seconds.\n\nHeres a list of commands you can try!\n**!deltimer enable**\n**!deltimer set number**", "Deletion Timer"))
+                await ctx.send(embed=lib.Editable("Uh oh", f"Deltimer is enabled and is currently set at **{timert}** seconds.\n\nHeres a list of commands you can try!\n**{ctx.prefix}deltimer enable**\n**{ctx.prefix}deltimer set number**", "Deletion Timer"))
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
@@ -474,7 +474,7 @@ class Mod(commands.Cog):
                 await lib.eraset(self, ctx, e2)
             else:
                 if not gid in db:
-                    e3 = await ctx.send(embed=lib.Editable("Error", "The Custom Deletion timer is not enabled for this server!\n\nRun command `!deltimer enable` to begin!", "Error"))
+                    e3 = await ctx.send(embed=lib.Editable("Error", f"The Custom Deletion timer is not enabled for this server!\n\nRun command `{ctx.prefix}deltimer enable` to begin!", "Error"))
                     await lib.eraset(self, ctx, e3)
                 else:
                     db[gid]["timer"] = timer

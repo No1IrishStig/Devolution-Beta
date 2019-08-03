@@ -155,14 +155,14 @@ class Admin(commands.Cog):
             userid = ctx.author.id
             avatar = ctx.author.avatar_url
             if user is None:
-                await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!pm {@user} {message}\n\n This will send a dm to the mentioned user.", "PM Usage"))
+                await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}pm @user message\n\n This will send a dm to the mentioned user.", "PM Usage"))
             else:
                 message = ""
                 for word in args:
                     message += word
                     message += " "
                 if message is "":
-                    await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!pm {@user} {message}\n\n This will send a dm to the mentioned user.", "PM Usage"))
+                    await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}pm @user message\n\n This will send a dm to the mentioned user.", "PM Usage"))
                 else:
                     embed = discord.Embed(
                         title = f"You've recieved a message from {member}",
@@ -181,7 +181,7 @@ class Admin(commands.Cog):
     async def pmid(self, ctx, id=None, *args):
         if ctx.author.id in self.config.owner:
             if id is None:
-                e = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!pmid {userid} {message}\n\n This will send a dm to the user with that ID", "PMID Usage"))
+                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}pmid userid message\n\n This will send a dm to the user with that ID", "PMID Usage"))
                 await lib.eraset(self, ctx, e)
             else:
                 member = ctx.author
@@ -192,7 +192,7 @@ class Admin(commands.Cog):
                     message += word
                     message += " "
                 if message is "":
-                    e1 = await ctx.send(embed=lib.Editable("Oops!", "You forgot something!\n\n!pmid {userid} {message}\n\n This will send a dm to the user with that ID.", "PMID Usage"))
+                    e1 = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}pmid userid message\n\n This will send a dm to the user with that ID.", "PMID Usage"))
                     await lib.eraset(self, ctx, e1)
                 else:
                     try:

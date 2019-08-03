@@ -34,6 +34,7 @@ class Core(commands.Cog):
         embed.set_footer(text="Devolution | Help", icon_url="https://i.imgur.com/BS6YRcT.jpg")
         embed.add_field(name="Information", value="**help** - Gives help!\n**help permissions** - Gives a list of permissions the bot requires to function\n**bug** - Use it to report bugs.\n**suggest** - Suggest something to the dev\n**sinfo** - Displays guild information.\n**uinfo** - Displays user information\n**uptime** - Displays the bots uptime\n**about** - Displays stuff about the bot\n**changelog** - Displays the entire bots changelog\n**github** - Provides github link", inline=False)
         embed.add_field(name="Fun", value="**coinflip** - Flip a coin\n**space** - Get live information about the ISS\n**colour** - Get a random colour\n**roll** - Roles a dice\n**insult** - Insult people you dislike!\n**boobs** - See some melons!\n**ass** - See some peaches!\n**gif** - Search up a gif on giphy by name\n**gifr** - Gives a random gif from giphy\n**owo** - Get random responses", inline=False)
+        embed.add_field(name="Economy", value="**bank**\n\n**register** - Creates a bank account at Devo Bank\n**balance** - Returns your balance\n**transfer** - Send credits to your friends\n**set** - Set the credits of an account\n**economyset** - Change economy values", inline=False)
         embed.add_field(name="Useful", value="**say** - Speak as the bot\n**rename** - Change a users nickname\n**invite** - Gives usage details\n**embed** - Creates an embed message\n**role** - Gives role options\n**music** - Gives music help\n**customcommand** - Add customcommands to your server", inline=False)
         embed.add_field(name="Moderation", value="**kick** - Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives mute options\n**cleanup** - Gives message moderation options\n**clean** - Deletes the last 100 command messages and bot messages\n**logs** - Get logs on nearly everything\n**deltimer** - Change the timer at which the bot auto deletes its messages", inline=False)
         embed.add_field(name="Admin", value="**leave** - Makes the bot leave the guild\n**leaveid** - Leaves a server by ID\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**todo** - Displays List of shit todo\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.\n**admin** - Add and remove admins", inline=False)
@@ -82,7 +83,7 @@ class Core(commands.Cog):
             )
         await user.send(embed=eee)
         eeee = discord.Embed(
-            description = "__**Changelog (04/07/2019) v1.4**__\n+ Added !deltimer\n\n- Fixed time being off in logs\n- Bug Fixes\n- Updated help command\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Bug fixes\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Changed !amiadmin to incorperate the new admin command\n- Updated error handler\n- Bug fixes\n\n__**Changelog (06/07/2019) v1.5.1\n\n- Bug fixes",
+            description = "__**Changelog (04/07/2019) v1.4**__\n+ Added !deltimer\n\n- Fixed time being off in logs\n- Bug Fixes\n- Updated help command\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Bug fixes\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Changed !amiadmin to incorperate the new admin command\n- Updated error handler\n- Bug fixes\n\n__**Changelog (06/07/2019) v1.5.1\n\n- Bug fixes\n\n__**Changelog (03/08/2019) v1.6**__\n+ Added custom prefix support\n+ Added economy update\n+ Added slots\n\n- Optimized code and remove unnecessary checks.\n- Added Economy to help command\n- Bug Fixes",
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
@@ -203,7 +204,7 @@ class Core(commands.Cog):
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def music(self, ctx):
-        m = await ctx.send(embed=lib.Editable("Music Usage", "**play {song/link}** - Plays a song by name or url from youtube\n**pause** - Pauses the current song\n**resume** - Resumes the current song\n**volume {number}** - Change the volume of the bot\n**stop** - Disconnects the bot\n**sstop** - Force disconnects the bot ", "Todo"))
+        m = await ctx.send(embed=lib.Editable("Music Usage", f"**{ctx.prefix}play (song/link)** - Plays a song by name or url from youtube\n**{ctx.prefix}pause** - Pauses the current song\n**{ctx.prefix}resume** - Resumes the current song\n**{ctx.prefix}volume (number)** - Change the volume of the bot\n**{ctx.prefix}stop** - Disconnects the bot\n**{ctx.prefix}sstop** - Force disconnects the bot ", "Todo"))
         await lib.eraset(self, ctx, m)
 
     @commands.command(no_pm=True)
@@ -219,7 +220,7 @@ class Core(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def customcommand(self, ctx):
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.send(embed=lib.Editable("Custom Commands - Usage", "!cc add {name} {text}\n!cc edit {name} {text}\n!cc delete {name}\n!cc list\n\nAllows for the use of custom commands.", "Custom Commands"))
+            await ctx.send(embed=lib.Editable("Custom Commands - Usage", f"{ctx.prefix}cc add (name) (text}\n{ctx.prefix}cc edit (name} (text}\n{ctx.prefix}cc delete (name}\n!cc list\n\nAllows for the use of custom commands.", "Custom Commands"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -261,7 +262,7 @@ class Core(commands.Cog):
             cc = self.cc
             gid = str(server.id)
             if command is None:
-                await ctx.send(embed=lib.Editable("Custom Commands - Usage", "!cc edit {name} {text}\n\nEdit a custom command on this server.", "Custom Commands"))
+                await ctx.send(embed=lib.Editable("Custom Commands - Usage", f"{ctx.prefix}cc edit (name) (text)\n\nEdit a custom command on this server.", "Custom Commands"))
             else:
                 command = command.lower()
                 if gid in cc:
@@ -273,9 +274,9 @@ class Core(commands.Cog):
                             json.dump(cc, f)
                             await ctx.send(embed=lib.Editable("Success", "Custom command successfully edited.", "Custom Commands"))
                     else:
-                        await ctx.send(embed=lib.Editable("Error", "That command doesn't exist. Use `!customcom add` to add it.", "Error"))
+                        await ctx.send(embed=lib.Editable("Error", f"That command doesn't exist. Use `{ctx.prefix}!customcom add` to add it.", "Error"))
                 else:
-                    await ctx.send(embed=lib.Editable("Error", "There are no custom commands in this server. Use `!customcom add` to start adding some.", "Error"))
+                    await ctx.send(embed=lib.Editable("Error", f"There are no custom commands in this server. Use `{ctx.prefix}customcom add` to start adding some.", "Error"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)

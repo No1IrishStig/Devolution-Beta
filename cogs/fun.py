@@ -140,7 +140,7 @@ class Fun(commands.Cog):
                         e = await ctx.send(embed=lib.Editable("Error", "No search results found", "Giphy"))
                         await lib.eraset(self, ctx, e)
                 else:
-                    ee = await ctx.send(embed=lib.Editable("Error", "There was an error contacting the API! Report this with !bug", "Giphy"))
+                    ee = await ctx.send(embed=lib.Editable("Error", f"There was an error contacting the API! Report this with {ctx.prefix}bug", "Giphy"))
                     await lib.eraset(self, ctx, ee)
 
     @commands.command(no_pm=True)
@@ -157,7 +157,7 @@ class Fun(commands.Cog):
                         e = await ctx.send(embed=lib.Editable("Error", "No search results found", "Giphy"))
                         await lib.eraset(self, ctx, e)
                 else:
-                    ee = await ctx.send(embed=lib.Editable("Error", "There was an error contacting the API! Report this with !bug", "Giphy"))
+                    ee = await ctx.send(embed=lib.Editable("Error", f"There was an error contacting the API! Report this with {ctx.prefix}bug", "Giphy"))
                     await lib.eraset(self, ctx, ee)
 
     @commands.command(no_pm=True)
