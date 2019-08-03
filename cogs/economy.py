@@ -67,10 +67,10 @@ class Economy(commands.Cog):
     async def transfer(self, ctx, user: discord.Member=None, amount : int=None):
         author = ctx.author
         if user is None:
-            ctx.send(embed=lib.Editable("Uh oh", "Please mention a user to transfer to.", "Devo Bank"))
+            await ctx.send(embed=lib.Editable("Uh oh", "Please mention a user to transfer to.", "Devo Bank"))
             return
         if amount is None:
-            ctx.send(embed=lib.Editable("Oops", "Please specify an amount of credits to set.", "Devo Bank"))
+            await ctx.send(embed=lib.Editable("Oops", "Please specify an amount of credits to set.", "Devo Bank"))
             return
         if author == user:
             await ctx.send(f"{ctx.author}, Bitch, do I look like a joke to you?")
@@ -91,10 +91,10 @@ class Economy(commands.Cog):
     @bank.group(invoke_without_command=True)
     async def set(self, ctx, user: discord.Member=None, amount : int=None):
         if user is None:
-            ctx.send(embed=lib.Editable("Uh oh", "Please mention a users bank to set.", "Devo Bank"))
+            await ctx.send(embed=lib.Editable("Uh oh", "Please mention a users bank to set.", "Devo Bank"))
             return
         if amount is None:
-            ctx.send(embed=lib.Editable("Oops", "Please specify an amount of credits to set.", "Devo Bank"))
+            await ctx.send(embed=lib.Editable("Oops", "Please specify an amount of credits to set.", "Devo Bank"))
             return
         if ctx.author.id in self.config.owner:
             done = self.set_money(user.id, amount)
