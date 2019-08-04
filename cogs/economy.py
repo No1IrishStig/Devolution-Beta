@@ -100,7 +100,7 @@ class Economy(commands.Cog):
     async def set(self, ctx, user: discord.Member=None, amount : int=None):
         GID = str(ctx.guild.id)
         if user and amount:
-            if ctx.author is guild.owner or ctx.author.id in self.config.owner:
+            if ctx.author is ctx.guild.owner or ctx.author.id in self.config.owner:
                 done = self.set_money(GID, user.id, amount)
                 if done:
                     await ctx.send(embed=lib.Editable("Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
