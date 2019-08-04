@@ -100,7 +100,7 @@ class Economy(commands.Cog):
     async def set(self, ctx, user: discord.Member=None, amount : int=None):
         GID = str(ctx.guild.id)
         if user and amount:
-            if ctx.author is guild.owner:
+            if ctx.author is guild.owner or ctx.author.id in self.config.owner:
                 done = self.set_money(GID, user.id, amount)
                 if done:
                     await ctx.send(embed=lib.Editable("Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
@@ -135,28 +135,31 @@ class Economy(commands.Cog):
 
     @commands.command()
     async def top(self, ctx, top : int=10):
-        GID = str(ctx.guild.id)
-        if top < 1:
-            top = 10
-        print(sorted(self.bank[GID].items()))
-        bank_sorted = sorted(self.bank[GID].items(), key=lambda x: x[1]["balance"], reverse=True)
-        if len(bank_sorted) < top:
-            top = len(bank_sorted)
-        topten = bank_sorted[:top]
-        highscore = ""
-        place = 1
-        for id in topten:
-            highscore += str(place).ljust(len(str(top))+1)
-            highscore += (id[1]["name"]+ "'s Balance:" + " ").ljust(23-len(str(id[1]["balance"])))
-            highscore += str(id[1]["balance"]) + "\n"
-            place += 1
-        if highscore:
-            if len(highscore) < 1985:
-                await ctx.send(embed=lib.Editable(f"Top {top}", f"{highscore}", "Devo Bank"))
+        if GID in self.bank:
+            GID = str(ctx.guild.id)
+            if top < 1:
+                top = 10
+            print(sorted(self.bank[GID].items()))
+            bank_sorted = sorted(self.bank[GID].items(), key=lambda x: x[1]["balance"], reverse=True)
+            if len(bank_sorted) < top:
+                top = len(bank_sorted)
+            topten = bank_sorted[:top]
+            highscore = ""
+            place = 1
+            for id in topten:
+                highscore += str(place).ljust(len(str(top))+1)
+                highscore += (id[1]["name"]+ "'s Balance:" + " ").ljust(23-len(str(id[1]["balance"])))
+                highscore += str(id[1]["balance"]) + "\n"
+                place += 1
+            if highscore:
+                if len(highscore) < 1985:
+                    await ctx.send(embed=lib.Editable(f"Top {top}", f"{highscore}", "Devo Bank"))
+                else:
+                    await ctx.send(embed=lib.Editable("Uh oh", "Thats too much data for me to handle, try a lower amount!", "Devo Bank"))
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", "Thats too much data for me to handle, try a lower amount!", "Devo Bank"))
+                await ctx.send(embed=lib.Editable("Uh oh", "There are no accounts in the bank.", "Devo Bank"))
         else:
-            await ctx.send(embed=lib.Editable("Uh oh", "There are no accounts in the bank.", "Devo Bank"))
+            await ctx.send(embed=lib.Editable("Oops", "This server has bank accounts to display! Register one and try again.", "Devo Bank"))
 
     @commands.command()
     async def winnings(self, ctx):
