@@ -39,10 +39,7 @@ class Mod(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def kick(self, ctx, user : discord.User=None, *args):
         if ctx.author.guild_permissions.kick_members:
-            if user is None:
-                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}kick (@user) (reason)\n\nKicks mentioned user from the server, with or without a reason.", "Kick Usage"))
-                await lib.eraset(self, ctx, e)
-            else:
+            if user:
                 try:
                     server = ctx.guild.name
                     author = ctx.author
@@ -63,6 +60,9 @@ class Mod(commands.Cog):
                 except Exception as error:
                         ex = await ctx.send(f"I cant kick **{user}** because: {error}")
                         await lib.eraset(self, ctx, ex)
+            else:
+                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}kick (@user) (reason)\n\nKicks mentioned user from the server, with or without a reason.", "Kick Usage"))
+                await lib.eraset(self, ctx, e)
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -71,10 +71,7 @@ class Mod(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ban(self, ctx, user : discord.User=None, *args):
         if ctx.author.guild_permissions.ban_members:
-            if user is None:
-                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}ban (@user)\n{ctx.prefix}ban (@user) (reason)\n\nBans mentioned user from the server, with or without a reason.", "Ban Usage"))
-                await lib.eraset(self, ctx, e)
-            else:
+            if user:
                 try:
                     server = ctx.guild.name
                     author = ctx.author
@@ -95,6 +92,9 @@ class Mod(commands.Cog):
                 except Exception as error:
                         ex = await self.bot.say(f"**{user}** cannot be banned. {error}")
                         await lib.eraset(self, ctx, ex)
+            else:
+                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}ban (@user)\n{ctx.prefix}ban (@user) (reason)\n\nBans mentioned user from the server, with or without a reason.", "Ban Usage"))
+                await lib.eraset(self, ctx, e)
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -232,9 +232,6 @@ class Mod(commands.Cog):
         if ctx.author.guild_permissions.manage_nicknames:
             try:
                 if member is None:
-                    e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}rename user (name)\n\nRenames the mentioned user to a specified nickname.", "Rename Usage"))
-                    await lib.eraset(self, ctx, e)
-                else:
                     author = ctx.author.name
                     name = ""
                     for word in args:
@@ -246,6 +243,9 @@ class Mod(commands.Cog):
                     else:
                         await ctx.send(embed=lib.Editable("Success", f"**{member.name}** has been renamed by **{author}** to **{name}**", "Moderation"))
                         await member.edit(nick=name)
+                else:
+                    e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}rename user (name)\n\nRenames the mentioned user to a specified nickname.", "Rename Usage"))
+                    await lib.eraset(self, ctx, e)
             except Exception as error:
                 ex = await ctx.send(f"Uh oh.. I could not rename **{user}**")
                 await lib.eraset(self, ctx, ex)

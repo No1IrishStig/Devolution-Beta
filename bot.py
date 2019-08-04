@@ -14,7 +14,7 @@ bot.remove_command('help')
 @bot.event
 async def on_ready():
     print(f'\nSuccessfully logged in as: {bot.user.name}\nVersion: {discord.__version__}\nBuild: {default.version}')
-    await bot.change_presence(activity=discord.Game(name=default.version, type=1, url='https://github.com/No1IrishStig/Devolution-Beta/'))
+    await bot.change_presence(activity=discord.Game(name=config.playing, type=1, url='https://github.com/No1IrishStig/Devolution-Beta/'))
 
 for file in os.listdir("cogs"):
     if file.endswith(".py"):

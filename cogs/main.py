@@ -187,26 +187,22 @@ class Main(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def add(self, ctx, rolename=None, member: discord.Member=None):
         if ctx.author.guild_permissions.manage_roles:
-            if rolename is None:
+            if rolename and member:
+                role = discord.utils.get(ctx.message.guild.roles, name=rolename)
+                if role in ctx.guild.roles:
+                    if role in member.roles:
+                        e = await ctx.send(embed=lib.Editable("Error", f"**{member.name}** already has the role **{role}**", "Roles"))
+                        await lib.eraset(self, ctx, e)
+                    else:
+                        await member.add_roles(role)
+                        d = await ctx.send(embed=lib.Editable("Role Added", f"The role **{role}** was added to **{member.name}**", "Roles"))
+                        await lib.eraset(self, ctx, d)
+                else:
+                    e = await ctx.send(embed=lib.Editable("Error", f"The role **{rolename}** doesnt exist!", "Roles"))
+                    await lib.eraset(self, ctx, e)
+            else:
                 u = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}role add (role) (@user)\n\n This will add the role to the user.", "Role Usage"))
                 await lib.eraset(self, ctx, u)
-            else:
-                if member is None:
-                    u1 = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}role add (role) (@user)\n\n This will add the role to the user.", "Role Usage"))
-                    await lib.eraset(self, ctx, u1)
-                else:
-                    role = discord.utils.get(ctx.message.guild.roles, name=rolename)
-                    if role in ctx.guild.roles:
-                        if role in member.roles:
-                            e = await ctx.send(embed=lib.Editable("Error", f"**{member.name}** already has the role **{role}**", "Roles"))
-                            await lib.eraset(self, ctx, e)
-                        else:
-                            await member.add_roles(role)
-                            d = await ctx.send(embed=lib.Editable("Role Added", f"The role **{role}** was added to **{member.name}**", "Roles"))
-                            await lib.eraset(self, ctx, d)
-                    else:
-                        e = await ctx.send(embed=lib.Editable("Error", f"The role **{rolename}** doesnt exist!", "Roles"))
-                        await lib.eraset(self, ctx, e)
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -215,27 +211,22 @@ class Main(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def remove(self, ctx, rolename=None, member: discord.Member=None):
         if ctx.author.guild_permissions.manage_roles:
-            if rolename is None:
+            if rolename and member:
+                role = discord.utils.get(ctx.message.guild.roles, name=rolename)
+                if role in ctx.guild.roles:
+                    if role in member.roles:
+                        await member.remove_roles(role)
+                        d = await ctx.send(embed=lib.Editable("Role Removed", f"The role **{role}** was removed from **{member.name}**", "Roles"))
+                        await lib.eraset(self, ctx, d)
+                    else:
+                        e = await ctx.send(embed=lib.Editable("Error", f"**{member.name}** does not have the role **{role}**", "Roles"))
+                        await lib.eraset(self, ctx, e)
+                else:
+                    e = await ctx.send(embed=lib.Editable("Error", f"The role **{rolename}** doesnt exist!", "Roles"))
+                    await lib.eraset(self, ctx, e)
+            else:
                 u = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}role remove (role) (@user)\n\n This will remove the role from the user.", "Roles"))
                 await lib.eraset(self, ctx, u)
-            else:
-                if member is None:
-                    u1 = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}role remove (role) (@user)\n\n This will remove the role from the user.", "Roles"))
-                    await lib.eraset(self, ctx, u1)
-                else:
-                    role = discord.utils.get(ctx.message.guild.roles, name=rolename)
-                    if role in ctx.guild.roles:
-                        if role in member.roles:
-                            await member.remove_roles(role)
-                            d = await ctx.send(embed=lib.Editable("Role Removed", f"The role **{role}** was removed from **{member.name}**", "Roles"))
-                            await lib.eraset(self, ctx, d)
-                        else:
-                            e = await ctx.send(embed=lib.Editable("Error", f"**{member.name}** does not have the role **{role}**", "Roles"))
-                            await lib.eraset(self, ctx, e)
-                    else:
-                        e = await ctx.send(embed=lib.Editable("Error", f"The role **{rolename}** doesnt exist!", "Roles"))
-                        await lib.eraset(self, ctx, e)
-
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -244,10 +235,7 @@ class Main(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def create(self, ctx, rolename=None):
         if ctx.author.guild_permissions.manage_roles:
-            if rolename is None:
-                u = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}role create (role)\n\n This will create a role with the specified name.", "Role Usage"))
-                await lib.eraset(self, ctx, u)
-            else:
+            if rolename:
                 role = discord.utils.get(ctx.message.guild.roles, name=rolename)
                 if role in ctx.message.guild.roles:
                     e = await ctx.send(embed=lib.Editable("Error", f"The role **{rolename}** already exists!", "Roles"))
@@ -256,6 +244,9 @@ class Main(commands.Cog):
                     await ctx.guild.create_role(name=rolename)
                     d = await ctx.send(embed=lib.Editable("Role Created", f"The role **{rolename}** has been created!", "Roles"))
                     await lib.eraset(self, ctx, d)
+            else:
+                u = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}role create (role)\n\n This will create a role with the specified name.", "Role Usage"))
+                await lib.eraset(self, ctx, u)
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -264,10 +255,7 @@ class Main(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def delete(self, ctx, rolename=None):
         if ctx.author.guild_permissions.manage_roles:
-            if rolename is None:
-                u = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}role delete (role)\n\n This will delete the role with the specified name.", "Role Usage"))
-                await lib.eraset(self, ctx, u)
-            else:
+            if rolename:
                 role = discord.utils.get(ctx.message.guild.roles, name=rolename)
                 if role in ctx.message.guild.roles:
                     await role.delete()
@@ -276,6 +264,9 @@ class Main(commands.Cog):
                 else:
                     e = await ctx.send(embed=lib.Editable("Error", f"The role **{rolename}** doesnt exist!", "Roles"))
                     await lib.eraset(self, ctx, e)
+            else:
+                u = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}role delete (role)\n\n This will delete the role with the specified name.", "Role Usage"))
+                await lib.eraset(self, ctx, u)
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)

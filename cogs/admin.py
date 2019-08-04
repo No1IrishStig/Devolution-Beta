@@ -29,48 +29,36 @@ class Admin(commands.Cog):
 
     @cog.group(invoke_without_command=True, no_pm=True)
     async def load(self, ctx, cog : str=None):
-        if ctx.author.id in self.config.owner:
-            if cog is None:
-                e = await ctx.send(embed=lib.Editable("Error", "Enter a cog name to load!", "Error"))
-                await lib.eraset(self, ctx, e)
-            else:
-                try:
-                    self.bot.load_extension(cog)
-                    s = await ctx.send(embed=lib.Editable("Success", f"{cog} has been loaded!", "Cogs"))
-                    await lib.erase(ctx, 20, s)
-                except Exception as error:
-                    ee = await ctx.send(embed=lib.Editable("Error", f"{cog} cannot be loaded because {error}!", "Cogs"))
-                    await lib.erase(ctx, 20, ee)
+        if cog:
+            try:
+                self.bot.load_extension(cog)
+                s = await ctx.send(embed=lib.Editable("Success", f"{cog} has been loaded!", "Cogs"))
+                await lib.erase(ctx, 20, s)
+            except Exception as error:
+                ee = await ctx.send(embed=lib.Editable("Error", f"{cog} cannot be loaded because {error}!", "Cogs"))
+                await lib.erase(ctx, 20, ee)
         else:
-            noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.eraset(self, ctx, noperm)
+            e = await ctx.send(embed=lib.Editable("Error", "Enter a cog name to load!", "Error"))
+            await lib.eraset(self, ctx, e)
 
     @cog.group(invoke_without_command=True, no_pm=True)
     async def unload(self, ctx, cog : str=None):
-        if ctx.author.id in self.config.owner:
-            if cog is None:
-                e = await ctx.send(embed=lib.Editable("Error", "Enter a cog name to unload!", "Error"))
-                await lib.eraset(self, ctx, e)
-            else:
-                try:
-                    self.bot.unload_extension(cog)
-                    s = await ctx.send(embed=lib.Editable("Success", f"{cog} has been unloaded!", "Cogs"))
-                    await lib.erase(ctx, 20, s)
-                except Exception as error:
-                    ee = await ctx.send(embed=lib.Editable("Error", f"{cog} cannot be unloaded because {error}!", "Cogs"))
-                    await lib.erase(ctx, 20, ee)
+        if cog:
+            try:
+                self.bot.unload_extension(cog)
+                s = await ctx.send(embed=lib.Editable("Success", f"{cog} has been unloaded!", "Cogs"))
+                await lib.erase(ctx, 20, s)
+            except Exception as error:
+                ee = await ctx.send(embed=lib.Editable("Error", f"{cog} cannot be unloaded because {error}!", "Cogs"))
+                await lib.erase(ctx, 20, ee)
         else:
-            noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.eraset(self, ctx, noperm)
+            e = await ctx.send(embed=lib.Editable("Error", "Enter a cog name to unload!", "Error"))
+            await lib.eraset(self, ctx, e)
 
     @cog.group(invoke_without_command=True)
     async def names(self, ctx):
-        if ctx.author.id in self.config.owner:
-            u = await ctx.send(embed=lib.Editable("Available Cogs", "cogs.core, cogs.main, cogs.fun, cogs.music, cogs.moderation, cogs.admin", "Cogs"))
-            await lib.erase(ctx, 20, u)
-        else:
-            noperm = await ctx.send(embed=lib.NoPerm())
-            await lib.eraset(self, ctx, noperm)
+        u = await ctx.send(embed=lib.Editable("Available Cogs", "cogs.core, cogs.main, cogs.fun, cogs.music, cogs.moderation, cogs.admin", "Cogs"))
+        await lib.erase(ctx, 20, u)
 
     @commands.command(aliases=["sp"], no_pm=True)
     async def setpresence(self, ctx, activity:str=None, *args):
@@ -103,17 +91,16 @@ class Admin(commands.Cog):
 
     @commands.command(no_pm=True)
     async def shutdown(self, ctx):
-            if ctx.author.id in self.config.owner:
-                o = await ctx.send(embed=lib.Editable("Going Offline", "Self Destruct Sequence Initiation detected.. Shutting down!.", "Owner"))
-                await self.bot.logout()
-            else:
-                noperm = await ctx.send(embed=lib.NoPerm())
-                await lib.eraset(self, ctx, noperm)
+        if ctx.author.id in self.config.owner:
+            o = await ctx.send(embed=lib.Editable("Going Offline", "Self Destruct Sequence Initiation detected.. Shutting down!.", "Owner"))
+            await self.bot.logout()
+        else:
+            noperm = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, noperm)
 
     @commands.command(no_pm=True)
     async def leave(self, ctx):
-        guild = ctx.message.guild
-        if ctx.author == guild.owner:
+        if ctx.author == ctx.guild.owner:
             await ctx.guild.leave()
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
@@ -122,13 +109,13 @@ class Admin(commands.Cog):
     @commands.command(no_pm=True)
     async def leaveid(self, ctx, id:int=None):
         if ctx.author.id in self.config.owner:
-            if id is None:
-                e = await ctx.send(embed=lib.Editable("Error", "Please enter a serverid for me to leave", "Error"))
-                await lib.eraset(self, ctx, e)
-            else:
+            if id:
                 guild = self.bot.get_guild(id)
                 await ctx.send(embed=lib.Editable("Success", f"I left the server **{guild}**", "Owner"))
-
+                await guild.leave()
+            else:
+                e = await ctx.send(embed=lib.Editable("Error", "Please enter a serverid for me to leave", "Error"))
+                await lib.eraset(self, ctx, e)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
@@ -154,9 +141,7 @@ class Admin(commands.Cog):
             member = ctx.author
             userid = ctx.author.id
             avatar = ctx.author.avatar_url
-            if user is None:
-                await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}pm @user message\n\n This will send a dm to the mentioned user.", "PM Usage"))
-            else:
+            if user:
                 message = ""
                 for word in args:
                     message += word
@@ -173,6 +158,9 @@ class Admin(commands.Cog):
                     embed.set_footer(text=f"UserID: {userid}")
                     await user.send(embed=embed)
                     await ctx.message.delete()
+            else:
+                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}pm @user message\n\n This will send a dm to the mentioned user.", "PM Usage"))
+                await lib.eraset(self, ctx, e)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
@@ -180,10 +168,7 @@ class Admin(commands.Cog):
     @commands.command(no_pm=True)
     async def pmid(self, ctx, id=None, *args):
         if ctx.author.id in self.config.owner:
-            if id is None:
-                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}pmid userid message\n\n This will send a dm to the user with that ID", "PMID Usage"))
-                await lib.eraset(self, ctx, e)
-            else:
+            if id:
                 member = ctx.author
                 userid = ctx.author.id
                 avatar = ctx.author.avatar_url
@@ -208,6 +193,9 @@ class Admin(commands.Cog):
                     except Exception as error:
                             er = await ctx.send(f"I couldnt send your message to {member} because of the error: {error}")
                             await lib.eraset(self, ctx, er)
+            else:
+                e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}pmid userid message\n\n This will send a dm to the user with that ID", "PMID Usage"))
+                await lib.eraset(self, ctx, e)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
@@ -226,7 +214,7 @@ class Admin(commands.Cog):
                 with open("./utils/essentials/admins.json", "w") as f:
                     json.dump(db, f)
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", "Admin access is enabled.\n\nHeres a list of commands you can try!\n**!admin add {userid}**\n**!admin remove {userid}**", "Admin Access"))
+                await ctx.send(embed=lib.Editable("Uh oh", f"Admin access is enabled.\n\nHeres a list of commands you can try!\n**{ctx.prefix}admin add (userid)**\n**{ctx.prefix}admin remove (userid)**", "Admin Access"))
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
@@ -239,16 +227,16 @@ class Admin(commands.Cog):
             guild = ctx.guild
             gid = str(guild.id)
             if gid in db:
-                if id is None:
-                    e = await ctx.send(embed=lib.Editable("Error", f"{ctx.author.mention} Please enter a UserID!", "Error"))
-                    await lib.eraset(self, ctx, e)
-                else:
+                if id:
                     db[gid]["admins"].append(str(id))
                     name = await self.bot.fetch_user(id)
                     with open("./utils/essentials/admins.json", "w") as f:
                         json.dump(db, f)
                     s = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} Added the UserID **{id}, ({name})** to the admins list!", "Admin Access"))
                     await lib.eraset(self, ctx, s)
+                else:
+                    e = await ctx.send(embed=lib.Editable("Error", f"{ctx.author.mention} Please enter a UserID!", "Error"))
+                    await lib.eraset(self, ctx, e)
             else:
                 e = await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
                 db[gid] = adminset
@@ -271,10 +259,7 @@ class Admin(commands.Cog):
             guild = ctx.guild
             gid = str(guild.id)
             if gid in db:
-                if id is None:
-                    e = await ctx.send(embed=lib.Editable("Error", f"{ctx.author.mention} Please enter a UserID!", "Error"))
-                    await lib.eraset(self, ctx, e)
-                else:
+                if id:
                     name = await self.bot.fetch_user(id)
                     if id in db[gid]["admins"]:
                         db[gid]["admins"].remove(id)
@@ -284,6 +269,9 @@ class Admin(commands.Cog):
                         await lib.eraset(self, ctx, s)
                     else:
                         await ctx.send(embed=lib.Editable("Uh oh", "That UserID doesnt have admin access!", "Admin Access"))
+                else:
+                    e = await ctx.send(embed=lib.Editable("Error", f"{ctx.author.mention} Please enter a UserID!", "Error"))
+                    await lib.eraset(self, ctx, e)
             else:
                 await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
                 db[gid] = adminset
