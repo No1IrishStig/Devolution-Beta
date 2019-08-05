@@ -2,5 +2,5 @@
   "token": "Token",
   "owner": [UserID],
   "prefix": "!",
-  "playing": "Stable v1.63"
+  "playing": "Stable v1.64"
 }

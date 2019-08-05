@@ -54,6 +54,8 @@ class Economy(commands.Cog):
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def bank(self, ctx):
+        if UID in self.bank[GID]:
+            await ctx.send(embed=lib.Editable("Bank Commands", f"`{ctx.prefix}bank register` - Creates you a bank account (You already have one)\n`{ctx.prefix}bank balance` - Shows your balance\n`{ctx.prefix}bank transfer @user (amount)` - Transfer credits to another user\n`{ctx.prefix}bank set @user (amount)` - Change the bank balance of another user (Admin Only)\n\nGame Commands\n`{ctx.prefix}blackjack play (bet)` - Play blackjack against the house\n`{ctx.prefix}slots (bet)` - Play the slot machine", "Devo Bank"))
         await ctx.send(embed=lib.Editable("Just do it!", "Use !bank register to create a bank account", "Devo Bank"))
 
     @bank.group(invoke_without_command=True)
@@ -80,7 +82,7 @@ class Economy(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def balance(self, ctx, user: discord.Member=None):
         GID = str(ctx.guild.id)
-        if gid in self.bank:
+        if GID in self.bank:
             if user is None:
                 user = ctx.author
                 if self.account_check(GID, user.id):
@@ -201,7 +203,7 @@ class Economy(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def slot(self, ctx, bid : int=None):
+    async def slots(self, ctx, bid : int=None):
         GID = str(ctx.guild.id)
         start_bid = bid
         if GID in self.bank:
@@ -494,9 +496,14 @@ class Economy(commands.Cog):
             gameover = True
             return await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "{} got blackjack!\n\n{} wins {} credits!".format(creator.name, creator.name, bet_amount * 2), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount * 2)
+        elif CARDS_TOTAL_WORTH == OPPONENT_TOTAL_WORTH:
+            gameover = True
+            await ctx.send(embed=lib.Editable(f"Its a Tie!", "You both stood with {}!\n\nYour original bet of {} has been returned to your bank!".format(CARDS_TOTAL_WORTH, CARDS, bet_amount), "Blackjack"))
+            self.add_money(GID, creator.id, bet_amount)
+            return
         elif STOOD_WHEN_LESS_HOUSE_WINS is True:
             gameover = True
-            return await ctx.send(embed=lib.Editable(f"The House Wins", "{} stood with {}!\n\nThe house wins {} credits with {}!".format(creator.name, CARDS, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
+            return await ctx.send(embed=lib.Editable(f"The House Wins", "{} stood with {}!\n\nThe house wins {} credits with {}!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
 
     async def bothit(self, ctx):
         global OPPONENT_TOTAL_WORTH
@@ -512,13 +519,14 @@ class Economy(commands.Cog):
         OPPONENT_TOTAL_WORTH += c
         OPPONENT_TOTAL_WORTH += bot_extra
         bot_cards.append(SETS[s] + " " + CARDS[crds])
+        await ctx.send("The house chose to hit")
         # [DEBUG] await channel.send(embed=lib.Editable("Your Cards", "The House hit and got {} which equals {}".format(bot_cards[0], OPPONENT_TOTAL_WORTH), "Blackjack"))
 
     async def blackjack_math(self, ctx):
         if CARDS_TOTAL_WORTH > OPPONENT_TOTAL_WORTH:
             await self.bothit(ctx)
         else:
-            return
+            await ctx.send("The house stood")
 
     def reset_match(self):
         global is_active
