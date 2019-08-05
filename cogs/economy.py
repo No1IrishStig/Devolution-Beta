@@ -484,8 +484,8 @@ class Economy(commands.Cog):
         global gameover
         if OPPONENT_TOTAL_WORTH > 21:
             gameover = True
-            return await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "The house bust with a total of {}\n\n{} wins {} credits!".format(OPPONENT_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
-            self.add_money(GID, creator.id, bet_amount * 2)
+            await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "The house bust with a total of {}\n\n{} wins {} credits!".format(OPPONENT_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
+            await self.add_money(GID, creator.id, bet_amount * 2)
         elif CARDS_TOTAL_WORTH > 21:
             gameover = True
             return await ctx.send(embed=lib.Editable(f"The House Wins", "{} bust with a total of {}\n\nThe House wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
@@ -494,12 +494,12 @@ class Economy(commands.Cog):
             return await ctx.send(embed=lib.Editable(f"The House Wins", "The house got blackjack!\n\nThe house wins {} credits!".format(bet_amount * 2), "Blackjack"))
         elif CARDS_TOTAL_WORTH == 21:
             gameover = True
-            return await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "{} got blackjack!\n\n{} wins {} credits!".format(creator.name, creator.name, bet_amount * 2), "Blackjack"))
-            self.add_money(GID, creator.id, bet_amount * 2)
+            await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "{} got blackjack!\n\n{} wins {} credits!".format(creator.name, creator.name, bet_amount * 2), "Blackjack"))
+            await self.add_money(GID, creator.id, bet_amount * 2)
         elif CARDS_TOTAL_WORTH == OPPONENT_TOTAL_WORTH:
             gameover = True
             await ctx.send(embed=lib.Editable(f"Its a Tie!", "You both stood with {}!\n\nYour original bet of {} has been returned to your bank!".format(CARDS_TOTAL_WORTH, bet_amount), "Blackjack"))
-            self.add_money(GID, creator.id, bet_amount)
+            await self.add_money(GID, creator.id, bet_amount)
             return
         elif STOOD_WHEN_LESS_HOUSE_WINS is True:
             gameover = True
