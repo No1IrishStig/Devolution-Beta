@@ -498,7 +498,7 @@ class Economy(commands.Cog):
             self.add_money(GID, creator.id, bet_amount * 2)
         elif CARDS_TOTAL_WORTH == OPPONENT_TOTAL_WORTH:
             gameover = True
-            await ctx.send(embed=lib.Editable(f"Its a Tie!", "You both stood with {}!\n\nYour original bet of {} has been returned to your bank!".format(CARDS_TOTAL_WORTH, CARDS, bet_amount), "Blackjack"))
+            await ctx.send(embed=lib.Editable(f"Its a Tie!", "You both stood with {}!\n\nYour original bet of {} has been returned to your bank!".format(CARDS_TOTAL_WORTH, bet_amount), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount)
             return
         elif STOOD_WHEN_LESS_HOUSE_WINS is True:
