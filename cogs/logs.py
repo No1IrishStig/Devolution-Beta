@@ -14,7 +14,7 @@ class Logs(commands.Cog):
             self.bot = bot
             with open("./data/logs/settings.json") as f:
                 self.logs = json.load(f)
-                with open("./utils/essentials/deltimer.json") as f:
+                with open("./data/admin/deltimer.json") as f:
                     self.deltimer = json.load(f)
 
     @commands.group(invoke_without_command=True, no_pm=True)

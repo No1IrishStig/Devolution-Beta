@@ -9,7 +9,7 @@ from discord.ext import commands
 class Main(commands.Cog):
     def __init__(self, bot):
             self.bot = bot
-            with open("./utils/essentials/deltimer.json") as f:
+            with open("./data/admin/deltimer.json") as f:
                 self.deltimer = json.load(f)
 
     @commands.command(no_pm=True)

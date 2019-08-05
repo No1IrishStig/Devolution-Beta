@@ -19,7 +19,7 @@ class Fun(commands.Cog):
                     self.settings = json.load(f)
                     with open("./data/owo/owo.json") as f:
                         self.owo = json.load(f)
-                        with open("./utils/essentials/deltimer.json") as f:
+                        with open("./data/admin/deltimer.json") as f:
                             self.deltimer = json.load(f)
 
     @commands.command(no_pm=True)

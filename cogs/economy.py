@@ -44,11 +44,11 @@ class Economy(commands.Cog):
         self.config = default.get("./utils/cfg.json")
         self.benefits_register = {}
         self.slot_register = {}
-        with open("./utils/essentials/economy.json") as f:
+        with open("./data/economy/economy.json") as f:
             self.bank = json.load(f)
             with open("./data/economy/settings.json") as s:
                 self.settings = json.load(s)
-                with open("./utils/essentials/deltimer.json") as f:
+                with open("./data/admin/deltimer.json") as f:
                     self.deltimer = json.load(f)
 
     @commands.group(invoke_without_command=True)
@@ -69,14 +69,14 @@ class Economy(commands.Cog):
         if GID in self.bank:
             if not UID in self.bank[GID]:
                 self.bank[GID][UID] = {"name": user.name, "balance": 100}
-                with open("./utils/essentials/economy.json", "w") as f:
+                with open("./data/economy/economy.json", "w") as f:
                     json.dump(self.bank, f, indent=4)
                 await ctx.send(embed=lib.Editable("Ayy", f"Bank Account Created for {ctx.author.mention}. Current balance: {str(self.check_balance(GID, user.id))}", "Devo Bank"))
             else:
                 await ctx.send(embed=lib.Editable("Uh oh", "You're too poor to make another bank account ;)", "Devo Bank"))
         else:
             self.bank[GID] = {}
-            with open("./utils/essentials/economy.json", "w") as f:
+            with open("./data/economy/economy.json", "w") as f:
                 json.dump(self.bank, f, indent=4)
             await ctx.reinvoke()
 
@@ -377,10 +377,10 @@ class Economy(commands.Cog):
                     embed.add_field(name="Creator", value=f"{creator.name}", inline=True)
                     embed.add_field(name="Opponent", value=f"The House", inline=True)
                     embed.add_field(name="Bet", value=f"{bet_amount}", inline=True)
-                    embed.add_field(name="Get Ready!", value=f"The match will start in 10 seconds.", inline=False)
+                    embed.add_field(name="Get Ready!", value=f"The match will start in 5 seconds.", inline=False)
                     blackjack_start = await ctx.send(embed=embed)
                     is_active = True
-                    await asyncio.sleep(10)
+                    await asyncio.sleep(5)
                     await self.cards(channel)
                     await asyncio.sleep(2)
                     await self.bot_cards(channel)
@@ -574,7 +574,7 @@ class Economy(commands.Cog):
         id = str(id)
         if self.account_check(GID, id):
             self.bank[GID][id]["balance"] = self.bank[GID][id]["balance"] + int(amount)
-            with open("./utils/essentials/economy.json", "w") as f:
+            with open("./data/economy/economy.json", "w") as f:
                 json.dump(self.bank, f)
         else:
             return False
@@ -584,7 +584,7 @@ class Economy(commands.Cog):
         if self.account_check(GID, id):
             if self.bank[GID][id]["balance"] >= int(amount):
                 self.bank[GID][id]["balance"] = self.bank[GID][id]["balance"] - int(amount)
-                with open("./utils/essentials/economy.json", "w") as f:
+                with open("./data/economy/economy.json", "w") as f:
                     json.dump(self.bank, f)
             else:
                 return False
@@ -605,7 +605,7 @@ class Economy(commands.Cog):
         id = str(id)
         if self.account_check(GID, id):
             self.bank[GID][id]["balance"] = amount
-            with open("./utils/essentials/economy.json", "w") as f:
+            with open("./data/economy/economy.json", "w") as f:
                 json.dump(self.bank, f)
             return True
         else:

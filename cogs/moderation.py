@@ -13,7 +13,7 @@ class Mod(commands.Cog):
     def __init__(self, bot):
             self.bot = bot
             self.config = default.get("utils/cfg.json")
-            with open("./utils/essentials/deltimer.json") as f:
+            with open("./data/admin/deltimer.json") as f:
                 self.deltimer = json.load(f)
 
     @commands.command(no_pm=True)
@@ -478,7 +478,7 @@ class Mod(commands.Cog):
                     await lib.eraset(self, ctx, e3)
                 else:
                     db[gid]["timer"] = timer
-                    with open("./utils/essentials/deltimer.json", "w") as f:
+                    with open("./data/admin/deltimer.json", "w") as f:
                         json.dump(db, f)
                         s = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} Changed the deletion timer to {timer}", "Deletion Timer"))
                         await lib.eraset(self, ctx, s)
@@ -495,13 +495,13 @@ class Mod(commands.Cog):
             gid = str(guild.id)
             if not gid in db:
                 db[gid] = db_timer
-                with open("./utils/essentials/deltimer.json", "w") as f:
+                with open("./data/admin/deltimer.json", "w") as f:
                     json.dump(db, f)
                     s = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} enabled the Custom Deletion Timer. It has automatically been set to **20** seconds.", "Deletion Timer"))
                     await lib.eraset(self, ctx, s)
             else:
                 del db[gid]
-                with open("./utils/essentials/deltimer.json", "w") as f:
+                with open("./data/admin/deltimer.json", "w") as f:
                     json.dump(db, f)
                     s1 = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} disabled the Custom Deletion Timer. Message deletion timers have been reset to **20** seconds.", "Deletion Timer"))
                     await lib.eraset(self, ctx, s1)

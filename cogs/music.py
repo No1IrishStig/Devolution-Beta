@@ -57,7 +57,7 @@ class Music(commands.Cog):
         self.bot = bot
         self.config = default.get("utils/cfg.json")
         song_requester = None
-        with open("./utils/essentials/deltimer.json") as f:
+        with open("./data/admin/deltimer.json") as f:
             self.deltimer = json.load(f)
 
     @commands.command()

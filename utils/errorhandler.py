@@ -1,4 +1,5 @@
 import discord
+import asyncio
 
 from discord.ext import commands
 from utils.default import lib
@@ -35,6 +36,9 @@ class ErrorHandler(commands.Cog):
         elif isinstance(error, discord.HTTPException):
             return await ctx.send(embed=lib.Editable("Error!", f"There was an error with your command! Here it is: {error}", "Error"))
 
+        # Asyncio Error's
+        elif isinstance(error, asyncio.TimeoutError):
+            return await ctx.send(embed=lib.Editable("Woops!", "You didnt reply, so the action timed out!", "Timed Out"))
         raise error
 
 def setup(bot):

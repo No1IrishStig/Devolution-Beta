@@ -19,7 +19,7 @@ class Core(commands.Cog):
             self.config = json.load(f)
             with open("./data/customcommands/commands.json") as f:
                 self.cc = json.load(f)
-                with open("./utils/essentials/deltimer.json") as f:
+                with open("./data/admin/deltimer.json") as f:
                     self.deltimer = json.load(f)
 
     @commands.group(invoke_without_command=True, no_pm=True)

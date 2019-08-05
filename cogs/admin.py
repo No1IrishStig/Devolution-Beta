@@ -15,9 +15,9 @@ class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = default.get("./utils/cfg.json")
-        with open("./utils/essentials/deltimer.json") as f:
+        with open("./data/admin/deltimer.json") as f:
             self.deltimer = json.load(f)
-            with open("./utils/essentials/admins.json") as f:
+            with open("./data/admin/admins.json") as f:
                 self.admindb = json.load(f)
 
     @commands.command()
@@ -225,7 +225,7 @@ class Admin(commands.Cog):
             if not gid in db:
                 await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
                 db[gid] = adminset
-                with open("./utils/essentials/admins.json", "w") as f:
+                with open("./data/admin/admins.json", "w") as f:
                     json.dump(db, f)
             else:
                 await ctx.send(embed=lib.Editable("Uh oh", f"Admin access is enabled.\n\nHeres a list of commands you can try!\n**{ctx.prefix}admin add (userid)**\n**{ctx.prefix}admin remove (userid)**", "Admin Access"))
@@ -244,7 +244,7 @@ class Admin(commands.Cog):
                 if id:
                     db[gid]["admins"].append(str(id))
                     name = await self.bot.fetch_user(id)
-                    with open("./utils/essentials/admins.json", "w") as f:
+                    with open("./data/admin/admins.json", "w") as f:
                         json.dump(db, f)
                     s = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} Added the UserID **{id}, ({name})** to the admins list!", "Admin Access"))
                     await lib.eraset(self, ctx, s)
@@ -254,7 +254,7 @@ class Admin(commands.Cog):
             else:
                 e = await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
                 db[gid] = adminset
-                with open("./utils/essentials/admins.json", "w") as f:
+                with open("./data/admin/admins.json", "w") as f:
                     json.dump(db, f)
                 await asyncio.sleep(5)
                 await e.delete()
@@ -277,7 +277,7 @@ class Admin(commands.Cog):
                     name = await self.bot.fetch_user(id)
                     if id in db[gid]["admins"]:
                         db[gid]["admins"].remove(id)
-                        with open("./utils/essentials/admins.json", "w") as f:
+                        with open("./data/admin/admins.json", "w") as f:
                             json.dump(db, f)
                         s = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} Removed the UserID **{id}, ({name})** from the admins list!", "Admin Access"))
                         await lib.eraset(self, ctx, s)
@@ -289,7 +289,7 @@ class Admin(commands.Cog):
             else:
                 await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
                 db[gid] = adminset
-                with open("./utils/essentials/admins.json", "w") as f:
+                with open("./data/admin/admins.json", "w") as f:
                     json.dump(db, f)
                 await asyncio.sleep(5)
                 await e.delete()
@@ -318,7 +318,7 @@ class Admin(commands.Cog):
             else:
                 await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
                 db[gid] = adminset
-                with open("./utils/essentials/admins.json", "w") as f:
+                with open("./data/admin/admins.json", "w") as f:
                     json.dump(db, f)
                 await asyncio.sleep(5)
                 await e.delete()
