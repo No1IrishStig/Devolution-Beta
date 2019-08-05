@@ -54,6 +54,8 @@ class Economy(commands.Cog):
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def bank(self, ctx):
+        UID = str(user.id)
+        GID = str(ctx.guild.id)
         if UID in self.bank[GID]:
             await ctx.send(embed=lib.Editable("Bank Commands", f"`{ctx.prefix}bank register` - Creates you a bank account (You already have one)\n`{ctx.prefix}bank balance` - Shows your balance\n`{ctx.prefix}bank transfer @user (amount)` - Transfer credits to another user\n`{ctx.prefix}bank set @user (amount)` - Change the bank balance of another user (Admin Only)\n\nGame Commands\n`{ctx.prefix}blackjack play (bet)` - Play blackjack against the house\n`{ctx.prefix}slots (bet)` - Play the slot machine", "Devo Bank"))
         await ctx.send(embed=lib.Editable("Just do it!", "Use !bank register to create a bank account", "Devo Bank"))
@@ -472,10 +474,8 @@ class Economy(commands.Cog):
         if c > 9:
             c = 10
             player_extra = player_extra - 1
-        print(f"Cards Worth (Before Adding Hit) - {CARDS_TOTAL_WORTH}\nC value is - {c}")
         CARDS_TOTAL_WORTH += c
         CARDS_TOTAL_WORTH += player_extra
-        print(CARDS_TOTAL_WORTH)
         players_cards.append(SETS[s] + " " + CARDS[crds])
         return await ctx.send(embed=lib.Editable(f"{ctx.author.name}'s Turn", "{} got a {} which gives a total of {}".format(creator.name, players_cards[0], CARDS_TOTAL_WORTH), "Blackjack"))
 
