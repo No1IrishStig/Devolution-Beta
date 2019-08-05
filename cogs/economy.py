@@ -377,10 +377,10 @@ class Economy(commands.Cog):
                     embed.add_field(name="Creator", value=f"{creator.name}", inline=True)
                     embed.add_field(name="Opponent", value=f"The House", inline=True)
                     embed.add_field(name="Bet", value=f"{bet_amount}", inline=True)
-                    embed.add_field(name="Get Ready!", value=f"The match will start in 15 seconds.", inline=False)
+                    embed.add_field(name="Get Ready!", value=f"The match will start in 10 seconds.", inline=False)
                     blackjack_start = await ctx.send(embed=embed)
                     is_active = True
-                    await asyncio.sleep(5)
+                    await asyncio.sleep(10)
                     await self.cards(channel)
                     await asyncio.sleep(2)
                     await self.bot_cards(channel)
@@ -520,6 +520,7 @@ class Economy(commands.Cog):
         OPPONENT_TOTAL_WORTH += c
         OPPONENT_TOTAL_WORTH += bot_extra
         bot_cards.append(SETS[s] + " " + CARDS[crds])
+        await asyncio.sleep(2)
         await ctx.send("The house chose to hit")
         # [DEBUG] await channel.send(embed=lib.Editable("Your Cards", "The House hit and got {} which equals {}".format(bot_cards[0], OPPONENT_TOTAL_WORTH), "Blackjack"))
 
@@ -528,6 +529,7 @@ class Economy(commands.Cog):
             await self.bothit(ctx)
         else:
             await ctx.send("The house stood")
+            await asyncio.sleep(2)
 
     def reset_match(self):
         global is_active
