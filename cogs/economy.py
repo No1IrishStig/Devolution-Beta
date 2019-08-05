@@ -327,7 +327,7 @@ class Economy(commands.Cog):
     async def benefitstime(self, ctx, seconds : int=None):
         if seconds:
             self.settings["BENEFITS_TIME"] = seconds
-            await ctx.send("Value modified. At least " + str(seconds) + " seconds must pass between each payday.")
+            await ctx.send("Value modified. At least " + str(seconds) + " seconds must pass between each benefits claim.")
             with open("./data/economy/settings.json", "w") as s:
                 json.dump(self.settings, s)
         else:
@@ -338,7 +338,7 @@ class Economy(commands.Cog):
     async def benefitscredits(self, ctx, credits : int=None):
         if credits:
             self.settings["BENEFITS_CREDITS"] = credits
-            await ctx.send("Every payday will now give " + str(credits) + " credits.")
+            await ctx.send("Every benefits claim will now give " + str(credits) + " credits.")
             with open("./data/economy/settings.json", "w") as s:
                 json.dump(self.settings, s)
         else:
