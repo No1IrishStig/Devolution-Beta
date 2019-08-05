@@ -482,6 +482,7 @@ class Economy(commands.Cog):
     async def win(self, ctx):
         global STOOD_WHEN_LESS_HOUSE_WINS
         global gameover
+        GID = str(ctx.guild.id)
         if OPPONENT_TOTAL_WORTH > 21:
             gameover = True
             await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "The house bust with a total of {}\n\n{} wins {} credits!".format(OPPONENT_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
