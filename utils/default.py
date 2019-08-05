@@ -16,7 +16,7 @@ def get(file):
     except FileNotFoundError:
         raise FileNotFoundError("JSON file wasn't found")
 
-version = "Stable v1.62"
+version = "Stable v1.63"
 invite = "https://discord.gg/V9DhKbW"
 config = default.get("./utils/cfg.json")
 
@@ -42,6 +42,17 @@ class lib(commands.Cog):
             title = title,
             description = desc,
             colour = 0x9bf442,
+            timestamp=datetime.datetime.utcnow()
+            )
+        e.set_footer(text=f"Devolution - {footer}", icon_url="https://i.imgur.com/BS6YRcT.jpg")
+        e.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
+        return e
+
+    def EditableC(title, desc, colour, footer):
+        e = discord.Embed(
+            title = title,
+            description = desc,
+            colour = colour,
             timestamp=datetime.datetime.utcnow()
             )
         e.set_footer(text=f"Devolution - {footer}", icon_url="https://i.imgur.com/BS6YRcT.jpg")

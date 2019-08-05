@@ -1,7 +1,9 @@
 import sys, traceback
+import subprocess
 import discord
 import asyncio
 import json
+import os
 
 from utils.default import lib
 from discord.ext import commands
@@ -17,6 +19,18 @@ class Admin(commands.Cog):
             self.deltimer = json.load(f)
             with open("./utils/essentials/admins.json") as f:
                 self.admindb = json.load(f)
+
+    @commands.command()
+    async def restart(self, ctx):
+        if ctx.author.id in self.config.owner:
+            await ctx.send("Restarting...")
+            os.system("cls")
+            print(f"{self.bot.user.name} is Restarting")
+            os.system("py -3 ./bot.py")
+            await self.bot.logout()
+        else:
+            noperm = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, noperm)
 
     @commands.group(invoke_without_command=True, no_pm=True)
     async def cog(self, ctx):
