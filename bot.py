@@ -6,8 +6,8 @@ from utils.default import lib
 from discord.ext import commands
 from utils import default
 
-JSON_VALIDATION = ['admin/admins.json', 'admin/deltimer.json', 'customcommands/commands.json', 'economy/economy.json', 'economy/settings.json', 'logs/settings.json']
-ERRORS = ["admins", "deltimer", "cc", "economy", "economysettings", "logsettings"]
+JSON_VALIDATION = ['admin/admins.json', 'admin/deltimer.json', 'customcommands/commands.json', 'economy/economy.json', 'economy/settings.json', 'logs/settings.json', 'levels/rankings.json']
+ERRORS = ["admins", "deltimer", "cc", "economy", "economysettings", "logsettings", "levels"]
 config = default.get("utils/cfg.json")
 
 bot = commands.Bot(command_prefix = config.prefix)
@@ -35,6 +35,8 @@ for files in JSON_VALIDATION:
             lib.ecoset()
         elif ERRORS[i] == "logsettings":
             lib.logset()
+        elif ERRORS[i] == "levels":
+            lib.levels()
     i += 1
 print("JSON Validation Complete")
 
