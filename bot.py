@@ -6,8 +6,9 @@ from utils.default import lib
 from discord.ext import commands
 from utils import default
 
-JSON_VALIDATION = ['admin/admins.json', 'admin/deltimer.json', 'customcommands/commands.json', 'economy/economy.json', 'economy/settings.json', 'logs/settings.json', 'levels/rankings.json']
-ERRORS = ["admins", "deltimer", "cc", "economy", "economysettings", "logsettings", "levels"]
+dbcheck = os.path.exists(f"data/db/data.db.dat")
+JSON_VALIDATION = ['settings/deltimer.json', 'settings/logs.json']
+ERRORS = ["deltimer", "logs"]
 config = default.get("utils/cfg.json")
 
 bot = commands.Bot(command_prefix = config.prefix)
@@ -23,22 +24,18 @@ for files in JSON_VALIDATION:
     check = os.path.exists(f"data/{files}")
     if check is False:
         ERRORS[i]
-        if ERRORS[i] == "admins":
-            lib.admins()
-        elif ERRORS[i] == "deltimer":
+        if ERRORS[i] == "deltimer":
             lib.deltimer()
-        elif ERRORS[i] == "cc":
-            lib.cc()
-        elif ERRORS[i] == "economy":
-            lib.eco()
-        elif ERRORS[i] == "economysettings":
-            lib.ecoset()
-        elif ERRORS[i] == "logsettings":
-            lib.logset()
-        elif ERRORS[i] == "levels":
-            lib.levels()
+        elif ERRORS[i] == "logs":
+            lib.logs()
     i += 1
-print("JSON Validation Complete")
+
+if check is False:
+    print("JSON Files Generated")
+
+if dbcheck is False:
+    print("Database Generated")
+
 
 for file in os.listdir("cogs"):
     if file.endswith(".py"):
@@ -49,5 +46,5 @@ for file in os.listdir("cogs"):
             traceback.print_exc()
 
 bot.load_extension("utils.errorhandler")
-print('Boot Successful!')
+print("Boot Successful!")
 bot.run(config.token, reconnect=True)

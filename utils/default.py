@@ -16,7 +16,7 @@ def get(file):
     except FileNotFoundError:
         raise FileNotFoundError("JSON file wasn't found")
 
-version = "Stable v1.6.6"
+version = "Stable v1.7"
 invite = "https://discord.gg/V9DhKbW"
 config = default.get("./utils/cfg.json")
 
@@ -122,40 +122,17 @@ class lib(commands.Cog):
         )
         return sa
 
-    def admins():
-        admins = open("data/admin/admins.json","w+")
-        admins.write("{}")
-        admins.close
 
     def deltimer():
-        deltimer = open("data/admin/deltimer.json","w+")
+        deltimer = open("data/settings/deltimer.json","w+")
         deltimer.write("{}")
         deltimer.close
 
-    def cc():
-        cc = open("data/customcommands/commands.json","w+")
-        cc.write("{}")
-        cc.close
-
-    def eco():
-        eco = open("data/economy/economy.json","w+")
-        eco.write("{}")
-        eco.close
-
-    def ecoset():
-        ecoset = open("data/economy/settings.json","w+")
-        ecoset.write('{\n"BENEFITS_TIME": 300,\n "BENEFITS_CREDITS": 250,\n "SLOT_MIN": 5,\n "SLOT_MAX": 100,\n "SLOT_TIME": 2\n}')
-        ecoset.close
-
-    def logset():
-        logset = open("data/logs/settings.json","w+")
+    def logs():
+        logset = open("data/settings/logs.json","w+")
         logset.write("{}")
         logset.close
 
-    def levels():
-        levels = open("data/levels/rankings.json","w+")
-        levels.write("{}")
-        levels.close
 
 def setup(client):
     client.add_cog(Lib(client))

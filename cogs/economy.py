@@ -1,4 +1,5 @@
 import sys, traceback
+import shelve
 import datetime
 import discord
 import asyncio
@@ -40,21 +41,25 @@ class Economy(commands.Cog):
         self.config = default.get("./utils/cfg.json")
         self.benefits_register = {}
         self.slot_register = {}
-        with open("./data/economy/economy.json") as f:
-            self.bank = json.load(f)
-            with open("./data/economy/settings.json") as s:
-                self.settings = json.load(s)
-                with open("./data/admin/deltimer.json") as f:
-                    self.deltimer = json.load(f)
+        self.db = shelve.open("./data/db/data.db", writeback=True)
+        with open("./data/settings/economy.json") as s:
+            self.settings = json.load(s)
+            with open("./data/settings/deltimer.json") as f:
+                self.deltimer = json.load(f)
 
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def bank(self, ctx):
+        user = ctx.author
         UID = str(user.id)
         GID = str(ctx.guild.id)
-        if UID in self.bank[GID]:
-            await ctx.send(embed=lib.Editable("Bank Commands", f"`{ctx.prefix}bank register` - Creates you a bank account (You already have one)\n`{ctx.prefix}bank balance` - Shows your balance\n`{ctx.prefix}bank transfer @user (amount)` - Transfer credits to another user\n`{ctx.prefix}bank set @user (amount)` - Change the bank balance of another user (Admin Only)\n\nGame Commands\n`{ctx.prefix}blackjack play (bet)` - Play blackjack against the house\n`{ctx.prefix}slots (bet)` - Play the slot machine", "Devo Bank"))
-        await ctx.send(embed=lib.Editable("Just do it!", "Use !bank register to create a bank account", "Devo Bank"))
+        if "Economy" in self.db and GID in self.db["Economy"]:
+            if UID in self.db["Economy"][GID]:
+                await ctx.send(embed=lib.Editable("Bank Commands", f"`{ctx.prefix}bank register` - Creates you a bank account (You already have one)\n`{ctx.prefix}bank balance` - Shows your balance\n`{ctx.prefix}bank transfer @user (amount)` - Transfer credits to another user\n`{ctx.prefix}bank set @user (amount)` - Change the bank balance of another user (Admin Only)\n\nGame Commands\n`{ctx.prefix}blackjack play (bet)` - Play blackjack against the house\n`{ctx.prefix}slots (bet)` - Play the slot machine", "Devo Bank"))
+            else:
+                await ctx.send(embed=lib.Editable("Just do it!", "Use !bank register to create a bank account", "Devo Bank"))
+        else:
+            await ctx.send(embed=lib.Editable("Just do it!", "Use !bank register to create a bank account", "Devo Bank"))
 
     @bank.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -62,25 +67,24 @@ class Economy(commands.Cog):
         user = ctx.author
         UID = str(user.id)
         GID = str(ctx.guild.id)
-        if GID in self.bank:
-            if not UID in self.bank[GID]:
-                self.bank[GID][UID] = {"name": user.name, "balance": 100}
-                with open("./data/economy/economy.json", "w") as f:
-                    json.dump(self.bank, f, indent=4)
+        if "Economy" in self.db and GID in self.db["Economy"]:
+            if UID not in self.db["Economy"][GID]:
+                self.db["Economy"][GID][UID] = {"name": user.name, "balance": 100}
                 await ctx.send(embed=lib.Editable("Ayy", f"Bank Account Created for {ctx.author.mention}. Current balance: {str(self.check_balance(GID, user.id))}", "Devo Bank"))
+                self.db.sync()
             else:
                 await ctx.send(embed=lib.Editable("Uh oh", "You're too poor to make another bank account ;)", "Devo Bank"))
         else:
-            self.bank[GID] = {}
-            with open("./data/economy/economy.json", "w") as f:
-                json.dump(self.bank, f, indent=4)
-            await ctx.reinvoke()
+            self.db["Economy"] = {}
+            self.db["Economy"] = {GID: {UID: {"name": user.name, "balance": 100}}}
+            self.db.sync()
+            await ctx.send(embed=lib.Editable("Ayy", f"Bank Account Created for {ctx.author.mention}. Current balance: {str(self.check_balance(GID, user.id))}", "Devo Bank"))
 
     @bank.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def balance(self, ctx, user: discord.Member=None):
         GID = str(ctx.guild.id)
-        if GID in self.bank:
+        if "Economy" in self.db and GID in self.db["Economy"]:
             if user is None:
                 user = ctx.author
                 if self.account_check(GID, user.id):
@@ -101,7 +105,7 @@ class Economy(commands.Cog):
     async def transfer(self, ctx, user: discord.Member=None, amount : int=None):
         author = ctx.author
         GID = str(ctx.guild.id)
-        if GID in self.bank:
+        if "Economy" in self.db and GID in self.db["Economy"]:
             if user and amount:
                 if not author == user:
                     if amount > 1:
@@ -109,6 +113,7 @@ class Economy(commands.Cog):
                             if self.enough_money(GID, author.id, amount):
                                 self.withdraw_money(GID, author.id, amount)
                                 self.add_money(GID, user.id, amount)
+                                self.db.sync()
                                 await ctx.send(embed=lib.Editable("Bye Bye Money", f"Transferred {amount} credits to {user.name}'s account.", "Devo Bank"))
                             else:
                                 await ctx.send(embed=lib.Editable("Aw shit, here we go again", f"{author.mention} You're too poor to do that", "Devo Bank"))
@@ -128,11 +133,12 @@ class Economy(commands.Cog):
     async def set(self, ctx, user: discord.Member=None, amount : int=None):
         GID = str(ctx.guild.id)
         if ctx.author is ctx.guild.owner or ctx.author.id in self.config.owner:
-            if GID in self.bank:
+            if "Economy" in self.db and GID in self.db["Economy"]:
                 if user and amount:
                     done = self.set_money(GID, user.id, amount)
                     if done:
                         await ctx.send(embed=lib.Editable("Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
+                        self.db.sync()
                     else:
                         await ctx.send(embed=lib.Editable("Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
                 else:
@@ -149,7 +155,7 @@ class Economy(commands.Cog):
         author = ctx.author
         GID = str(ctx.guild.id)
         id = author.id
-        if GID in self.bank:
+        if "Economy" in self.db and GID in self.db["Economy"]:
             if self.account_check(GID, id):
                 if id in self.benefits_register:
                     seconds = abs(self.benefits_register[id] - int(time.perf_counter()))
@@ -157,12 +163,14 @@ class Economy(commands.Cog):
                         self.add_money(GID, id, self.settings["BENEFITS_CREDITS"])
                         self.benefits_register[id] = int(time.perf_counter())
                         await ctx.send(embed=lib.Editable(f"{author.name} collected their benefits", "{} has been added to your account!".format(self.settings["BENEFITS_CREDITS"]), "Devo Bank"))
+                        self.db.sync()
                     else:
                         await ctx.send(embed=lib.Editable("Uh oh", "You need to wait another {} seconds until you can get more benefits.".format(self.display_time(self.settings["BENEFITS_TIME"] - seconds)), "Devo Bank"))
                 else:
                     self.benefits_register[id] = int(time.perf_counter())
                     self.add_money(GID, id, self.settings["BENEFITS_CREDITS"])
                     await ctx.send(embed=lib.Editable(f"{author.name} collected their benefits", "{} has been added to your account!".format(self.settings["BENEFITS_CREDITS"]), "Devo Bank"))
+                    self.db.sync()
             else:
                 await ctx.send(embed=lib.Editable("Uh oh", f"{user.mention}, You dont have a bank account at the Devo Bank. Type !bank register to open one.", "Devo Bank"))
         else:
@@ -172,10 +180,10 @@ class Economy(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def top(self, ctx, top : int=10):
         GID = str(ctx.guild.id)
-        if GID in self.bank:
+        if "Economy" in self.db and GID in self.db["Economy"]:
             if top < 1:
                 top = 10
-            bank_sorted = sorted(self.bank[GID].items(), key=lambda x: x[1]["balance"], reverse=True)
+            bank_sorted = sorted(self.db["Economy"][GID].items(), key=lambda x: x[1]["balance"], reverse=True)
             if len(bank_sorted) < top:
                 top = len(bank_sorted)
             topten = bank_sorted[:top]
@@ -200,11 +208,10 @@ class Economy(commands.Cog):
         await ctx.send(slot_winnings)
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.cooldown(1, 5, commands.BucketType.user)
     async def slots(self, ctx, bid : int=None):
         GID = str(ctx.guild.id)
         start_bid = bid
-        if GID in self.bank:
+        if "Economy" in self.db and GID in self.db["Economy"]:
             if bid:
                 author = ctx.author
                 if self.enough_money(GID, author.id, bid):
@@ -268,8 +275,10 @@ class Economy(commands.Cog):
         else:
             await message.channel.send(embed=lib.Editable(f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nNothing! Bet lost..", "Slot Machine"))
             self.withdraw_money(GID, message.author.id, bid)
+            self.db.sync()
             return True
         self.add_money(GID, message.author.id, bid)
+        self.db.sync()
 
     @commands.group(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -358,6 +367,7 @@ class Economy(commands.Cog):
             if self.bank_exists(GID):
                 if self.enough_money(GID, creator.id, bet):
                     self.withdraw_money(GID, creator.id, bet)
+                    self.db.sync()
                     bet_amount = bet
                     await ctx.message.delete()
                     channel = ctx.message.channel
@@ -384,8 +394,11 @@ class Economy(commands.Cog):
                                 await self.player(ctx)
                                 if gameover is False:
                                     await self.win(ctx)
-                                    await self.blackjack_math(ctx)
-                                    if is_active is False:
+                                    if gameover is False:
+                                        await self.blackjack_math(ctx)
+                                        if is_active is False:
+                                            break
+                                    else:
                                         break
                                 else:
                                     break
@@ -476,7 +489,8 @@ class Economy(commands.Cog):
         if OPPONENT_TOTAL_WORTH > 21:
             gameover = True
             await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "The house bust with a total of {}\n\n{} wins {} credits!".format(OPPONENT_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
-            return self.add_money(GID, creator.id, bet_amount * 2)
+            self.add_money(GID, creator.id, bet_amount * 2)
+            return self.db.sync()
         elif CARDS_TOTAL_WORTH > 21:
             gameover = True
             return await ctx.send(embed=lib.Editable(f"The House Wins", "{} bust with a total of {}\n\nThe House wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
@@ -486,11 +500,13 @@ class Economy(commands.Cog):
         elif CARDS_TOTAL_WORTH == 21:
             gameover = True
             await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "{} got blackjack!\n\n{} wins {} credits!".format(creator.name, creator.name, bet_amount * 2), "Blackjack"))
-            return self.add_money(GID, creator.id, bet_amount * 2)
+            self.add_money(GID, creator.id, bet_amount * 2)
+            return self.db.sync()
         elif CARDS_TOTAL_WORTH == OPPONENT_TOTAL_WORTH:
             gameover = True
             await ctx.send(embed=lib.Editable(f"Its a Tie!", "You both got {}!\n\nYour original bet of {} has been returned to your bank!".format(CARDS_TOTAL_WORTH, bet_amount), "Blackjack"))
-            return self.add_money(GID, creator.id, bet_amount)
+            self.add_money(GID, creator.id, bet_amount)
+            return self.db.sync()
         elif STOOD_WHEN_LESS_HOUSE_WINS is True:
             gameover = True
             return await ctx.send(embed=lib.Editable(f"The House Wins", "{} stood with {}!\n\nThe house wins {} credits with {}!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
@@ -500,7 +516,8 @@ class Economy(commands.Cog):
                 return await ctx.send(embed=lib.Editable(f"The House Wins", "The house stood with {}!\n\nThe house wins {} credits!".format(OPPONENT_TOTAL_WORTH, bet_amount * 2), "Blackjack"))
             else:
                 await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "{} stood with {}!\n\n{} wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
-                return self.add_money(GID, creator.id, bet_amount * 2)
+                self.add_money(GID, creator.id, bet_amount * 2)
+                return self.db.sync()
 
     async def bothit(self, ctx):
         global OPPONENT_TOTAL_WORTH
@@ -536,7 +553,7 @@ class Economy(commands.Cog):
     def account_check(self, GID, id):
         id = str(id)
         if self.bank_exists(GID):
-            if id in self.bank[GID]:
+            if id in self.db["Economy"][GID]:
                 return True
             else:
                 return False
@@ -544,34 +561,31 @@ class Economy(commands.Cog):
             return False
 
     def bank_exists(self, GID):
-        if GID not in self.bank:
+        if GID not in self.db["Economy"]:
             return False
         else:
             return True
 
     def check_balance(self, GID, id):
         id = str(id)
+        GID = str(GID)
         if self.account_check(GID, id):
-            return self.bank[GID][id]["balance"]
+            return self.db["Economy"][GID][id]["balance"]
         else:
             return False
 
     def add_money(self, GID, id, amount):
         id = str(id)
         if self.account_check(GID, id):
-            self.bank[GID][id]["balance"] += int(amount)
-            with open("./data/economy/economy.json", "w") as f:
-                json.dump(self.bank, f)
+            self.db["Economy"][GID][id]["balance"] += int(amount)
         else:
             return False
 
     def withdraw_money(self, GID, id, amount):
         id = str(id)
         if self.account_check(GID, id):
-            if self.bank[GID][id]["balance"] >= int(amount):
-                self.bank[GID][id]["balance"] = self.bank[GID][id]["balance"] - int(amount)
-                with open("./data/economy/economy.json", "w") as f:
-                    json.dump(self.bank, f)
+            if self.db["Economy"][GID][id]["balance"] >= int(amount):
+                self.db["Economy"][GID][id]["balance"] = self.db["Economy"][GID][id]["balance"] - int(amount)
             else:
                 return False
         else:
@@ -580,7 +594,7 @@ class Economy(commands.Cog):
     def enough_money(self, GID, id, amount):
         id = str(id)
         if self.account_check(GID, id):
-            if self.bank[GID][id]["balance"] >= int(amount):
+            if self.db["Economy"][GID][id]["balance"] >= int(amount):
                 return True
             else:
                 return False
@@ -590,9 +604,7 @@ class Economy(commands.Cog):
     def set_money(self, GID, id, amount):
         id = str(id)
         if self.account_check(GID, id):
-            self.bank[GID][id]["balance"] = amount
-            with open("./data/economy/economy.json", "w") as f:
-                json.dump(self.bank, f)
+            self.db["Economy"][GID][id]["balance"] = amount
             return True
         else:
             return False

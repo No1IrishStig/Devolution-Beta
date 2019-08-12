@@ -1,24 +1,20 @@
-import sys, traceback
-import subprocess
 import discord
 import asyncio
+import shelve
 import json
 import os
 
+from utils import default
 from utils.default import lib
 from discord.ext import commands
-from utils import default
-
-adminset = {"admins": []}
 
 class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = default.get("./utils/cfg.json")
-        with open("./data/admin/deltimer.json") as f:
+        self.db = shelve.open("./data/db/data.db", writeback=True)
+        with open("./data/settings/deltimer.json") as f:
             self.deltimer = json.load(f)
-            with open("./data/admin/admins.json") as f:
-                self.admindb = json.load(f)
 
     @commands.command()
     async def restart(self, ctx):
@@ -218,17 +214,15 @@ class Admin(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def admin(self, ctx):
         if ctx.author.id in self.config.owner:
-            db = self.admindb
-            guild = ctx.guild
-            author = str(ctx.author.id)
-            gid = str(guild.id)
-            if not gid in db:
-                await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
-                db[gid] = adminset
-                with open("./data/admin/admins.json", "w") as f:
-                    json.dump(db, f)
-            else:
+            UID = str(ctx.author.id)
+            GID = str(ctx.guild.id)
+            if "Admin" in self.db and GID in self.db["Admin"]:
                 await ctx.send(embed=lib.Editable("Uh oh", f"Admin access is enabled.\n\nHeres a list of commands you can try!\n**{ctx.prefix}admin add (userid)**\n**{ctx.prefix}admin remove (userid)**", "Admin Access"))
+            else:
+                self.db["Admin"] = {}
+                self.db["Admin"] = {GID: {"Admins": []}}
+                self.db.sync()
+                await ctx.reinvoke()
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
@@ -237,30 +231,22 @@ class Admin(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def add(self, ctx, id:int = None):
         if ctx.author.id in self.config.owner:
-            db = self.admindb
-            guild = ctx.guild
-            gid = str(guild.id)
-            if gid in db:
+            GID = str(ctx.guild.id)
+            if GID in self.db["Admin"]:
                 if id:
-                    db[gid]["admins"].append(str(id))
+                    UID = str(id)
+                    self.db["Admin"][GID]["Admins"].append(UID)
+                    self.db.sync()
+                    print(self.db["Admin"])
                     name = await self.bot.fetch_user(id)
-                    with open("./data/admin/admins.json", "w") as f:
-                        json.dump(db, f)
                     s = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} Added the UserID **{id}, ({name})** to the admins list!", "Admin Access"))
                     await lib.eraset(self, ctx, s)
                 else:
                     e = await ctx.send(embed=lib.Editable("Error", f"{ctx.author.mention} Please enter a UserID!", "Error"))
                     await lib.eraset(self, ctx, e)
             else:
-                e = await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
-                db[gid] = adminset
-                with open("./data/admin/admins.json", "w") as f:
-                    json.dump(db, f)
-                await asyncio.sleep(5)
-                await e.delete()
-                r = await ctx.send(embed=lib.Editable("Success", "Alright all set up now. Retrying your command!", "Admin Access"))
-                await ctx.reinvoke()
-                await lib.eraset(self, ctx, r)
+                e = await ctx.send(embed=lib.Editable("Uh oh", f"This server doesnt have Admin access setup yet.. Run {ctx.prefix}admin to setup!", "Admin Access"))
+                await lib.eraset(self, ctx, e)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
@@ -269,16 +255,13 @@ class Admin(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def remove(self, ctx, id:str = None):
         if ctx.author.id in self.config.owner:
-            db = self.admindb
-            guild = ctx.guild
-            gid = str(guild.id)
-            if gid in db:
+            GID = str(ctx.guild.id)
+            if GID in self.db["Admin"]:
                 if id:
                     name = await self.bot.fetch_user(id)
-                    if id in db[gid]["admins"]:
-                        db[gid]["admins"].remove(id)
-                        with open("./data/admin/admins.json", "w") as f:
-                            json.dump(db, f)
+                    if id in self.db["Admin"][GID]["Admins"]:
+                        self.db["Admin"][GID]["Admins"].remove(id)
+                        self.db.sync()
                         s = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} Removed the UserID **{id}, ({name})** from the admins list!", "Admin Access"))
                         await lib.eraset(self, ctx, s)
                     else:
@@ -287,16 +270,8 @@ class Admin(commands.Cog):
                     e = await ctx.send(embed=lib.Editable("Error", f"{ctx.author.mention} Please enter a UserID!", "Error"))
                     await lib.eraset(self, ctx, e)
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
-                db[gid] = adminset
-                with open("./data/admin/admins.json", "w") as f:
-                    json.dump(db, f)
-                await asyncio.sleep(5)
-                await e.delete()
-                r = await ctx.send(embed=lib.Editable("Success", "Alright all set up now. Retrying your command!", "Admin Access"))
-                await ctx.reinvoke()
-                await lib.eraset(self, ctx, r)
-
+                e = await ctx.send(embed=lib.Editable("Uh oh", f"This server doesnt have Admin access setup yet.. Run {ctx.prefix}admin to setup!", "Admin Access"))
+                await lib.eraset(self, ctx, e)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
@@ -305,32 +280,20 @@ class Admin(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def list(self, ctx):
         if ctx.author.id in self.config.owner:
-            db = self.admindb
-            guild = ctx.guild
-            gid = str(guild.id)
+            GID = str(ctx.guild.id)
             names = []
-            admin_list = db[gid]["admins"]
-            if gid in db:
+            admin_list = self.db["Admin"][GID]["Admins"]
+            if GID in self.db["Admin"]:
                 for id in admin_list:
                     user = await self.bot.fetch_user(id)
                     names.append(user.name)
-                await ctx.send(embed=lib.Editable("Admin List", "{} \n\n{}".format(", ".join(db[gid]["admins"]), ", ".join(names)), "Admin Access"))
+                await ctx.send(embed=lib.Editable("Admin List", "{} \n\n{}".format(", ".join(self.db["Admin"][GID]["Admins"]), ", ".join(names)), "Admin Access"))
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", "This server doesnt have Admin access setup yet.. Setting up...", "Admin Access"))
-                db[gid] = adminset
-                with open("./data/admin/admins.json", "w") as f:
-                    json.dump(db, f)
-                await asyncio.sleep(5)
-                await e.delete()
-                r = await ctx.send(embed=lib.Editable("Success", "Alright all set up now. Retrying your command!", "Admin Access"))
-                await ctx.reinvoke()
-                await lib.eraset(self, ctx, r)
-
+                e = await ctx.send(embed=lib.Editable("Uh oh", f"This server doesnt have Admin access setup yet.. Run {ctx.prefix}admin to setup!", "Admin Access"))
+                await lib.eraset(self, ctx, e)
         else:
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
-
-
 
 def setup(bot):
     bot.add_cog(Admin(bot))

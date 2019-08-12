@@ -1,22 +1,24 @@
 import datetime
 import asyncio
 import discord
+import shelve
 import json
 
 from utils import default
 from utils.default import lib
 from discord.ext import commands
 
-db_timer = {"timer": 20}
+punished_users = []
 
 class Mod(commands.Cog):
     def __init__(self, bot):
-            self.bot = bot
-            self.config = default.get("utils/cfg.json")
-            with open("./data/admin/deltimer.json") as f:
-                self.deltimer = json.load(f)
-                with open("./data/logs/settings.json") as f:
-                    self.logs = json.load(f)
+        self.bot = bot
+        self.config = default.get("utils/cfg.json")
+        self.db = shelve.open("./data/db/data.db", writeback=True)
+        with open("./data/settings/deltimer.json") as f:
+            self.deltimer = json.load(f)
+            with open("./data/settings/logs.json") as f:
+                self.logs = json.load(f)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -140,7 +142,7 @@ class Mod(commands.Cog):
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def punish(self, ctx, member: discord.Member=None, *args):
+    async def punish(self, ctx, member: discord.Member=None, time:int=None, *args):
         if ctx.author.guild_permissions.manage_roles:
             if member is None:
                 u = await ctx.send(embed=lib.Editable("Punish Usage", f"{ctx.prefix}punish (@user)\n{ctx.prefix}unpunish (@user)\n{ctx.prefix}lspunish - Lists all punished users\n{ctx.prefix}spp - **Warning** Use this command only, if there are channels which do not have the permissions for the punished role.\n\n Mutes or unmutes mentioned user from all channels on the server.", "Moderation"))
@@ -178,15 +180,24 @@ class Mod(commands.Cog):
                             reason += word
                             reason += " "
                         if reason == "":
-                            await member.send(embed=lib.Editable("Punished!", f"You were punished from **{server}** by **{author}**", "Moderation"))
-                            s = await ctx.send(embed=lib.Editable("Success", f"**{member.name}** has been punished by **{author}**", "Moderation"))
-                            await member.add_roles(role)
+                            s = await ctx.send(embed=lib.Editable("Uh oh", f"Please use punish like this: `{ctx.prefix}punish @user time (reason)`", "Moderation"))
                             await lib.eraset(self, ctx, s)
                         else:
-                            await member.send(embed=lib.Editable("Punished!", f"You were punished from **{server}** by **{author}** for **{reason}**", "Moderation"))
-                            s1 = await ctx.send(embed=lib.Editable("Success", f"**{member.name}** has been punished by **{author}** for **{reason}**", "Moderation"))
-                            await member.add_roles(role)
-                            await lib.eraset(self, ctx, s1)
+                            punished_users.append(member.id)
+                            if time is not None:
+                                await member.send(embed=lib.Editable("Punished!", f"You were punished from **{server}** by **{author}** for **{reason}** with a duration of **{time}**", "Moderation"))
+                                s1 = await ctx.send(embed=lib.Editable("Success", f"**{member.name}** has been punished by **{author}** for **{reason}** with a duration of **{time}**", "Moderation"))
+                                await member.add_roles(role)
+                                await asyncio.sleep(time)
+                                await member.remove_roles(role)
+                                if member.id in punished_users:
+                                    await member.send(embed=lib.Editable("Punished!", f"You were unpunished from **{server}** as your time expried!", "Moderation"))
+                                    s2 = await ctx.send(embed=lib.Editable("Unpunished", f"**{member.name}** has been unpunished because their time expired!", "Moderation"))
+                            else:
+                                await member.send(embed=lib.Editable("Punished!", f"You were punished from **{server}** by **{author}** for **{reason}**", "Moderation"))
+                                s1 = await ctx.send(embed=lib.Editable("Success", f"**{member.name}** has been punished by **{author}** for **{reason}**", "Moderation"))
+                                await member.add_roles(role)
+                                await lib.eraset(self, ctx, s1)
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -209,6 +220,7 @@ class Mod(commands.Cog):
                     await member.send(embed=lib.Editable("Unpunished!", f"You were unpunished from {server} by {author}", "Moderation"))
                     s = await ctx.send(embed=lib.Editable("Success", f"**{member.name}** unpunished by {author}", "Moderation"))
                     await member.remove_roles(role)
+                    punished_users.remove(member.id)
                     await lib.eraset(self, ctx, s)
         else:
             p = await ctx.send(embed=lib.NoPerm())
@@ -217,13 +229,8 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True)
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def lspunish(self, ctx):
-        pusers = []
         if ctx.author.guild_permissions.manage_roles:
-            role = discord.utils.get(ctx.guild.roles, name="punished")
-            for member in ctx.guild.members:
-                if role in member.roles:
-                        pusers.append(member.name)
-            await ctx.send(embed=lib.Editable("Punished List", "{}".format(", ".join(pusers)), "Moderation"))
+            await ctx.send(embed=lib.Editable("Punished List", "{}".format(", ".join(punished_users)), "Moderation"))
         else:
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
@@ -511,6 +518,11 @@ class Mod(commands.Cog):
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
 
+    @commands.Cog.listener(name="on_member_join")
+    async def on_join_(self, member):
+        role = discord.utils.get(member.guild.roles, name="punished")
+        if member.id in punished_users:
+            await member.add_roles(role)
 
 # Logs Start ------------------------------------------------------------------------------------------------
 
@@ -929,6 +941,11 @@ class Mod(commands.Cog):
 
 # Logs End --------------------------------------------------------------------------------------------------
 
+    @commands.command()
+    async def test(self, ctx, time:int=None):
+        await ctx.send(f"Fake Muted {ctx.author.name} for {time}")
+        await asyncio.sleep(time)
+        await ctx.send(f"Fake unmuted {ctx.author.name}")
 
 def setup(bot):
     bot.add_cog(Mod(bot))
