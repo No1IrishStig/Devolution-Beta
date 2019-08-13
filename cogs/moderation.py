@@ -535,7 +535,6 @@ class Mod(commands.Cog):
             gid = str(guild.id)
             await ctx.send(embed=lib.Editable("Logs - Usage", f"{ctx.prefix}logs set channel\n{ctx.prefix}logs toggle\n\n Enable logs for this server.", "Logs"))
             if not gid in db:
-                print(type(self.logs))
                 db[gid] = inv_settings
                 db[gid]["Channel"] = ctx.channel.id
                 with open("./data/logs/settings.json", "w") as f:
@@ -955,13 +954,11 @@ class Mod(commands.Cog):
                             await ctx.send(f"{user.mention} has been warned by {ctx.author.name}")
                             self.db["Warnings"][GID]["Users"][UID]["Warnings"] += 1
                             self.db.sync()
-                            print(self.db["Warnings"])
                         else:
                             await ctx.send(f"{user.mention} has been warned by {ctx.author.name} for {reason}")
                             self.db["Warnings"][GID]["Users"][UID]["Warnings"] += 1
                             self.db["Warnings"][GID]["Users"][UID]["Reasons"].append(reason)
                             self.db.sync()
-                            print(self.db["Warnings"])
                     else:
                         self.db["Warnings"][GID]["Users"][UID] = {"Warnings": 0, "Reasons": []}
                         self.db.sync()
@@ -982,9 +979,8 @@ class Mod(commands.Cog):
     @warn.group()
     async def list(self, ctx):
         GID = str(ctx.guild.id)
-        warned_users = self.db["Warnings"][GID]["Users"]
-        print(warned_users)
         if "Warnings" in self.db and GID in self.db["Warnings"]:
+            warned_users = self.db["Warnings"][GID]["Users"]
             for UID in self.db["Warnings"][GID]:
                 await ctx.send(embed=lib.Editable("Warned Users List", "{}".format(", ".join(warned_users)), "Moderation"))
         else:

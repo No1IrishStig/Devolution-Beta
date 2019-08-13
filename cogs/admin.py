@@ -191,6 +191,7 @@ class Admin(commands.Cog):
                     await lib.eraset(self, ctx, e1)
                 else:
                     try:
+                        await ctx.message.delete()
                         user = await self.bot.fetch_user(id)
                         embed = discord.Embed(
                             title = f"You've recieved a message from {member}",
@@ -237,7 +238,6 @@ class Admin(commands.Cog):
                     UID = str(id)
                     self.db["Admin"][GID]["Admins"].append(UID)
                     self.db.sync()
-                    print(self.db["Admin"])
                     name = await self.bot.fetch_user(id)
                     s = await ctx.send(embed=lib.Editable("Success", f"{ctx.author.mention} Added the UserID **{id}, ({name})** to the admins list!", "Admin Access"))
                     await lib.eraset(self, ctx, s)

@@ -697,7 +697,10 @@ class Core(commands.Cog):
                 place += 1
             await ctx.send(embed=lib.Editable(f"Top 10", f"{highscore}", "Leveling"))
         else:
-            ctx.send("There was an error")
+            self.db["Levels"] = {}
+            self.db.sync()
+            self.db["Levels"] = {GID :{UID: {"name": user.name, "level": 0, "xp": 0}}}
+            self.db.sync()
 
     @toggle.group()
     async def messages(self, ctx):
@@ -761,8 +764,7 @@ class Core(commands.Cog):
                 self.db.sync()
         else:
             self.db["Levels"] = {}
-            self.db.sync()
-            self.db["Levels"] = {GID :{UID: {"name": user.name, "level": 0, "xp": 0}}}
+            self.db["Levels"][GID] = {UID: {"name": user.name, "level": 0, "xp": 0}}
             self.db.sync()
 
     async def level_up(self, message):
