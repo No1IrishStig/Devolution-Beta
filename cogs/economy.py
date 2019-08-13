@@ -172,7 +172,7 @@ class Economy(commands.Cog):
                     await ctx.send(embed=lib.Editable(f"{author.name} collected their benefits", "{} has been added to your account!".format(self.settings["BENEFITS_CREDITS"]), "Devo Bank"))
                     self.db.sync()
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", f"{user.mention}, You dont have a bank account at the Devo Bank. Type !bank register to open one.", "Devo Bank"))
+                await ctx.send(embed=lib.Editable("Uh oh", f"{author.mention}, You dont have a bank account at the Devo Bank. Type !bank register to open one.", "Devo Bank"))
         else:
             await ctx.send(embed=lib.Editable("Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
 
