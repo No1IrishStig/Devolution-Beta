@@ -30,12 +30,15 @@ Devolution Beta is sleek and clean bot made for moderation in discord. The bot i
 **The base set of modules includes:**
 
 - Provides tons of useful features (userinfo, serverinfo, role management, avatar stealer, rename)
+- Comes with a full blown economy, which has a few minigames such as Slots and blackjack.
+- Moderation features (kick/ban/hackban/punish/warnings, chat cleanup and more)
 - Some fun commands to use against your friends. (insult, speak as the bot)
-- Moderation features (kick/ban/hackban/punish, chat cleanup and more)
-- Music features (YouTube, SoundCloud, local files, playlists, queues)
+- Music features (Youtube Links and names)
 - Gif search and random gif generator
+- Leveling system with XP
 - Custom embed generator
 
+Devolution uses a complex method of storing data through the use of Databases. Meaning that your information is kept safe, encrypted and backed up at all times. It also allows for quick access, with low memory usage and millions of queries per minute.
 
 [Installation](#installation) is easy, and you do **NOT** need to know anything about coding! Aside
 from installation and updating.
