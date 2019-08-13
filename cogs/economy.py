@@ -388,22 +388,17 @@ class Economy(commands.Cog):
                     await asyncio.sleep(2)
                     await self.bot_cards(channel)
                     while is_active is True:
+                        await self.win(ctx)
                         if gameover is False:
-                            await self.win(ctx)
+                            await self.player(ctx)
                             if is_active is True:
-                                await self.player(ctx)
+                                await self.win(ctx)
                                 if gameover is False:
-                                    await self.win(ctx)
-                                    if gameover is False:
-                                        await self.blackjack_math(ctx)
-                                        if is_active is False:
-                                            break
-                                    else:
+                                    await self.blackjack_math(ctx)
+                                    if is_active is False:
                                         break
                                 else:
                                     break
-                            else:
-                                break
                         else:
                             break
 
@@ -484,32 +479,39 @@ class Economy(commands.Cog):
         return await ctx.send(embed=lib.Editable(f"{ctx.author.name}'s Turn", "{} got a {} which gives a total of {}".format(creator.name, players_cards[0], CARDS_TOTAL_WORTH), "Blackjack"))
 
     async def win(self, ctx):
-        global STOOD_WHEN_LESS_HOUSE_WINS, gameover
+        global STOOD_WHEN_LESS_HOUSE_WINS
+        global gameover
         GID = str(ctx.guild.id)
         if OPPONENT_TOTAL_WORTH > 21:
             gameover = True
             await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "The house bust with a total of {}\n\n{} wins {} credits!".format(OPPONENT_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount * 2)
             return self.db.sync()
+            self.reset_match()
         elif CARDS_TOTAL_WORTH > 21:
             gameover = True
             return await ctx.send(embed=lib.Editable(f"The House Wins", "{} bust with a total of {}\n\nThe House wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
+            self.reset_match()
         elif OPPONENT_TOTAL_WORTH == 21:
             gameover = True
             return await ctx.send(embed=lib.Editable(f"The House Wins", "The house got blackjack!\n\nThe house wins {} credits!".format(bet_amount * 2), "Blackjack"))
+            self.reset_match()
         elif CARDS_TOTAL_WORTH == 21:
             gameover = True
             await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "{} got blackjack!\n\n{} wins {} credits!".format(creator.name, creator.name, bet_amount * 2), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount * 2)
             return self.db.sync()
+            self.reset_match()
         elif CARDS_TOTAL_WORTH == OPPONENT_TOTAL_WORTH:
             gameover = True
             await ctx.send(embed=lib.Editable(f"Its a Tie!", "You both got {}!\n\nYour original bet of {} has been returned to your bank!".format(CARDS_TOTAL_WORTH, bet_amount), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount)
             return self.db.sync()
+            self.reset_match()
         elif STOOD_WHEN_LESS_HOUSE_WINS is True:
             gameover = True
             return await ctx.send(embed=lib.Editable(f"The House Wins", "{} stood with {}!\n\nThe house wins {} credits with {}!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
+            self.reset_match()
         elif STAND is True and HOUSE_STAND is True:
             gameover = True
             if OPPONENT_TOTAL_WORTH > CARDS_TOTAL_WORTH:
@@ -518,6 +520,7 @@ class Economy(commands.Cog):
                 await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "{} stood with {}!\n\n{} wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
                 self.add_money(GID, creator.id, bet_amount * 2)
                 return self.db.sync()
+                self.reset_match()
 
     async def bothit(self, ctx):
         global OPPONENT_TOTAL_WORTH
@@ -628,6 +631,22 @@ class Economy(commands.Cog):
                     name = name.rstrip('s')
                 result.append("{} {}".format(value, name))
         return ', '.join(result[:granularity])
+
+    def reset_match(self):
+        global is_active
+        global creator
+        global opponent
+        global bet_amount
+        global CARDS_TOTAL_WORTH
+        global OPPONENT_TOTAL_WORTH
+        global gameover
+        is_active = False
+        gameover = False
+        creator = "Noone"
+        opponent = "Noone"
+        bet_amount = 0
+        CARDS_TOTAL_WORTH = 0
+        OPPONENT_TOTAL_WORTH = 0
 
 
 def setup(bot):

