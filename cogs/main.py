@@ -723,23 +723,28 @@ class Core(commands.Cog):
     async def on_message_(self, message):
         GID = str(message.guild.id)
         UID = str(message.author.id)
-        if self.levels[GID]["Enabled"] is True:
-            if message.author != self.bot.user:
-                if "Levels" in self.db and GID in self.db["Levels"]:
-                    if UID in self.db["Levels"][GID]:
-                        await self.add_xp(message, 1)
-                        await self.level_up(message)
-                        self.db.sync()
+        if GID in self.levels:
+            if self.levels[GID]["Enabled"] is True:
+                if message.author != self.bot.user:
+                    if "Levels" in self.db and GID in self.db["Levels"]:
+                        if UID in self.db["Levels"][GID]:
+                            await self.add_xp(message, 1)
+                            await self.level_up(message)
+                            self.db.sync()
+                        else:
+                            await self.setup(message)
+                            self.db.sync()
                     else:
                         await self.setup(message)
                         self.db.sync()
                 else:
-                    await self.setup(message)
-                    self.db.sync()
+                    return
             else:
                 return
         else:
-            return
+            self.levels[GID] = {"Enabled": True, "Messages": True}
+            with open("./data/settings/leveling.json", "w") as f:
+                json.dump(self.levels, f)
 
     async def add_xp(self, message, exp):
         GID = str(message.guild.id)
@@ -750,11 +755,15 @@ class Core(commands.Cog):
         GID = str(message.guild.id)
         user = message.author
         UID = str(user.id)
-        if "Levels" not in self.db and GID not in self.db["Levels"]:
-            self.db["Levels"] = {}
-            self.db["Levels"] = {GID :{UID: {"name": user.name, "level": 0, "xp": 0}}}
+        if "Levels" in self.db:
+            if GID not in self.db["Levels"]:
+                self.db["Levels"] = {GID :{UID: {"name": user.name, "level": 0, "xp": 0}}}
+                self.db.sync()
         else:
-            self.db["Levels"][GID][UID] = {"name": user.name, "level": 0, "xp": 0}
+            self.db["Levels"] = {}
+            self.db.sync()
+            self.db["Levels"] = {GID :{UID: {"name": user.name, "level": 0, "xp": 0}}}
+            self.db.sync()
 
     async def level_up(self, message):
         GID = str(message.guild.id)
