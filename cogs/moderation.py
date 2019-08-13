@@ -963,11 +963,11 @@ class Mod(commands.Cog):
                             self.db.sync()
                             print(self.db["Warnings"])
                     else:
-                        self.db["Warnings"][GID]["Users"] = {UID: {"Warnings": 0, "Reasons": []}}
+                        self.db["Warnings"][GID]["Users"][UID] = {"Warnings": 0, "Reasons": []}
                         self.db.sync()
                         await ctx.reinvoke()
                 else:
-                    await ctx.send(embed=lib.Editable("Uh oh", f"{ctx.author.mention}, Warnings: `{ctx.prefix}warn @user (reason)`", "Warnings"))
+                    await ctx.send(embed=lib.Editable("Uh oh", f"{ctx.author.mention}, Warnings: `{ctx.prefix}warn @user (reason)`, `{ctx.prefix}warn list`, `{ctx.prefix}warn get (userid)`, `{ctx.prefix}warn remove (userid) (warning number)`", "Warnings"))
             else:
                 self.db["Warnings"] = {}
                 self.db["Warnings"] = {GID: {"Users": {}}}
@@ -983,6 +983,7 @@ class Mod(commands.Cog):
     async def list(self, ctx):
         GID = str(ctx.guild.id)
         warned_users = self.db["Warnings"][GID]["Users"]
+        print(warned_users)
         if "Warnings" in self.db and GID in self.db["Warnings"]:
             for UID in self.db["Warnings"][GID]:
                 await ctx.send(embed=lib.Editable("Warned Users List", "{}".format(", ".join(warned_users)), "Moderation"))
@@ -1003,16 +1004,12 @@ class Mod(commands.Cog):
             await ctx.send(embed=lib.Editable("Uh oh", f"The Warnings System is not set up on this server. Run {ctx.prefix}warn to start!", "Warnings"))
 
     @warn.group()
-    async def remove(self, ctx, UID:int=None, num:int=None):
+    async def remove(self, ctx, UID:str=None, num:int=None):
         GID = str(ctx.guild.id)
-        UID = str(UID)
         if "Warnings" in self.db and GID in self.db["Warnings"]:
             if UID is not None:
                 if num is not None:
-                    print(self.db["Warnings"])
-                    print(num)
                     num -= 1
-                    print(num)
                     warn = self.db["Warnings"][GID]["Users"][UID]["Reasons"][num]
                     await ctx.send(f"{warn}, Is this the correct warning?\n\nReplies: `Yes` or anything to abort.")
                     choice = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 30)
@@ -1022,9 +1019,7 @@ class Mod(commands.Cog):
                         if self.db["Warnings"][GID]["Users"][UID]["Warnings"] == 0:
                             del self.db["Warnings"][GID]["Users"][UID]
                             self.db.sync()
-                            print(self.db["Warnings"])
                         else:
-                            print(self.db["Warnings"])
                             self.db.sync()
                     else:
                         await ctx.send("Ok. Cancelling")
