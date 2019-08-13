@@ -682,9 +682,10 @@ class Core(commands.Cog):
     @commands.command()
     async def leaderboard(self, ctx):
         GID = str(ctx.guild.id)
+        UID = str(ctx.author.id)
         if "Levels" in self.db and GID in self.db["Levels"]:
             top = 10
-            level_sorted = sorted(self.db["Levels"][GID].items(), key=lambda x: x[1]["xp"], reverse=True)
+            level_sorted = sorted(self.db["Levels"][GID].items(), key=lambda x: x[1]["level"], reverse=True)
             if len(level_sorted) < top:
                 top = len(level_sorted)
             topten = level_sorted[:top]
@@ -692,14 +693,13 @@ class Core(commands.Cog):
             place = 1
             for id in topten:
                 highscore += str(place).ljust(len(str(top))+1)
-                highscore += (id[1]["name"]+ "'s XP:" + " ").ljust(23-len(str(id[1]["xp"])))
-                highscore += str(id[1]["xp"]) + "\n"
+                highscore += (id[1]["name"]+ "'s Level:" + " ").ljust(23-len(str(id[1]["level"])))
+                highscore += str(id[1]["level"]) + "\n"
                 place += 1
             await ctx.send(embed=lib.Editable(f"Top 10", f"{highscore}", "Leveling"))
         else:
             self.db["Levels"] = {}
-            self.db.sync()
-            self.db["Levels"] = {GID :{UID: {"name": user.name, "level": 0, "xp": 0}}}
+            self.db["Levels"][GID] = {UID: {"name": ctx.author.name, "level": 0, "xp": 0}}
             self.db.sync()
 
     @toggle.group()
@@ -760,7 +760,7 @@ class Core(commands.Cog):
         UID = str(user.id)
         if "Levels" in self.db:
             if GID not in self.db["Levels"]:
-                self.db["Levels"] = {GID :{UID: {"name": user.name, "level": 0, "xp": 0}}}
+                self.db["Levels"][GID] = {UID: {"name": user.name, "level": 0, "xp": 0}}
                 self.db.sync()
         else:
             self.db["Levels"] = {}
