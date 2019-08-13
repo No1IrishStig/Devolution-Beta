@@ -102,3 +102,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+data/settings/deltimer.json
+data/settings/leveling.json
+data/settings/logs.json

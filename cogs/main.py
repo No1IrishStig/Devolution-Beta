@@ -248,28 +248,19 @@ class Core(commands.Cog):
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def sinfo(self, ctx):
-        name = ctx.message.guild.name
-        id = ctx.message.guild.id
-        region = ctx.message.guild.region
-        members = ctx.message.guild.member_count
-        created = ctx.message.guild.created_at
-        owner = ctx.message.guild.owner
-        roles = ctx.message.guild.roles
-        channels = ctx.message.guild.channels
-        afk = ctx.message.guild.afk_channel
         embed = discord.Embed(
-            title = "Server Information for " + name,
+            title = "Server Information for " + ctx.guild.name,
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        embed.add_field(name="Creation Date", value=created.strftime("%d/%m/%Y at %H:%M:%S (GMT)"), inline=False)
-        embed.add_field(name="Owner", value=owner, inline=True)
-        embed.add_field(name="Region", value=region, inline=True)
-        embed.add_field(name="Roles", value=len(roles), inline=True)
-        embed.add_field(name="Users", value=members, inline=True)
-        embed.add_field(name="Channels", value=len(channels), inline=True)
-        embed.add_field(name="AFK Channel", value=afk, inline=True)
-        embed.set_author(name=f"Devolution                                                                              ID: {id}", icon_url="https://i.imgur.com/BS6YRcT.jpg", )
+        embed.add_field(name="Creation Date", value=ctx.guild.created_at.strftime("%d/%m/%Y at %H:%M:%S (GMT)"), inline=False)
+        embed.add_field(name="Owner", value=ctx.guild.owner.name, inline=True)
+        embed.add_field(name="Region", value=ctx.guild.region, inline=True)
+        embed.add_field(name="Roles", value=len(ctx.guild.roles), inline=True)
+        embed.add_field(name="Users", value=ctx.guild.member_count, inline=True)
+        embed.add_field(name="Channels", value=len(ctx.guild.channels), inline=True)
+        embed.add_field(name="AFK Channel", value=ctx.guild.afk_channel, inline=True)
+        embed.set_author(name=f"Devolution                                                                              ID: {ctx.guild.id}", icon_url="https://i.imgur.com/BS6YRcT.jpg", )
         embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
         e = await ctx.send(embed=embed)
         await lib.eraset(self, ctx, e)
@@ -278,91 +269,67 @@ class Core(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def uinfo(self, ctx, user:discord.User=None):
         if user is None:
-            name = ctx.author.name
-            id = ctx.author.id
-            avatar = ctx.author.avatar_url
-            joined = ctx.author.joined_at
-            created = ctx.author.created_at
-            status = ctx.author.status
-            playing = ctx.author.activity
-            roles = ctx.author.roles
-            display = ctx.author.nick
             embed = discord.Embed(
                 title = "User Information",
                 colour = 0x9bf442,
                 timestamp=datetime.datetime.utcnow()
                 )
-            embed.add_field(name="Status", value=status, inline=True)
-            embed.add_field(name="Playing", value=playing, inline=True)
-            embed.add_field(name="Nickname", value=display, inline=True)
-            embed.add_field(name="Role Count", value=len(roles), inline=True)
-            embed.add_field(name="Account Creation", value=created.strftime("Since %d/%m/%Y"), inline=True)
-            embed.add_field(name="Joined guild", value=joined.strftime("Since %d/%m/%Y"), inline=True)
-            embed.set_author(name=name + "s User Information", icon_url=avatar)
+            embed.add_field(name="Status", value=ctx.author.status, inline=True)
+            embed.add_field(name="Playing", value=ctx.author.activity, inline=True)
+            embed.add_field(name="Nickname", value=ctx.author.nick, inline=True)
+            embed.add_field(name="Role Count", value=len(ctx.author.roles), inline=True)
+            embed.add_field(name="Account Creation", value=ctx.author.created_at.strftime("Since %d/%m/%Y"), inline=True)
+            embed.add_field(name="Joined guild", value=ctx.author.joined_at.strftime("Since %d/%m/%Y"), inline=True)
+            embed.set_author(name=ctx.author.name + "s User Information", icon_url=ctx.author.avatar_url)
             embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
             e = await ctx.send(embed=embed)
             await lib.eraset(self, ctx, e)
         else:
-            for user in ctx.message.mentions:
-                name = user.name
-                id = user.id
-                avatar = user.avatar_url
-                joined = user.joined_at
-                created = user.created_at
-                status = user.status
-                playing = user.activity
-                roles = user.roles
-                display = user.nick
-                embed = discord.Embed(
-                    title = "User Information",
-                    colour = 0x9bf442,
-                    timestamp=datetime.datetime.utcnow()
-                    )
-                embed.add_field(name="Status", value=status, inline=True)
-                embed.add_field(name="Playing", value=playing, inline=True)
-                embed.add_field(name="Nickname", value=display, inline=True)
-                embed.add_field(name="Role Count", value=len(roles), inline=True)
-                embed.add_field(name="Account Creation", value=created.strftime("Since %d/%m/%Y"), inline=True)
-                embed.add_field(name="Joined guild", value=joined.strftime("Since %d/%m/%Y"), inline=True)
-                embed.set_author(name=name + "s User Information", icon_url=avatar)
-                embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
-                ee = await ctx.send(embed=embed)
-                await lib.eraset(self, ctx, ee)
+            embed = discord.Embed(
+                title = "User Information",
+                colour = 0x9bf442,
+                timestamp=datetime.datetime.utcnow()
+                )
+            embed.add_field(name="Status", value=user.status, inline=True)
+            embed.add_field(name="Playing", value=user.activity, inline=True)
+            embed.add_field(name="Nickname", value=user.nick, inline=True)
+            embed.add_field(name="Role Count", value=len(user.roles), inline=True)
+            embed.add_field(name="Account Creation", value=user.created_at.strftime("Since %d/%m/%Y"), inline=True)
+            embed.add_field(name="Joined guild", value=user.joined_at.strftime("Since %d/%m/%Y"), inline=True)
+            embed.set_author(name=user.name + "s User Information", icon_url=user.avatar_url)
+            embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
+            ee = await ctx.send(embed=embed)
+            await lib.eraset(self, ctx, ee)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def avatar(self, ctx, user:discord.User=None):
         if user is None:
-            sname = ctx.author.name
-            savatar = str(ctx.author.avatar_url)
             embed = discord.Embed(
                 title = "Avatar Stealer",
-                description = savatar,
+                description = ctx.author.avatar_url,
                 colour = 0x9bf442,
                 timestamp=datetime.datetime.utcnow()
                 )
-            embed.set_image(url=savatar)
-            embed.set_thumbnail(url=savatar)
-            embed.set_author(name=sname, icon_url=savatar)
+            embed.set_image(url=ctx.author.avatar_url)
+            embed.set_thumbnail(url=ctx.author.avatar_url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
             embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
             e = await ctx.send(embed=embed)
             await lib.eraset(self, ctx, e)
         else:
-            for user in ctx.message.mentions:
-                avatar = str(user.avatar_url)
-                name = user.name
-                embed = discord.Embed(
-                    title = "Avatar Stealer",
-                    description = avatar,
-                    colour = 0x9bf442,
-                    timestamp=datetime.datetime.utcnow()
-                    )
-                embed.set_image(url=avatar)
-                embed.set_thumbnail(url=avatar)
-                embed.set_author(name=name, icon_url=avatar)
-                embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
-                e = await ctx.send(embed=embed)
-                await lib.eraset(self, ctx, e)
+            embed = discord.Embed(
+                title = "Avatar Stealer",
+                description = user.avatar_url,
+                colour = 0x9bf442,
+                timestamp=datetime.datetime.utcnow()
+                )
+            embed.set_image(url=user.avatar_url)
+            embed.set_thumbnail(url=user.avatar_url)
+            embed.set_author(name=user.name, icon_url=user.avatar_url)
+            embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
+            e = await ctx.send(embed=embed)
+            await lib.eraset(self, ctx, e)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 15, commands.BucketType.user)
