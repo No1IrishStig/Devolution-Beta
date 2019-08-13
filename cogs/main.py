@@ -30,6 +30,8 @@ class Core(commands.Cog):
                         self.settings = json.load(f)
                         with open("./data/cmd_data/owo.json") as f:
                             self.owo = json.load(f)
+                            with open("./data/settings/leveling.json") as f:
+                                self.levels = json.load(f)
 
     @commands.group(invoke_without_command=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -47,8 +49,8 @@ class Core(commands.Cog):
         embed.add_field(name="Fun", value="**coinflip** - Flip a coin\n**space** - Get live information about the ISS\n**colour** - Get a random colour\n**roll** - Roles a dice\n**insult** - Insult people you dislike!\n**boobs** - See some melons!\n**ass** - See some peaches!\n**gif** - Search up a gif on giphy by name\n**gifr** - Gives a random gif from giphy\n**owo** - Get random responses", inline=False)
         embed.add_field(name="Economy", value="**bank**\n\n**register** - Creates a bank account at Devo Bank\n**balance** - Returns your balance\n**transfer** - Send credits to your friends\n**set** - Set the credits of an account\n**economyset** - Change economy values\n**slot** - Play the slot machine\n**blackjack** - Gives details on how to play (Updated Soon)", inline=False)
         embed.add_field(name="Useful", value="**say** - Speak as the bot\n**rename** - Change a users nickname\n**invite** - Gives usage details\n**embed** - Creates an embed message\n**role** - Gives role options\n**music** - Gives music help", inline=False)
-        embed.add_field(name="Moderation", value="**kick** - Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives mute options\n**cleanup** - Gives message moderation options\n**clean** - Deletes the last 100 command messages and bot messages\n**logs** - Get logs on nearly everything\n**deltimer** - Change the timer at which the bot auto deletes its messages", inline=False)
-        embed.add_field(name="Admin", value="**leave** - Makes the bot leave the guild\n**leaveid** - Leaves a server by ID\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**todo** - Displays List of shit todo\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.\n**admin** - Add and remove admins", inline=False)
+        embed.add_field(name="Moderation", value="**kick** - Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives mute options\n**cleanup** - Gives message moderation options\n**clean** - Deletes the last 100 command messages and bot messages\n**logs** - Get logs on nearly everything\n**deltimer** - Change the timer at which the bot auto deletes its messages\n**warn** - Warnings System", inline=False)
+        embed.add_field(name="Admin", value="**leave** - Makes the bot leave the guild\n**leaveid** - Leaves a server by ID\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**todo** - Displays List of shit todo\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.\n**admin** - Add and remove admins\n**leveling** - Enable leveling system", inline=False)
         await author.send(embed=embed)
         await asyncio.sleep(10)
         await ctx.message.delete()
@@ -110,7 +112,7 @@ class Core(commands.Cog):
             )
         await user.send(embed=eee)
         eeee = discord.Embed(
-            description = "__**Changelog (04/07/2019) v1.4**__\n+ Added !deltimer\n\n- Fixed time being off in logs\n- Bug Fixes\n- Updated help command\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Bug fixes\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Changed !amiadmin to incorperate the new admin command\n- Updated error handler\n- Bug fixes\n\n__**Changelog (06/07/2019) v1.5.1\n\n- Bug fixes\n\n__**Changelog (03/08/2019) v1.6**__\n+ Added custom prefix support\n+ Added economy update\n+ Added slots\n\n- Optimized code and remove unnecessary checks.\n- Added Economy to help command\n- Bug Fixes\n\n__**Changelog (03/08/2019) v1.6.1**__\n- Made each server have its own bank\n- Many code optimizations\n- Began work on blackjack\n- Bug fixes\n\n__**Changelog (05/08/2019) v1.6.3**__\n+ Added a restart command (This only restarts the connection, wont apply any file changes)\n+ Added checks to bank balance, bank register, bank transfer, bank set, benefits and top\n+ Added blackjack\n\n- Removed unnecessary checks\n- Code optimization\n- Many bug fixes\n\n__**Changelog (05/08/2019) v1.6.4**__\n+ Added check to !blackjack command and more information\n+ Added a message to show if the house hit or stood\n+ Added a Tie Check to blackjack\n\n- Fixed a bug when losing after standing where all cards are shown\n- Fixed bank balance\n\n__**Changelog (11/08/2019) v1.6.6**__\n+ Began work on leveling system\n\n- Began work on changing the way data is stored\n- Completely reworked the blackjack logic\n- Reworked and removed cogs\n\n__**Changelog (12/08/2019) v1.7**__\n+ Added check if punished users try rejoin\n+ Added some new folders\n+ Added Database Check\n+ Added Timer to Punish\n\n- Reworked Economy and Admins to use Database\n- Removed some checks from bot.py\n- Removed checks from default.py\n- Removed a lot of the json files\n- Remove customcommand\n- Updated Help Command\n- Added cmd_data folder\n- Added Settings folder\n- Cleaned up imports",
+            description = "__**Changelog (04/07/2019) v1.4**__\n+ Added !deltimer\n\n- Fixed time being off in logs\n- Bug Fixes\n- Updated help command\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Bug fixes\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Changed !amiadmin to incorperate the new admin command\n- Updated error handler\n- Bug fixes\n\n__**Changelog (06/07/2019) v1.5.1\n\n- Bug fixes\n\n__**Changelog (03/08/2019) v1.6**__\n+ Added custom prefix support\n+ Added economy update\n+ Added slots\n\n- Optimized code and remove unnecessary checks.\n- Added Economy to help command\n- Bug Fixes\n\n__**Changelog (03/08/2019) v1.6.1**__\n- Made each server have its own bank\n- Many code optimizations\n- Began work on blackjack\n- Bug fixes\n\n__**Changelog (05/08/2019) v1.6.3**__\n+ Added a restart command (This only restarts the connection, wont apply any file changes)\n+ Added checks to bank balance, bank register, bank transfer, bank set, benefits and top\n+ Added blackjack\n\n- Removed unnecessary checks\n- Code optimization\n- Many bug fixes\n\n__**Changelog (05/08/2019) v1.6.4**__\n+ Added check to !blackjack command and more information\n+ Added a message to show if the house hit or stood\n+ Added a Tie Check to blackjack\n\n- Fixed a bug when losing after standing where all cards are shown\n- Fixed bank balance\n\n__**Changelog (11/08/2019) v1.6.6**__\n+ Began work on leveling system\n\n- Began work on changing the way data is stored\n- Completely reworked the blackjack logic\n- Reworked and removed cogs\n\n__**Changelog (12/08/2019) v1.7**__\n+ Added check if punished users try rejoin\n+ Added some new folders\n+ Added Database Check\n+ Added Timer to Punish\n\n- Reworked Economy and Admins to use Database\n- Removed some checks from bot.py\n- Removed checks from default.py\n- Removed a lot of the json files\n- Remove customcommand\n- Updated Help Command\n- Added cmd_data folder\n- Added Settings folder\n- Cleaned up imports\n\n__**Changelog (13/08/2019) v1.7.2**__\n+ Added Warnings System\n+ Added Leveling System\n\n- Bug Fixes and Improvements\n- Updated JSON Check\n- Updated Help",
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
@@ -685,47 +687,124 @@ class Core(commands.Cog):
 # Leveling System Start ------------------------------------------------------------------
 
 
-    #@commands.Cog.listener()
-    #async def on_message(self, message):
-    #    GID = str(message.guild.id)
-    #    UID = str(message.author.id)
-    #    await self.setup(message)
-    #    await self.add_xp(message, 1)
+    @commands.group(invoke_without_command=True)
+    async def leveling(self, ctx):
+        await ctx.send(embed=lib.Editable("Uh oh", f"Looks like you forgot something.\n\n`{ctx.prefix}leaderboard - To show the highest rankers in the server\n`{ctx.prefix}leveling toggle` - To enable the leveling system\n`{ctx.prefix}leaderboard - To show the highest rankers in the server\n`{ctx.prefix}leveling toggle messages` - Disables level up messages for the guild", "Leveling"))
+
+    @leveling.group(invoke_without_command=True)
+    async def toggle(self, ctx):
+        GID = str(ctx.guild.id)
+        if ctx.author.guild_permissions.manage_roles:
+            if GID in self.levels:
+                if self.levels[GID]["Enabled"] is False:
+                    self.levels[GID]["Enabled"] = True
+                    with open("./data/settings/leveling.json", "w") as f:
+                        json.dump(self.levels, f)
+                else:
+                    self.levels[GID]["Enabled"] = False
+                    with open("./data/settings/leveling.json", "w") as f:
+                        json.dump(self.levels, f)
+            else:
+                self.levels[GID] = {"Enabled": True, "Messages": True}
+                with open("./data/settings/leveling.json", "w") as f:
+                    json.dump(self.levels, f)
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
+
+    @commands.command()
+    async def leaderboard(self, ctx):
+        GID = str(ctx.guild.id)
+        if "Levels" in self.db and GID in self.db["Levels"]:
+            top = 10
+            level_sorted = sorted(self.db["Levels"][GID].items(), key=lambda x: x[1]["xp"], reverse=True)
+            if len(level_sorted) < top:
+                top = len(level_sorted)
+            topten = level_sorted[:top]
+            highscore = ""
+            place = 1
+            for id in topten:
+                highscore += str(place).ljust(len(str(top))+1)
+                highscore += (id[1]["name"]+ "'s XP:" + " ").ljust(23-len(str(id[1]["xp"])))
+                highscore += str(id[1]["xp"]) + "\n"
+                place += 1
+            await ctx.send(embed=lib.Editable(f"Top 10", f"{highscore}", "Leveling"))
+        else:
+            ctx.send("There was an error")
+
+    @toggle.group()
+    async def messages(self, ctx):
+        GID = str(ctx.guild.id)
+        if ctx.author.guild_permissions.manage_roles:
+            if GID in self.levels:
+                if self.levels[GID]["Messages"] is False:
+                    self.levels[GID]["Messages"] = True
+                    with open("./data/settings/leveling.json", "w") as f:
+                        json.dump(self.levels, f)
+                else:
+                    self.levels[GID]["Messages"] = False
+                    with open("./data/settings/leveling.json", "w") as f:
+                        json.dump(self.levels, f)
+
+            else:
+                self.levels[GID] = {"Enabled": True, "Messages": True}
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
+
+    @commands.Cog.listener(name="on_message")
+    async def on_message_(self, message):
+        GID = str(message.guild.id)
+        UID = str(message.author.id)
+        if self.levels[GID]["Enabled"] is True:
+            if message.author != self.bot.user:
+                if "Levels" in self.db and GID in self.db["Levels"]:
+                    if UID in self.db["Levels"][GID]:
+                        await self.add_xp(message, 1)
+                        await self.level_up(message)
+                        self.db.sync()
+                    else:
+                        await self.setup(message)
+                        self.db.sync()
+                else:
+                    await self.setup(message)
+                    self.db.sync()
+            else:
+                return
+        else:
+            return
 
     async def add_xp(self, message, exp):
         GID = str(message.guild.id)
         UID = str(message.author.id)
-        self.levels[GID][UID]["xp"] += int(exp)
-        with open("./data/levels/rankings.json", "w") as f:
-            json.dump(self.levels, f)
+        self.db["Levels"][GID][UID]["xp"] += int(exp)
 
     async def setup(self, message):
         GID = str(message.guild.id)
         user = message.author
+        UID = str(user.id)
+        if "Levels" not in self.db and GID not in self.db["Levels"]:
+            self.db["Levels"] = {}
+            self.db["Levels"] = {GID :{UID: {"name": user.name, "level": 0, "xp": 0}}}
+        else:
+            self.db["Levels"][GID][UID] = {"name": user.name, "level": 0, "xp": 0}
+
+    async def level_up(self, message):
+        GID = str(message.guild.id)
         UID = str(message.author.id)
-        if GID in self.levels:
-            if UID not in self.levels:
-                self.levels[GID][UID] = {"name": user.name, "level": 0, "xp": 0}
-                with open("./data/levels/rankings.json", "w") as f:
-                    json.dump(self.levels, f)
+        xp = self.db["Levels"][GID][UID]["xp"]
+        level = self.db["Levels"][GID][UID]["level"]
+        required_xp = 10 * level
+        if level == 0:
+            required_xp = 10 * 1
+        if xp >= required_xp:
+            self.db["Levels"][GID][UID]["level"] += 1
+            self.db["Levels"][GID][UID]["xp"] = 0
+            if self.levels[GID]["Messages"] is True:
+                newlevel = self.db["Levels"][GID][UID]["level"]
+                await message.channel.send(embed=lib.Editable("Level Up!", f"{message.author.name} Leveled up to {newlevel}", "Leveling"))
             else:
                 return
-        else:
-            self.levels[GID] = {}
-            with open("./data/levels/rankings.json", "w") as f:
-                json.dump(self.levels, f)
-
-
-
-
-
-
-
-
-
-
-
-
 
 def setup(bot):
     bot.add_cog(Core(bot))

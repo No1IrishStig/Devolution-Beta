@@ -16,7 +16,7 @@ def get(file):
     except FileNotFoundError:
         raise FileNotFoundError("JSON file wasn't found")
 
-version = "Stable v1.7.1"
+version = "Stable v1.7.2"
 invite = "https://discord.gg/V9DhKbW"
 config = default.get("./utils/cfg.json")
 
@@ -132,6 +132,11 @@ class lib(commands.Cog):
         logset = open("data/settings/logs.json","w+")
         logset.write("{}")
         logset.close
+
+    def levels():
+        levels = open("data/settings/leveling.json","w+")
+        levels.write("{}")
+        levels.close
 
 
 def setup(client):

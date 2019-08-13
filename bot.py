@@ -7,8 +7,8 @@ from discord.ext import commands
 from utils import default
 
 dbcheck = os.path.exists(f"data/db/data.db.dat")
-JSON_VALIDATION = ['settings/deltimer.json', 'settings/logs.json']
-ERRORS = ["deltimer", "logs"]
+JSON_VALIDATION = ['settings/deltimer.json', 'settings/logs.json', "settings/leveling.json"]
+ERRORS = ["deltimer", "logs", "leveling"]
 config = default.get("utils/cfg.json")
 
 bot = commands.Bot(command_prefix = config.prefix)
@@ -28,6 +28,8 @@ for files in JSON_VALIDATION:
             lib.deltimer()
         elif ERRORS[i] == "logs":
             lib.logs()
+        elif ERRORS[i] == "leveling":
+            lib.levels()
     i += 1
 
 if check is False:

@@ -939,13 +939,104 @@ class Mod(commands.Cog):
         else:
             return
 
+    @commands.group(invoke_without_command=True)
+    async def warn(self, ctx, user: discord.User = None, *args):
+        if ctx.author.guild_permissions.manage_messages:
+            GID = str(ctx.guild.id)
+            if "Warnings" in self.db and GID in self.db["Warnings"]:
+                if user is not None:
+                    UID = str(user.id)
+                    if UID in self.db["Warnings"][GID]["Users"]:
+                        reason = ""
+                        for word in args:
+                            reason += word
+                            reason += " "
+                        if reason is "":
+                            await ctx.send(f"{user.mention} has been warned by {ctx.author.name}")
+                            self.db["Warnings"][GID]["Users"][UID]["Warnings"] += 1
+                            self.db.sync()
+                            print(self.db["Warnings"])
+                        else:
+                            await ctx.send(f"{user.mention} has been warned by {ctx.author.name} for {reason}")
+                            self.db["Warnings"][GID]["Users"][UID]["Warnings"] += 1
+                            self.db["Warnings"][GID]["Users"][UID]["Reasons"].append(reason)
+                            self.db.sync()
+                            print(self.db["Warnings"])
+                    else:
+                        self.db["Warnings"][GID]["Users"] = {UID: {"Warnings": 0, "Reasons": []}}
+                        self.db.sync()
+                        await ctx.reinvoke()
+                else:
+                    await ctx.send(embed=lib.Editable("Uh oh", f"{ctx.author.mention}, Warnings: `{ctx.prefix}warn @user (reason)`", "Warnings"))
+            else:
+                self.db["Warnings"] = {}
+                self.db["Warnings"] = {GID: {"Users": {}}}
+                self.db.sync()
+                print(f"{list(self.db.keys())}")
+                await ctx.reinvoke()
+
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
+
+    @warn.group()
+    async def list(self, ctx):
+        GID = str(ctx.guild.id)
+        warned_users = self.db["Warnings"][GID]["Users"]
+        if "Warnings" in self.db and GID in self.db["Warnings"]:
+            for UID in self.db["Warnings"][GID]:
+                await ctx.send(embed=lib.Editable("Warned Users List", "{}".format(", ".join(warned_users)), "Moderation"))
+        else:
+            await ctx.send(embed=lib.Editable("Uh oh", f"The Warnings System is not set up on this server. Run {ctx.prefix}warn to start!", "Warnings"))
+
+    @warn.group()
+    async def get(self, ctx, UID:int=None):
+        GID = str(ctx.guild.id)
+        UID = str(UID)
+        user = await self.bot.fetch_user(UID)
+        if "Warnings" in self.db and GID in self.db["Warnings"]:
+            if UID is not None:
+                await ctx.send(embed=lib.Editable(f"{UID}'s ({user.name}) Warnings", "{}".format(", ".join(self.db["Warnings"][GID]["Users"][UID]["Reasons"])), "Warnings"))
+            else:
+                await ctx.send(embed=lib.Editable("Uh oh", "Please give me a UserID to get the warnings of!", "Warnings"))
+        else:
+            await ctx.send(embed=lib.Editable("Uh oh", f"The Warnings System is not set up on this server. Run {ctx.prefix}warn to start!", "Warnings"))
+
+    @warn.group()
+    async def remove(self, ctx, UID:int=None, num:int=None):
+        GID = str(ctx.guild.id)
+        UID = str(UID)
+        if "Warnings" in self.db and GID in self.db["Warnings"]:
+            if UID is not None:
+                if num is not None:
+                    print(self.db["Warnings"])
+                    print(num)
+                    num -= 1
+                    print(num)
+                    warn = self.db["Warnings"][GID]["Users"][UID]["Reasons"][num]
+                    await ctx.send(f"{warn}, Is this the correct warning?\n\nReplies: `Yes` or anything to abort.")
+                    choice = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 30)
+                    if choice.content == "Yes" or choice.content == "yes":
+                        del self.db["Warnings"][GID]["Users"][UID]["Reasons"][num]
+                        self.db["Warnings"][GID]["Users"][UID]["Warnings"] -= 1
+                        if self.db["Warnings"][GID]["Users"][UID]["Warnings"] == 0:
+                            del self.db["Warnings"][GID]["Users"][UID]
+                            self.db.sync()
+                            print(self.db["Warnings"])
+                        else:
+                            print(self.db["Warnings"])
+                            self.db.sync()
+                    else:
+                        await ctx.send("Ok. Cancelling")
+                else:
+                    await ctx.send(embed=lib.Editable("Uh oh", "Please give me the number of the warning to remove!", "Warnings"))
+            else:
+                await ctx.send(embed=lib.Editable("Uh oh", "Please give me a UserID to get the warnings of!", "Warnings"))
+        else:
+            await ctx.send(embed=lib.Editable("Uh oh", f"The Warnings System is not set up on this server. Run {ctx.prefix}warn to start!", "Warnings"))
+
 # Logs End --------------------------------------------------------------------------------------------------
 
-    @commands.command()
-    async def test(self, ctx, time:int=None):
-        await ctx.send(f"Fake Muted {ctx.author.name} for {time}")
-        await asyncio.sleep(time)
-        await ctx.send(f"Fake unmuted {ctx.author.name}")
 
 def setup(bot):
     bot.add_cog(Mod(bot))
