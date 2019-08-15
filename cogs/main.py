@@ -683,9 +683,9 @@ class Core(commands.Cog):
     async def leaderboard(self, ctx):
         GID = str(ctx.guild.id)
         UID = str(ctx.author.id)
-        if "Levels" in self.db and GID in self.db["Levels"]:
+        if "Leveling" in self.db and GID in self.db["Leveling"]:
             top = 10
-            level_sorted = sorted(self.db["Levels"][GID].items(), key=lambda x: x[1]["level"], reverse=True)
+            level_sorted = sorted(self.db["Leveling"][GID]["Users"].items(), key=lambda x: x[1]["level"], reverse=True)
             if len(level_sorted) < top:
                 top = len(level_sorted)
             topten = level_sorted[:top]
@@ -724,65 +724,74 @@ class Core(commands.Cog):
 
     @commands.Cog.listener(name="on_message")
     async def on_message_(self, message):
-        GID = str(message.guild.id)
-        UID = str(message.author.id)
-        if GID in self.levels:
-            if self.levels[GID]["Enabled"] is True:
-                if message.author != self.bot.user:
-                    if "Levels" in self.db and GID in self.db["Levels"]:
-                        if UID in self.db["Levels"][GID]:
-                            await self.add_xp(message, 1)
-                            await self.level_up(message)
-                            self.db.sync()
+        try:
+            GID = str(message.guild.id)
+            UID = str(message.author.id)
+            if GID in self.levels:
+                if self.levels[GID]["Enabled"] is True:
+                    if message.author != self.bot.user:
+                        if "Leveling" in self.db and GID in self.db["Leveling"]:
+                            if UID in self.db["Leveling"][GID]["Users"]:
+                                await self.add_xp(message, 1)
+                                return await self.level_up(message)
+                            else:
+                                await self.setup(message)
                         else:
                             await self.setup(message)
-                            self.db.sync()
                     else:
-                        await self.setup(message)
-                        self.db.sync()
+                        return
                 else:
                     return
             else:
-                return
-        else:
-            self.levels[GID] = {"Enabled": True, "Messages": True}
-            with open("./data/settings/leveling.json", "w") as f:
-                json.dump(self.levels, f)
+                self.levels[GID] = {"Enabled": True, "Messages": True}
+                with open("./data/settings/leveling.json", "w") as f:
+                    json.dump(self.levels, f)
+        except AttributeError:
+            return
 
     async def add_xp(self, message, exp):
         GID = str(message.guild.id)
         UID = str(message.author.id)
-        self.db["Levels"][GID][UID]["xp"] += int(exp)
+        self.db["Leveling"][GID]["Users"][UID]["xp"] += int(exp)
+        self.db.sync()
 
     async def setup(self, message):
         GID = str(message.guild.id)
         user = message.author
         UID = str(user.id)
-        if "Levels" in self.db:
-            if GID not in self.db["Levels"]:
-                self.db["Levels"][GID] = {UID: {"name": user.name, "level": 0, "xp": 0}}
+        if "Leveling" in self.db and GID in self.db["Leveling"]:
+            if UID in self.db["Leveling"][GID]["Users"]:
+                return
+            else:
+                self.db["Leveling"][GID]["Users"][UID] = {"name": user.name, "level": 0, "xp": 0}
                 self.db.sync()
         else:
-            self.db["Levels"] = {}
-            self.db["Levels"][GID] = {UID: {"name": user.name, "level": 0, "xp": 0}}
+            self.db["Leveling"] = {GID: {"Users": {}}}
             self.db.sync()
 
     async def level_up(self, message):
         GID = str(message.guild.id)
         UID = str(message.author.id)
-        xp = self.db["Levels"][GID][UID]["xp"]
-        level = self.db["Levels"][GID][UID]["level"]
-        required_xp = 10 * level
-        if level == 0:
-            required_xp = 10 * 1
-        if xp >= required_xp:
-            self.db["Levels"][GID][UID]["level"] += 1
-            self.db["Levels"][GID][UID]["xp"] = 0
-            if self.levels[GID]["Messages"] is True:
-                newlevel = self.db["Levels"][GID][UID]["level"]
-                await message.channel.send(embed=lib.Editable("Level Up!", f"{message.author.name} Leveled up to {newlevel}", "Leveling"))
+        if "Leveling" in self.db:
+            if GID in self.db["Leveling"]:
+                xp = self.db["Leveling"][GID]["Users"][UID]["xp"]
+                level = self.db["Leveling"][GID]["Users"][UID]["level"]
+                required_xp = 15 * level
+                if level == 0:
+                    required_xp = 15 * 1
+                if xp >= required_xp:
+                    self.db["Leveling"][GID]["Users"][UID]["level"] += 1
+                    self.db["Leveling"][GID]["Users"][UID]["xp"] = 0
+                    if self.levels[GID]["Messages"] is True:
+                        newlevel = self.db["Leveling"][GID]["Users"][UID]["level"]
+                        await message.channel.send(embed=lib.Editable("Level Up!", f"{message.author.name} Leveled up to {newlevel}", "Leveling"))
+                        self.db.sync()
+                    else:
+                        self.db.sync()
             else:
-                return
+                await self.setup(message)
+        else:
+            await self.setup(message)
 
 def setup(bot):
     bot.add_cog(Core(bot))

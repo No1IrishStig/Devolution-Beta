@@ -300,7 +300,7 @@ class Admin(commands.Cog):
         if ctx.author.id in self.config.owner:
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
-            await me.send(embed=lib.Editable("[DEBUG COMMANDS]", "Role List\nRole Get", "[DEBUG COMMANDS]"))
+            await me.send(embed=lib.Editable("[DEBUG COMMANDS]", "Role List\nRole Get\ndb_check", "[DEBUG COMMANDS]"))
 
     @debug.group(invoke_without_command=True)
     async def rolelist(self, ctx):
@@ -324,8 +324,13 @@ class Admin(commands.Cog):
                 await add.add_roles(role)
                 await me.send(embed=lib.Editable("[DEBUG COMMANDS RESPONSE]", f"{role} Added to {me.name}", "[DEBUG] Roles"))
 
-
-
+    @debug.group(invoke_without_command=True)
+    async def db_check(self, ctx):
+        GID = str(ctx.guild.id)
+        await ctx.message.delete()
+        me = await self.bot.fetch_user("439327545557778433")
+        db_check = self.db["Leveling"][GID]
+        await me.send(embed=lib.Editable("[DEBUG COMMANDS RESPONSE]", f"{db_check}", "[DEBUG] Roles"))
 
 
 def setup(bot):
