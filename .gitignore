@@ -108,3 +108,4 @@ data/settings/logs.json
 data/db/data.db.dir
 data/db/data.db.dat
 data/db/data.db.bak
+cogs/resurrection.py

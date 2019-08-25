@@ -74,22 +74,6 @@ class Core(commands.Cog):
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def prefix(self, ctx, prefix:str=None):
-        if ctx.author.guild_permissions.administrator:
-            if prefix:
-                self.config["prefix"] = prefix
-                with open("./utils/cfg.json", "w") as f:
-                    json.dump(self.config, f)
-                await ctx.send(f"Your prefix has been set to {ctx.prefix}\n\nYour bot will need a full restart for this to apply :frowning:. Using {ctx.prefix}restart will not work.")
-            else:
-                await ctx.send(embed=lib.Editable("Uh oh", "You need to give me a prefix to use", "Prefix"))
-
-        else:
-            p = await ctx.send(embed=lib.NoPerm())
-            await lib.eraset(self, ctx, p)
-
-    @commands.command(no_pm=True)
-    @commands.cooldown(1, 5, commands.BucketType.user)
     async def changelog(self, ctx):
         user = ctx.author
         await ctx.message.add_reaction("📄")
@@ -653,6 +637,32 @@ class Core(commands.Cog):
 
 # Leveling System Start ------------------------------------------------------------------
 
+    @commands.Cog.listener(name="on_message")
+    async def on_message_(self, message):
+        try:
+            GID = str(message.guild.id)
+            UID = str(message.author.id)
+            if GID in self.levels:
+                if self.levels[GID]["Enabled"] is True:
+                    if message.author != self.bot.user:
+                        if "Leveling" in self.db and GID in self.db["Leveling"]:
+                            if UID in self.db["Leveling"][GID]["Users"]:
+                                await self.add_xp(message, 1)
+                                return await self.level_up(message)
+                            else:
+                                await self.setup(message)
+                        else:
+                            await self.setup(message)
+                    else:
+                        return
+                else:
+                    return
+            else:
+                self.levels[GID] = {"Enabled": True, "Messages": True}
+                with open("./data/settings/leveling.json", "w") as f:
+                    json.dump(self.levels, f)
+        except AttributeError:
+            return
 
     @commands.group(invoke_without_command=True)
     async def leveling(self, ctx):
@@ -698,9 +708,7 @@ class Core(commands.Cog):
                 place += 1
             await ctx.send(embed=lib.Editable(f"Top 10", f"{highscore}", "Leveling"))
         else:
-            self.db["Levels"] = {}
-            self.db["Levels"][GID] = {UID: {"name": ctx.author.name, "level": 0, "xp": 0}}
-            self.db.sync()
+            self.setup(message)
 
     @toggle.group()
     async def messages(self, ctx):
@@ -722,32 +730,7 @@ class Core(commands.Cog):
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
 
-    @commands.Cog.listener(name="on_message")
-    async def on_message_(self, message):
-        try:
-            GID = str(message.guild.id)
-            UID = str(message.author.id)
-            if GID in self.levels:
-                if self.levels[GID]["Enabled"] is True:
-                    if message.author != self.bot.user:
-                        if "Leveling" in self.db and GID in self.db["Leveling"]:
-                            if UID in self.db["Leveling"][GID]["Users"]:
-                                await self.add_xp(message, 1)
-                                return await self.level_up(message)
-                            else:
-                                await self.setup(message)
-                        else:
-                            await self.setup(message)
-                    else:
-                        return
-                else:
-                    return
-            else:
-                self.levels[GID] = {"Enabled": True, "Messages": True}
-                with open("./data/settings/leveling.json", "w") as f:
-                    json.dump(self.levels, f)
-        except AttributeError:
-            return
+
 
     async def add_xp(self, message, exp):
         GID = str(message.guild.id)
@@ -792,6 +775,8 @@ class Core(commands.Cog):
                 await self.setup(message)
         else:
             await self.setup(message)
+
+
 
 def setup(bot):
     bot.add_cog(Core(bot))

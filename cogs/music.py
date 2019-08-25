@@ -67,7 +67,7 @@ class Music(commands.Cog):
             member = ctx.author
             if member.voice is None:
                 e = await ctx.send(embed=lib.Editable("Error", "You arent in a voice channel!", "Music"))
-                await lib.eraset(self, ctx, e1)
+                await lib.eraset(self, ctx, e)
             else:
                 channel = ctx.author.voice.channel
                 await channel.connect()

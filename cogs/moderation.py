@@ -94,7 +94,7 @@ class Mod(commands.Cog):
                         await ctx.guild.ban(user)
                         await lib.eraset(self, ctx, s1)
                 except Exception as error:
-                        ex = await self.bot.say(f"**{user}** cannot be banned. {error}")
+                        ex = await ctx.send(f"**{user}** cannot be banned. {error}")
                         await lib.eraset(self, ctx, ex)
             else:
                 e = await ctx.send(embed=lib.Editable("Oops!", f"You forgot something!\n\n{ctx.prefix}ban (@user)\n{ctx.prefix}ban (@user) (reason)\n\nBans mentioned user from the server, with or without a reason.", "Ban Usage"))
@@ -979,55 +979,154 @@ class Mod(commands.Cog):
     @warn.group()
     async def list(self, ctx):
         GID = str(ctx.guild.id)
-        if "Warnings" in self.db and GID in self.db["Warnings"]:
-            warned_users = self.db["Warnings"][GID]["Users"]
-            for UID in self.db["Warnings"][GID]:
-                await ctx.send(embed=lib.Editable("Warned Users List", "{}".format(", ".join(warned_users)), "Moderation"))
+        if ctx.author.guild_permissions.manage_messages:
+            if "Warnings" in self.db and GID in self.db["Warnings"]:
+                warned_users = self.db["Warnings"][GID]["Users"]
+                for UID in self.db["Warnings"][GID]:
+                    await ctx.send(embed=lib.Editable("Warned Users List", "{}".format(", ".join(warned_users)), "Moderation"))
+            else:
+                await ctx.send(embed=lib.Editable("Uh oh", f"The Warnings System is not set up on this server. Run {ctx.prefix}warn to start!", "Warnings"))
         else:
-            await ctx.send(embed=lib.Editable("Uh oh", f"The Warnings System is not set up on this server. Run {ctx.prefix}warn to start!", "Warnings"))
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
 
     @warn.group()
     async def get(self, ctx, UID:int=None):
         GID = str(ctx.guild.id)
         UID = str(UID)
         user = await self.bot.fetch_user(UID)
-        if "Warnings" in self.db and GID in self.db["Warnings"]:
-            if UID is not None:
-                await ctx.send(embed=lib.Editable(f"{UID}'s ({user.name}) Warnings", "{}".format(", ".join(self.db["Warnings"][GID]["Users"][UID]["Reasons"])), "Warnings"))
+        if ctx.author.guild_permissions.manage_messages:
+            if "Warnings" in self.db and GID in self.db["Warnings"]:
+                if UID is not None:
+                    await ctx.send(embed=lib.Editable(f"{UID}'s ({user.name}) Warnings", "{}".format(", ".join(self.db["Warnings"][GID]["Users"][UID]["Reasons"])), "Warnings"))
+                else:
+                    await ctx.send(embed=lib.Editable("Uh oh", "Please give me a UserID to get the warnings of!", "Warnings"))
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", "Please give me a UserID to get the warnings of!", "Warnings"))
+                await ctx.send(embed=lib.Editable("Uh oh", f"The Warnings System is not set up on this server. Run {ctx.prefix}warn to start!", "Warnings"))
         else:
-            await ctx.send(embed=lib.Editable("Uh oh", f"The Warnings System is not set up on this server. Run {ctx.prefix}warn to start!", "Warnings"))
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
 
     @warn.group()
     async def remove(self, ctx, UID:str=None, num:int=None):
         GID = str(ctx.guild.id)
-        if "Warnings" in self.db and GID in self.db["Warnings"]:
-            if UID is not None:
-                if num is not None:
-                    num -= 1
-                    warn = self.db["Warnings"][GID]["Users"][UID]["Reasons"][num]
-                    await ctx.send(f"{warn}, Is this the correct warning?\n\nReplies: `Yes` or anything to abort.")
-                    choice = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 30)
-                    if choice.content == "Yes" or choice.content == "yes":
-                        del self.db["Warnings"][GID]["Users"][UID]["Reasons"][num]
-                        self.db["Warnings"][GID]["Users"][UID]["Warnings"] -= 1
-                        if self.db["Warnings"][GID]["Users"][UID]["Warnings"] == 0:
-                            del self.db["Warnings"][GID]["Users"][UID]
-                            self.db.sync()
+        if ctx.author.guild_permissions.manage_messages:
+            if "Warnings" in self.db and GID in self.db["Warnings"]:
+                if UID is not None:
+                    if num is not None:
+                        num -= 1
+                        warn = self.db["Warnings"][GID]["Users"][UID]["Reasons"][num]
+                        await ctx.send(f"{warn}, Is this the correct warning?\n\nReplies: `Yes` or anything to abort.")
+                        choice = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 30)
+                        if choice.content == "Yes" or choice.content == "yes":
+                            del self.db["Warnings"][GID]["Users"][UID]["Reasons"][num]
+                            self.db["Warnings"][GID]["Users"][UID]["Warnings"] -= 1
+                            if self.db["Warnings"][GID]["Users"][UID]["Warnings"] == 0:
+                                del self.db["Warnings"][GID]["Users"][UID]
+                                self.db.sync()
+                            else:
+                                self.db.sync()
                         else:
-                            self.db.sync()
+                            await ctx.send("Ok. Cancelling")
                     else:
-                        await ctx.send("Ok. Cancelling")
+                        await ctx.send(embed=lib.Editable("Uh oh", "Please give me the number of the warning to remove!", "Warnings"))
                 else:
-                    await ctx.send(embed=lib.Editable("Uh oh", "Please give me the number of the warning to remove!", "Warnings"))
+                    await ctx.send(embed=lib.Editable("Uh oh", "Please give me a UserID to get the warnings of!", "Warnings"))
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", "Please give me a UserID to get the warnings of!", "Warnings"))
+                await ctx.send(embed=lib.Editable("Uh oh", f"The Warnings System is not set up on this server. Run {ctx.prefix}warn to start!", "Warnings"))
         else:
-            await ctx.send(embed=lib.Editable("Uh oh", f"The Warnings System is not set up on this server. Run {ctx.prefix}warn to start!", "Warnings"))
-
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
 # Logs End --------------------------------------------------------------------------------------------------
 
+    @commands.group(invoke_without_command=True)
+    async def move(self, ctx):
+        if ctx.author.guild_permissions.manage_messages:
+            await ctx.send(embed=lib.Editable("Move Usage", f"You must be in a voice channel\n\n`{ctx.prefix}move list`\n`{ctx.prefix}move all`\n`{ctx.prefix}move role`\n`{ctx.prefix}move channel` (ChannelID)", "Voice Moderation"))
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
+
+    @move.group()
+    async def list(self, ctx):
+        if ctx.author.guild_permissions.manage_messages:
+            list_of_channels = ctx.guild.voice_channels
+            for voice_channels in list_of_channels:
+                if len(voice_channels.members) > 0:
+                    await ctx.send("Found **{}** Members in **{}**".format(len(voice_channels.members), voice_channels.name))
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
+
+    @move.group()
+    async def all(self, ctx):
+        if ctx.author.guild_permissions.manage_messages:
+            list_of_channels = ctx.guild.voice_channels
+            userlist = []
+            membercount = 0
+            channel_count = 0
+            move_to = ctx.author.voice.channel
+            if move_to:
+                for voice_channels in list_of_channels:
+                    if len(voice_channels.members) > 0:
+                        membercount += len(voice_channels.members)
+                        channel_count += 1
+                    for members in voice_channels.members:
+                        if members.bot is False:
+                            await members.move_to(move_to)
+                            userlist.append(members.name)
+                        else:
+                            membercount -= 1
+                moved = await ctx.send(embed=lib.Editable("Calculating..", "Found **{}** Users in **{}** Voice Channels. Moved them to {} under the command of **{}**".format(membercount, channel_count, move_to, ctx.author.name), "Voice Moderation"))
+                membercount = 0
+            else:
+                e = await ctx.send(embed=lib.Editable("Error", "You arent in a voice channel!", "Voice Moderation"))
+                await lib.eraset(self, ctx, e)
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
+
+    @move.group()
+    async def role(self, ctx, rolename:str=None):
+        if ctx.author.guild_permissions.manage_messages:
+            move_to = ctx.author.voice.channel
+            list_of_channels = ctx.guild.voice_channels
+            membercount = 0
+            if rolename:
+                role = discord.utils.get(ctx.guild.roles, name=rolename)
+                for voice_channels in list_of_channels:
+                    if len(voice_channels.members) > 0:
+                        for members in voice_channels.members:
+                            if members.bot is False:
+                                if role in members.roles:
+                                    membercount += len(voice_channels.members)
+                                    await members.move_to(move_to)
+                await ctx.send(embed=lib.Editable("Calculating..", "Found **{}** Users with **{}** role. Moved them to {} under the command of **{}**".format(membercount, rolename, move_to, ctx.author.name), "Voice Moderation"))
+                membercount = 0
+            else:
+                ctx.send("That role wasnt found")
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
+
+    @move.group()
+    async def channel(self, ctx, channelname:int=None):
+        if ctx.author.guild_permissions.manage_messages:
+            move_to = ctx.author.voice.channel
+            list_of_channels = ctx.guild.voice_channels
+            membercount = 0
+            if channelname:
+                for channels in ctx.guild.voice_channels:
+                    if channels.id == channelname:
+                        for members in channels.members:
+                            if members.bot is False:
+                                membercount += len(channels.members)
+                                await members.move_to(move_to)
+                await ctx.send(embed=lib.Editable("Calculating..", "Found **{}** Users in channel **{}**. Moved them to {} under the command of **{}**".format(membercount, channelname, move_to, ctx.author.name), "Voice Moderation"))
+                membercount = 0
+        else:
+            p = await ctx.send(embed=lib.NoPerm())
+            await lib.eraset(self, ctx, p)
 
 def setup(bot):
     bot.add_cog(Mod(bot))
