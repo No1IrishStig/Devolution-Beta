@@ -730,8 +730,6 @@ class Core(commands.Cog):
             p = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, p)
 
-
-
     async def add_xp(self, message, exp):
         GID = str(message.guild.id)
         UID = str(message.author.id)

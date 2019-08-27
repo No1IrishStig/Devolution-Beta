@@ -6,10 +6,16 @@ from utils.default import lib
 from discord.ext import commands
 from utils import default
 
+config = default.get("utils/cfg.json")
+
+if config.token == "Token" or config.owner == 0:
+    print("Uh oh, you got an error!\n\nYou appear to be missing the bot's token or OwnerID.\nPlease input these into the CFG file located in /utils/cfg.json\n\n")
+    a = input("Press enter to close this window.")
+    os.system("exit", a)
+
 dbcheck = os.path.exists(f"data/db/data.db.dat")
 JSON_VALIDATION = ['settings/deltimer.json', 'settings/logs.json', "settings/leveling.json"]
 ERRORS = ["deltimer", "logs", "leveling"]
-config = default.get("utils/cfg.json")
 
 bot = commands.Bot(command_prefix = config.prefix)
 bot.remove_command('help')
