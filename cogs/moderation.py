@@ -9,7 +9,7 @@ from utils.default import lib
 from discord.ext import commands
 
 punished_users = []
-
+db_timer = {"timer": 20}
 inv_settings = {"embed": False, "Channel": None, "edit": False, "delete": False, "user": False, "join": False, "leave": False, "server": False}
 
 class Mod(commands.Cog):
@@ -497,6 +497,8 @@ class Mod(commands.Cog):
             noperm = await ctx.send(embed=lib.NoPerm())
             await lib.eraset(self, ctx, noperm)
 
+
+
     @deltimer.group(invoke_without_command=True)
     @commands.cooldown(1, 15, commands.BucketType.guild)
     async def enable(self, ctx):
@@ -966,7 +968,7 @@ class Mod(commands.Cog):
                         self.db.sync()
                         await ctx.reinvoke()
                 else:
-                    await ctx.send(embed=lib.Editable("Uh oh", f"{ctx.author.mention}, Warnings: `{ctx.prefix}warn @user (reason)`, `{ctx.prefix}warn list`, `{ctx.prefix}warn get (userid)`, `{ctx.prefix}warn remove (userid) (warning number)`", "Warnings"))
+                    await ctx.send(embed=lib.Editable("Warn Usage", f"{ctx.prefix}warn @user (reason), {ctx.prefix}warn list, {ctx.prefix}warn get (userid), {ctx.prefix}warn remove (userid) (warning number)", "Warnings"))
             else:
                 self.db["Warnings"] = {}
                 self.db["Warnings"] = {GID: {"Users": {}}}

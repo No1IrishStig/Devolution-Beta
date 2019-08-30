@@ -10,10 +10,15 @@ import re
 
 
 from utils import default
+from discord import Spotify
 from utils.default import lib
 from discord.ext import commands
 from random import choice as randchoice
 
+global page_number
+page_number = None
+global page_num
+page_num = None
 start_time = time.time()
 
 class Core(commands.Cog):
@@ -33,77 +38,173 @@ class Core(commands.Cog):
                             with open("./data/settings/leveling.json") as f:
                                 self.levels = json.load(f)
 
-    @commands.group(invoke_without_command=True, no_pm=True)
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        global page_number
+        emojis = ['◀', '▶', '🗑', ':one:', ':two:', ':three:', ':four:', ':five:']
+        if not user.bot:
+            if str(reaction.emoji in emojis):
+                if str(reaction.emoji) == '1\N{combining enclosing keycap}':
+                    page_number = 1
+                    await reaction.remove(user)
+                elif str(reaction.emoji) == '2\N{combining enclosing keycap}':
+                    page_number = 2
+                    await reaction.remove(user)
+                elif str(reaction.emoji) == '3\N{combining enclosing keycap}':
+                    page_number = 3
+                    await reaction.remove(user)
+                elif str(reaction.emoji) == '4\N{combining enclosing keycap}':
+                    page_number = 4
+                    await reaction.remove(user)
+                elif str(reaction.emoji) == '5\N{combining enclosing keycap}':
+                    page_number = 5
+                    await reaction.remove(user)
+                elif str(reaction.emoji) == '0\N{combining enclosing keycap}':
+                    page_number = 0
+                    await reaction.remove(user)
+
+                elif str(reaction.emoji) == '🗑':
+                    try:
+                        await changelog.delete()
+                        page_number = None
+                    except Exception as e:
+                        return
+
+                if page_number == 0:
+                    e = lib.Editable("Devolution Beta Changelogs Since 15/12/18", "**Page 0** - This Page\n**Page 1** 15/12/2018 - 04/01/2019\n**Page 2** 04/01/2019 - 17/06/2019\n**Page 3** 17/06/2019 - 23/06/2019\n**Page 4** 04/07/2019 - 26/08/2019\n**Page 5** 13/08/2019 - {}".format(datetime.datetime.utcnow().strftime("%d/%m/%Y")), "Changelogs Index")
+                    await changelog.edit(embed=e)
+
+                elif page_number == 1:
+                    e = lib.Editable(f"Devolution Beta Changelogs Since 15/12/18", "__**Changelog (15/12/2018) v0.0.1 Beta 1**__\n+ Added Help command\n+ Added Ping command\n+ Added Music Cog\n\n__**Changelog (16/12/2018) v0.0.2 Beta 2**__\n+ Added shutdown command\n\n- Changed some Music messages to embeds\n\n__**Changelog (18/12/2018) v0.0.3 Beta 3**__\n- Finished changing all music embeds\n- Updated help command\n\n__**Changelog (21/12/2018) v0.0.4 Beta 4**__\n+ Added sinfo command\n\n- Edited many embed messages in music commands\n- Updated Help command\n- Music Cog Work\n\n__**Changelog (21/12/2018  v0.0.5 Beta 5**__\n+ Added Uptime command\n+ Added Kick command\n\n- Fixed all timestamps to make them actually work\n- Changed set presence command to an embed\n- Updated Help command\n\n__**Changelog (22/12/2018) v0.1**__\n+ Added Cog check, if you arent me, goodluck using that one\n+ Added Cog commands Load, Unload and List\n+ Added Set Presence command (Alias sp)\n\n- Updated Help command\n\n__**Changelog (23/12/2018) v0.1.1**__\n+ Added Avatar command\n+ Added Avatar command\n+ Added purge command\n+ Added uinfo command\n+ Added ban command\n+ Added say command\n+ Added about command\n+ Added pm Command\n\n- Changed kick embed message, bot sends embed to kicked user {server} {kicked_by} {reason (if there was one)}\n- Kick command now accepts reasons\n- Updated Help command\n\n__**Changelog (29/12/2018) v0.1.2**__\n+ Added rename command\n+ Added coinflip command\n\n- Updated Help command\n\n__**Changelog (04/01/2019) v0.1.3**__\n- Changed music play embed again", f"Page {page_number}")
+                    await changelog.edit(embed=e)
+
+                elif page_number == 2:
+                    e = lib.Editable(f"Devolution Beta Changelogs Since 15/12/18", f"__**Changelog (04/01/2019) v0.2**__\n+ Added Colour command\n+ Added Meme command\n+ Added Space command\n\n- Updated Help command\n\n__**Changelog (14/01/2019) v0.2.1**__\n+ Added Prefix command\n+ Added Leave command\n\n- Reworked Invite command\n- Updated Help command\n\n__**Changelog (24/01/2019) v0.2.2**__\n+ Added spp command (Set punish permissions)\n+ Added punish & unpunish commands\n\n- Updated Help command\n\n__**Changelog (26/01/2019) v0.3 **__\n- Major code overhaul\n- File sizes cut in half, bot should now run smoother\n\n__**Changelog (26/01/2019) v0.3.1**__\n+ Added lspunish command\n+ Added Embed command\n\n- Updated Punish command to give usage details\n- Updated Help command\n\n__**Changelog (27/01/2019) v0.4 **__\n+ Added role commands\n+ Added Bug command\n\n- Updated Help command\n\n__**Changelog (02/03/2019) v0.5 **__\n+ Added changelog command (So you can see all this)\n+ Added new cog for tournaments\n+ Added Tournament commands\n\n- Updated bots default playing status\n- Updated Help command\n\n__**Changelog (09/03/2019) v0.5.1**__\n+ Added volume min and max 0 - 200\n\n - Fixed anyone being able to skip on the fist vote\n - Fixed Embed Messages not sending\n- Fixed Music failing to play\n\n__**Changelog (16/06/2019) v1.0 **__\n- Rewrote the entire bot into the newest version of Python and Discordpy\n- Updated Todo Command and made it public\n- Reworked Bug report command\n- Reworked help command\n\n__**Changelog (17/06/2019) v1.0.1 **__\n+ Added a command to list all roles in a server\n+ Added github issue link to bug command\n+ Reintroduced the beloved data folder!\n+ Added Boobs & Ass command\n+ Added Insult command\n+ Added roll command\n+ Added bot launcher\n+ Added Cleanup\n\n- Huge amounts of optimization with the cogs\n- Removed meme api as it was broken\n- Removed unnecessary json loading\n- Squashed a **lot** of nasty bugs\n- Removed Purge command\n- Removed prefix command\n- Removed tournament cog", f"Page {page_number}")
+                    await changelog.edit(embed=e)
+
+                elif page_number == 3:
+                    e = lib.Editable(f"Devolution Beta Changelogs Since 15/12/18", f"__**Changelog (17/06/2019) v1.0.2**__\nAdded music command!(Play, Pause, Resume, volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) v1.1**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added amiadmin command\n+ Added utils folder\n+ Added config file\n\n- Merged lib into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs\n\n__**Changelog (18/06/2019) v1.1.1**__\n+ Added owo command (944)\n\n- Fixed Punish not setting channel permissions\n- Finished Cleanup command\n- Fixed volume command\n- Updated help command\n- Added clean command\n- Bug Fixes\n\n__**Changelog (21/06/2019) v1.2**__\n+ Added Error handler (catches and resolves errors automatically)\n+ Added help command for bot required permissions\n+ Added self delete function to every command\n+ Added 'role exist' check to remove and add\n+ Added sstop command (Force stop song)\n+ Added command cooldowns\n\n- Updated 'Forgot Something' errors to add more detail and to give a similar appearance\n- Reworked invite command (Invite ClientID is now based on the bots ID)\n- Changed stop command so only the song player can stop the song\n- Rewrote every command and optimized a lot of code\n- Rearranged and removed unused imports\n- Tweaked and tidied changelog output\n- Reverted and updated help command\n- Placed all commands into cogs\n- Reworked Cog loading system\n- Removed todo command\n- Reworked every cog\n- Reworked bot.py file\n- Bug Fixes\n\n__**Changelog (21/06/2019) v1.3**__\n+ Added customcommands\n+ Added leaveid\n+ Added logs\n\n- Added permission check to spp\n- Updated help command\n- Updated changelog\n- Bug fixes\n\n__**Changelog (23/06/2019) v1.3.1**__\n- Fixed cleanup after\n- Bug fixes", f"Page {page_number}")
+                    await changelog.edit(embed=e)
+
+                elif page_number == 4:
+                    e = lib.Editable(f"Devolution Beta Changelogs Since 15/12/18", f"__**Changelog (04/07/2019) v1.4**__\n+ Added !deltimer\n\n- Fixed time being off in logs\n- Bug Fixes\n- Updated help command\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Bug fixes\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Changed !amiadmin to incorperate the new admin command\n- Updated error handler\n- Bug fixes\n\n__**Changelog (06/07/2019) v1.5.1**__\n\n- Bug fixes\n\n__**Changelog (03/08/2019) v1.6**__\n+ Added custom prefix support\n+ Added economy update\n+ Added slots\n\n- Optimized code and remove unnecessary checks.\n- Added Economy to help command\n- Bug Fixes\n\n__**Changelog (03/08/2019) v1.6.1**__\n- Made each server have its own bank\n- Many code optimizations\n- Began work on blackjack\n- Bug fixes\n\n__**Changelog (05/08/2019) v1.6.3**__\n+ Added a restart command (This only restarts the connection, wont apply any file changes)\n+ Added checks to bank balance, bank register, bank transfer, bank set, benefits and top\n+ Added blackjack\n\n- Removed unnecessary checks\n- Code optimization\n- Many bug fixes\n\n__**Changelog (05/08/2019) v1.6.4**__\n+ Added check to !blackjack command and more information\n+ Added a message to show if the house hit or stood\n+ Added a Tie Check to blackjack\n\n- Fixed a bug when losing after standing where all cards are shown\n- Fixed bank balance\n\n__**Changelog (11/08/2019) v1.6.6**__\n+ Began work on leveling system\n\n- Began work on changing the way data is stored\n- Completely reworked the blackjack logic\n- Reworked and removed cogs\n\n__**Changelog (12/08/2019) v1.7**__\n+ Added check if punished users try rejoin\n+ Added some new folders\n+ Added Database Check\n+ Added Timer to Punish\n\n- Reworked Economy and Admins to use Database\n- Removed some checks from bot.py\n- Removed checks from default.py\n- Removed a lot of the json files\n- Remove customcommand\n- Updated Help Command\n- Added cmd_data folder\n- Added Settings folder\n- Cleaned up imports", f"Page {page_number}")
+                    await changelog.edit(embed=e)
+
+                elif page_number == 5:
+                    e = lib.Editable(f"Devolution Beta Changelogs Since 15/12/18", f"__**Changelog (13/08/2019) v1.7.2**__\n+ Added Warnings System\n+ Added Leveling System\n\n- Bug Fixes and Improvements\n- Updated JSON Check\n- Updated Help\n\n__**Changelog (26/08/2019) v1.7.5**__\n+ Added Move Commands\n\n- Fixed a check for Prefix\n- Fixed music auto delete\n- Other random bugs\n\n__**Changelog (30/08/2019) v1.7.6**__\n- Rewrote changelog command\n- Rewrote uinfo command\n- Rewrote help command\n- Bug Fixes", f"Page {page_number}")
+                    await changelog.edit(embed=e)
+
+            else:
+                return
+        else:
+            return
+
+    @commands.command()
+    @commands.cooldown(1, 30, commands.BucketType.user)
+    async def changelog(self, ctx):
+        global page_number
+        global changelog
+        await ctx.message.delete()
+        page_number = 0
+        changelog = await ctx.send(embed = lib.Editable("Devolution Beta Changelogs Since 15/12/18", "**Page 0** - This Page\n**Page 1** 15/12/2018 - 04/01/2019\n**Page 2** 04/01/2019 - 17/06/2019\n**Page 3** 17/06/2019 - 23/06/2019\n**Page 4** 04/07/2019 - 26/08/2019\n**Page 5** 13/08/2019 - {}".format(datetime.datetime.utcnow().strftime("%d/%m/%Y")), "Changelogs Index"))
+
+        await changelog.add_reaction("🗑")
+        await changelog.add_reaction("1\N{combining enclosing keycap}")
+        await changelog.add_reaction("2\N{combining enclosing keycap}")
+        await changelog.add_reaction("3\N{combining enclosing keycap}")
+        await changelog.add_reaction("4\N{combining enclosing keycap}")
+        await changelog.add_reaction("5\N{combining enclosing keycap}")
+        await changelog.add_reaction("0\N{combining enclosing keycap}")
+
+    @commands.Cog.listener(name="on_reaction_add")
+    async def reaction_add_(self, reaction, user):
+        global page_num
+        emojis1 = ['◀', '▶', '🇽', '🇵']
+        if not user.bot:
+            if str(reaction.emoji in emojis1):
+
+                if str(reaction.emoji) == '🇽':
+                    try:
+                        await help.delete()
+                        page_num = None
+                    except Exception as e:
+                        return
+
+                elif str(reaction.emoji) == '◀':
+                    if page_num > 0:
+                        await help.add_reaction("◀")
+                        page_num -= 1
+                        await reaction.remove(user)
+                        if page_num == 0:
+                            try:
+                                await reaction.remove(self.bot.user)
+                                await reaction.remove(user)
+                            except Exception as e:
+                                return
+                    else:
+                        try:
+                            await reaction.remove(self.bot.user)
+                            await reaction.remove(user)
+                        except Exception as e:
+                            return
+
+                elif str(reaction.emoji) == '▶':
+                    if page_num <= 5:
+                        page_num += 1
+                        await reaction.remove(user)
+                        await help.add_reaction("◀")
+                    else:
+                        try:
+                            await reaction.remove(self.bot.user)
+                            await reaction.remove(user)
+                        except Exception as e:
+                            return
+
+                elif str(reaction.emoji) == '🇵':
+                    await user.send(embed=lib.Editable("Permission Requirements", "Manage Roles\nManage Channels\nKick Members\n Ban Members\nManage Nicknames\nRead Channels\nSend Messages\nManage Messages\nAdd Reactions\nConnect\nSpeak", "Help"))
+                    await reaction.remove(user)
+
+                if page_num == 0:
+                    e = lib.Editable("Devolution - Help", "**Page 0** - This Page\n**Page 1** - Information\n**Page 2** - Fun\n**Page 3** - Useful\n**Page 4** - Moderation\n**Page 5** - Admin\n**Permission Help (P)** - DM's Required Permissions", "Help Index")
+                    await help.edit(embed=e)
+
+                elif page_num == 1:
+                    e = lib.Editable(f"Devolution Help", "**help** - Gives help!\n**about** - Displays stuff about the bot\n**changelog** - Displays the entire bots changelog\n**sinfo** - Displays guild information.\n**uinfo** - Displays user information\n**uptime** - Displays the bots uptime\n**bug** - Use it to report bugs.\n**suggest** - Suggest something to the dev\n**github** - Provides github link", "Information")
+                    await help.edit(embed=e)
+
+                elif page_num == 2:
+                    e = lib.Editable(f"Devolution Help", "**bank** - Gives usage details\n**coinflip** - Flip a coin\n**space** - Get live information about the ISS\n**colour** - Get a random colour\n**roll** - Roles a dice\n**insult** - Insult people you dislike!\n**boobs** - See some melons!\n**ass** - See some peaches!\n**gif** - Search up a gif on giphy by name\n**gifr** - Gives a random gif from giphy\n**owo** - Get random responses", "Fun Help")
+                    await help.edit(embed=e)
+
+                elif page_num == 3:
+                    e = lib.Editable("Devolution Help", "**say** - Speak as the bot\n**rename** - Change a users nickname\n**invite** - Sends a bot invite link\n**embed** - Creates an embed message\n**role** - Gives role options\n**music** - Gives music help", "Useful Help")
+                    await help.edit(embed=e)
+
+                elif page_num == 4:
+                    e = lib.Editable("Devolution Help", "**kick**- Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives usage details\n**clean** - Cleans the current channel of bot messages and commands\n**cleanup** - Gives usage details\n**logs** - Gives usage details\n**warn** - Gives usage details\n**move** - Gives usage details\n**deltimer** - Change the timer at which the bot auto deletes its messages", "Moderation Help")
+                    await help.edit(embed=e)
+
+                elif page_num == 5:
+                    e = lib.Editable(f"Devolution Help", "**leave** - Makes the bot leave the guild\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.\n**admin** - Gives usage details\n**leveling** - Gives usage details", "Admin Help")
+                    await help.edit(embed=e)
+
+            else:
+                return
+        else:
+            return
+
+    @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def help(self, ctx):
-        await ctx.message.add_reaction("📄")
-        author = ctx.author
-        embed = discord.Embed(
-            title = "Help",
-            colour = 0x9bf442,
-            timestamp=datetime.datetime.utcnow()
-            )
-        embed.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-        embed.set_footer(text="Devolution | Help", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-        embed.add_field(name="Information", value="**help** - Gives help!\n**help permissions** - Gives a list of permissions the bot requires to function\n**bug** - Use it to report bugs.\n**suggest** - Suggest something to the dev\n**sinfo** - Displays guild information.\n**uinfo** - Displays user information\n**uptime** - Displays the bots uptime\n**about** - Displays stuff about the bot\n**changelog** - Displays the entire bots changelog\n**github** - Provides github link", inline=False)
-        embed.add_field(name="Fun", value="**coinflip** - Flip a coin\n**space** - Get live information about the ISS\n**colour** - Get a random colour\n**roll** - Roles a dice\n**insult** - Insult people you dislike!\n**boobs** - See some melons!\n**ass** - See some peaches!\n**gif** - Search up a gif on giphy by name\n**gifr** - Gives a random gif from giphy\n**owo** - Get random responses", inline=False)
-        embed.add_field(name="Economy", value="**bank**\n\n**register** - Creates a bank account at Devo Bank\n**balance** - Returns your balance\n**transfer** - Send credits to your friends\n**set** - Set the credits of an account\n**economyset** - Change economy values\n**slot** - Play the slot machine\n**blackjack** - Gives details on how to play (Updated Soon)", inline=False)
-        embed.add_field(name="Useful", value="**say** - Speak as the bot\n**rename** - Change a users nickname\n**invite** - Gives usage details\n**embed** - Creates an embed message\n**role** - Gives role options\n**music** - Gives music help", inline=False)
-        embed.add_field(name="Moderation", value="**kick** - Kick a mentioned user\n**ban** - Ban a mentioned user\n**hackban** - Allows you to ban a UserID\n**punish** - Gives mute options\n**cleanup** - Gives message moderation options\n**clean** - Deletes the last 100 command messages and bot messages\n**logs** - Get logs on nearly everything\n**deltimer** - Change the timer at which the bot auto deletes its messages\n**warn** - Warnings System\n**move** - Voice Channel Moderation Options", inline=False)
-        embed.add_field(name="Admin", value="**leave** - Makes the bot leave the guild\n**leaveid** - Leaves a server by ID\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**todo** - Displays List of shit todo\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.\n**admin** - Add and remove admins\n**leveling** - Enable leveling system", inline=False)
-        await author.send(embed=embed)
-        await asyncio.sleep(10)
+        global page_num
+        global help
         await ctx.message.delete()
+        page_num = 0
+        help = await ctx.send(embed = lib.Editable("Devolution - Help", "**Page 0** - This Page\n**Page 1** - Information\n**Page 2** - Fun\n**Page 3** - Useful\n**Page 4** - Moderation\n**Page 5** - Admin\n**Permission Help (P)** - DM's Required Permissions", "Help Index"))
 
-    @help.group(invoke_without_command=True, no_pm=True)
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def permissions(self, ctx):
-        await ctx.message.add_reaction("📄")
-        author = ctx.author
-        embed = discord.Embed(
-            title = "Help",
-            colour = 0x9bf442,
-            timestamp=datetime.datetime.utcnow()
-            )
-        embed.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-        embed.set_footer(text="Devolution | Bot Permission Help", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-        embed.add_field(name="Permission Requirements", value="Manage Roles\nManage Channels\nKick Members\n Ban Members\nManage Nicknames\nRead Channels\nSend Messages\nManage Messages\nAdd Reactions\nConnect\nSpeak", inline=False)
-        await author.send(embed=embed)
-        await asyncio.sleep(10)
-        await ctx.message.delete()
-
-    @commands.command(no_pm=True)
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def changelog(self, ctx):
-        user = ctx.author
-        await ctx.message.add_reaction("📄")
-        e = discord.Embed(
-            description = "__**Changelog (15/12/2018) v0.0.1 Beta 1**__\n+ Added Help command\n+ Added Ping command\n+ Added Music Cog\n\n__**Changelog (16/12/2018) v0.0.2 Beta 2**__\n+ Added shutdown command\n\n- Changed some Music messages to embeds\n\n__**Changelog (18/12/2018) v0.0.3 Beta 3**__\n- Finished changing all music embeds\n- Updated help command\n\n__**Changelog (21/12/2018) v0.0.4 Beta 4**__\n+ Added sinfo command\n\n- Edited many embed messages in music commands\n- Updated Help command\n- Music Cog Work\n\n__**Changelog (21/12/2018  v0.0.5 Beta 5**__\n+ Added Uptime command\n+ Added Kick command\n\n- Fixed all timestamps to make them actually work\n- Changed set presence command to an embed\n- Updated Help command\n\n__**Changelog (22/12/2018) v0.1**__\n+ Added Cog check, if you arent me, goodluck using that one\n+ Added Cog commands Load, Unload and List\n+ Added Set Presence command (Alias sp)\n\n- Updated Help command\n\n__**Changelog (23/12/2018) v0.1.1**__\n+ Added Avatar command\n+ Added Avatar command\n+ Added purge command\n+ Added uinfo command\n+ Added ban command\n+ Added say command\n+ Added about command\n+ Added pm Command\n\n- Changed kick embed message, bot sends embed to kicked user {server} {kicked_by} {reason (if there was one)}\n- Kick command now accepts reasons\n- Updated Help command\n\n__**Changelog (29/12/2018) v0.1.2**__\n+ Added rename command\n+ Added coinflip command\n\n- Updated Help command\n\n__**Changelog (04/01/2019) v0.1.3**__\n- Changed music play embed again",
-            colour = 0x9bf442,
-            )
-        e.set_author(name="Stig#1337 - The developer of Devolution", icon_url="https://cdn.discordapp.com/avatars/439327545557778433/a_09b7d5d0f8ecbd826fe3f7b15ee2fb93.gif")
-        await user.send(embed=e)
-        ee = discord.Embed(
-            description = "__**Changelog (04/01/2019) v0.2**__\n+ Added Colour command\n+ Added Meme command\n+ Added Space command\n\n- Updated Help command\n\n__**Changelog (14/01/2019) v0.2.1**__\n+ Added Prefix command\n+ Added Leave command\n\n- Reworked Invite command\n- Updated Help command\n\n__**Changelog (24/01/2019) v0.2.2**__\n+ Added spp command (Set punish permissions)\n+ Added punish & unpunish commands\n\n- Updated Help command\n\n__**Changelog (26/01/2019) v0.3 **__\n- Major code overhaul\n- File sizes cut in half, bot should now run smoother\n\n__**Changelog (26/01/2019) v0.3.1**__\n+ Added lspunish command\n+ Added Embed command\n\n- Updated Punish command to give usage details\n- Updated Help command\n\n__**Changelog (27/01/2019) v0.4 **__\n+ Added role commands\n+ Added Bug command\n\n- Updated Help command\n\n__**Changelog (02/03/2019) v0.5 **__\n+ Added changelog command (So you can see all this)\n+ Added new cog for tournaments\n+ Added Tournament commands\n\n- Updated bots default playing status\n- Updated Help command\n\n__**Changelog (09/03/2019) v0.5.1**__\n+ Added volume min and max 0 - 200\n\n - Fixed anyone being able to skip on the fist vote\n - Fixed Embed Messages not sending\n- Fixed Music failing to play\n\n__**Changelog (16/06/2019) v1.0 **__\n- Rewrote the entire bot into the newest version of Python and Discordpy\n- Updated Todo Command and made it public\n- Reworked Bug report command\n- Reworked help command\n\n__**Changelog (17/06/2019) v1.0.1 **__\n+ Added a command to list all roles in a server\n+ Added github issue link to bug command\n+ Reintroduced the beloved data folder!\n+ Added Boobs & Ass command\n+ Added Insult command\n+ Added roll command\n+ Added bot launcher\n+ Added Cleanup\n\n- Huge amounts of optimization with the cogs\n- Removed meme api as it was broken\n- Removed unnecessary json loading\n- Squashed a **lot** of nasty bugs\n- Removed Purge command\n- Removed prefix command\n- Removed tournament cog",
-            colour = 0x9bf442,
-            timestamp=datetime.datetime.utcnow()
-            )
-        await user.send(embed=ee)
-        eee = discord.Embed(
-            description = "__**Changelog (17/06/2019) v1.0.2**__\nAdded music command!(Play, Pause, Resume, volume, Stop)\n+ Added gif and gifr commands\n+ Added Hackban!\n+ Added pmid\n\n- Reworked the changelog command and put it in size order (iiCarelessness)\n- Reworked and updated Help command\n- Planted logos everywhere!\n\n__**Changelog (18/06/2019) v1.1**__\n+ Added a launcher gui with a few features\n+ Added Set Activity command\n+ Created a new admin cog\n+ Added amiadmin command\n+ Added utils folder\n+ Added config file\n\n- Merged lib into a new file named default inside util\n- Music now creates a folder for songs\n- Updated help command\n- Fixed some music bugs\n\n__**Changelog (18/06/2019) v1.1.1**__\n+ Added owo command (944)\n\n- Fixed Punish not setting channel permissions\n- Finished Cleanup command\n- Fixed volume command\n- Updated help command\n- Added clean command\n- Bug Fixes\n\n__**Changelog (21/06/2019) v1.2**__\n+ Added Error handler (catches and resolves errors automatically)\n+ Added help command for bot required permissions\n+ Added self delete function to every command\n+ Added 'role exist' check to remove and add\n+ Added sstop command (Force stop song)\n+ Added command cooldowns\n\n- Updated 'Forgot Something' errors to add more detail and to give a similar appearance\n- Reworked invite command (Invite ClientID is now based on the bots ID)\n- Changed stop command so only the song player can stop the song\n- Rewrote every command and optimized a lot of code\n- Rearranged and removed unused imports\n- Tweaked and tidied changelog output\n- Reverted and updated help command\n- Placed all commands into cogs\n- Reworked Cog loading system\n- Removed todo command\n- Reworked every cog\n- Reworked bot.py file\n- Bug Fixes\n\n__**Changelog (21/06/2019) v1.3**__\n+ Added customcommands\n+ Added leaveid\n+ Added logs\n\n- Added permission check to spp\n- Updated help command\n- Updated changelog\n- Bug fixes\n\n__**Changelog (23/06/2019) v1.3.1**__\n- Fixed cleanup after\n- Bug fixes",
-            colour = 0x9bf442,
-            timestamp=datetime.datetime.utcnow()
-            )
-        await user.send(embed=eee)
-        eeee = discord.Embed(
-            description = "__**Changelog (04/07/2019) v1.4**__\n+ Added !deltimer\n\n- Fixed time being off in logs\n- Bug Fixes\n- Updated help command\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Bug fixes\n\n__**Changelog (05/07/2019) v1.5**__\n+ Added !admin\n\n- Changed !amiadmin to incorperate the new admin command\n- Updated error handler\n- Bug fixes\n\n__**Changelog (06/07/2019) v1.5.1\n\n- Bug fixes\n\n__**Changelog (03/08/2019) v1.6**__\n+ Added custom prefix support\n+ Added economy update\n+ Added slots\n\n- Optimized code and remove unnecessary checks.\n- Added Economy to help command\n- Bug Fixes\n\n__**Changelog (03/08/2019) v1.6.1**__\n- Made each server have its own bank\n- Many code optimizations\n- Began work on blackjack\n- Bug fixes\n\n__**Changelog (05/08/2019) v1.6.3**__\n+ Added a restart command (This only restarts the connection, wont apply any file changes)\n+ Added checks to bank balance, bank register, bank transfer, bank set, benefits and top\n+ Added blackjack\n\n- Removed unnecessary checks\n- Code optimization\n- Many bug fixes\n\n__**Changelog (05/08/2019) v1.6.4**__\n+ Added check to !blackjack command and more information\n+ Added a message to show if the house hit or stood\n+ Added a Tie Check to blackjack\n\n- Fixed a bug when losing after standing where all cards are shown\n- Fixed bank balance\n\n__**Changelog (11/08/2019) v1.6.6**__\n+ Began work on leveling system\n\n- Began work on changing the way data is stored\n- Completely reworked the blackjack logic\n- Reworked and removed cogs\n\n__**Changelog (12/08/2019) v1.7**__\n+ Added check if punished users try rejoin\n+ Added some new folders\n+ Added Database Check\n+ Added Timer to Punish\n\n- Reworked Economy and Admins to use Database\n- Removed some checks from bot.py\n- Removed checks from default.py\n- Removed a lot of the json files\n- Remove customcommand\n- Updated Help Command\n- Added cmd_data folder\n- Added Settings folder\n- Cleaned up imports\n\n__**Changelog (13/08/2019) v1.7.2**__\n+ Added Warnings System\n+ Added Leveling System\n\n- Bug Fixes and Improvements\n- Updated JSON Check\n- Updated Help\n\n__**Changelog (26/08/2019) v1.7.5**__\n+ Added Move Commands\n\n- Fixed a check for Prefix\n- Fixed music auto delete\n- Other random bugs",
-            colour = 0x9bf442,
-            timestamp=datetime.datetime.utcnow()
-            )
-        eeee.set_footer(text="Devolution | Changelogs", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-        await user.send(embed=eeee)
-        await asyncio.sleep(10)
-        await ctx.message.delete()
+        await help.add_reaction("🇽")
+        await help.add_reaction("▶")
+        await help.add_reaction("🇵")
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -249,71 +350,58 @@ class Core(commands.Cog):
         e = await ctx.send(embed=embed)
         await lib.eraset(self, ctx, e)
 
-    @commands.command(no_pm=True)
+    @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def uinfo(self, ctx, user:discord.User=None):
+    async def uinfo(self, ctx, user: discord.Member = None):
         if user is None:
-            embed = discord.Embed(
-                title = "User Information",
-                colour = 0x9bf442,
-                timestamp=datetime.datetime.utcnow()
-                )
-            embed.add_field(name="Status", value=ctx.author.status, inline=True)
-            embed.add_field(name="Playing", value=ctx.author.activity, inline=True)
-            embed.add_field(name="Nickname", value=ctx.author.nick, inline=True)
-            embed.add_field(name="Role Count", value=len(ctx.author.roles), inline=True)
-            embed.add_field(name="Account Creation", value=ctx.author.created_at.strftime("Since %d/%m/%Y"), inline=True)
-            embed.add_field(name="Joined guild", value=ctx.author.joined_at.strftime("Since %d/%m/%Y"), inline=True)
-            embed.set_author(name=ctx.author.name + "s User Information", icon_url=ctx.author.avatar_url)
-            embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
-            e = await ctx.send(embed=embed)
-            await lib.eraset(self, ctx, e)
+            user = ctx.author
+            pass
+        if user.voice is None:
+            channel = "Not in a voice channel"
         else:
-            embed = discord.Embed(
-                title = "User Information",
-                colour = 0x9bf442,
-                timestamp=datetime.datetime.utcnow()
-                )
-            embed.add_field(name="Status", value=user.status, inline=True)
-            embed.add_field(name="Playing", value=user.activity, inline=True)
-            embed.add_field(name="Nickname", value=user.nick, inline=True)
-            embed.add_field(name="Role Count", value=len(user.roles), inline=True)
-            embed.add_field(name="Account Creation", value=user.created_at.strftime("Since %d/%m/%Y"), inline=True)
-            embed.add_field(name="Joined guild", value=user.joined_at.strftime("Since %d/%m/%Y"), inline=True)
-            embed.set_author(name=user.name + "s User Information", icon_url=user.avatar_url)
-            embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
-            ee = await ctx.send(embed=embed)
-            await lib.eraset(self, ctx, ee)
+            channel = user.voice.channel.name
+        if user.activities:
+            for activity in user.activities:
+                if isinstance(activity, Spotify):
+                    title = f"Listening to {activity.title} by {activity.artist}"
+                else:
+                    title = f"Playing {activity.name}"
+        else:
+            title = "Doing Nothing"
+        embed = discord.Embed(
+            title = title,
+            colour = 0x9bf442,
+            timestamp = datetime.datetime.utcnow()
+            )
+        embed.set_author(name = "Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
+        embed.set_footer(text=f"{user.name}'s User Info", icon_url=user.avatar_url)
+        embed.add_field(name="Joined At", value=user.joined_at.strftime("%d/%m/%Y"), inline=True)
+        embed.add_field(name="Account Created", value=user.created_at.strftime("%d/%m/%Y"), inline=True)
+        embed.add_field(name="Status", value=user.status, inline=True)
+        embed.add_field(name="Role Count", value=len(user.roles), inline=True)
+        embed.add_field(name="Nickname", value=user.nick, inline=True)
+        embed.add_field(name="Voice", value=channel, inline=True)
+        ee = await ctx.send(embed=embed)
+        await lib.eraset(self, ctx, ee)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def avatar(self, ctx, user:discord.User=None):
         if user is None:
-            embed = discord.Embed(
-                title = "Avatar Stealer",
-                description = ctx.author.avatar_url,
-                colour = 0x9bf442,
-                timestamp=datetime.datetime.utcnow()
-                )
-            embed.set_image(url=ctx.author.avatar_url)
-            embed.set_thumbnail(url=ctx.author.avatar_url)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
-            embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
-            e = await ctx.send(embed=embed)
-            await lib.eraset(self, ctx, e)
-        else:
-            embed = discord.Embed(
-                title = "Avatar Stealer",
-                description = user.avatar_url,
-                colour = 0x9bf442,
-                timestamp=datetime.datetime.utcnow()
-                )
-            embed.set_image(url=user.avatar_url)
-            embed.set_thumbnail(url=user.avatar_url)
-            embed.set_author(name=user.name, icon_url=user.avatar_url)
-            embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
-            e = await ctx.send(embed=embed)
-            await lib.eraset(self, ctx, e)
+            user = ctx.author
+            pass
+        embed = discord.Embed(
+            title = "Avatar Stealer",
+            description = user.avatar_url,
+            colour = 0x9bf442,
+            timestamp=datetime.datetime.utcnow()
+            )
+        embed.set_image(url=user.avatar_url)
+        embed.set_thumbnail(url=user.avatar_url)
+        embed.set_author(name=user.name, icon_url=user.avatar_url)
+        embed.set_footer(icon_url="https://i.imgur.com/BS6YRcT.jpg", text="Devolution | Info")
+        e = await ctx.send(embed=embed)
+        await lib.eraset(self, ctx, e)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 15, commands.BucketType.user)
