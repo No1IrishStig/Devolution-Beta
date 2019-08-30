@@ -10,6 +10,8 @@ from discord.ext import commands
 
 punished_users = []
 
+inv_settings = {"embed": False, "Channel": None, "edit": False, "delete": False, "user": False, "join": False, "leave": False, "server": False}
+
 class Mod(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
