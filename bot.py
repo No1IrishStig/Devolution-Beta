@@ -57,6 +57,6 @@ for file in os.listdir("cogs"):
         except Exception as error:
             traceback.print_exc()
 
-#bot.load_extension("utils.errorhandler")
+bot.load_extension("utils.errorhandler")
 print("Boot Successful!")
 bot.run(config.token, reconnect=True)

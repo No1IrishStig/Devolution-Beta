@@ -59,7 +59,7 @@ class lib(commands.Cog):
             colour = colour,
             timestamp=datetime.datetime.utcnow()
             )
-        e.set_footer(text=f"{self.self.bot.user.name} - {footer}", icon_url=self.bot.user.avatar_url)
+        e.set_footer(text=f"{self.bot.user.name} - {footer}", icon_url=self.bot.user.avatar_url)
         e.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
         return e
 
@@ -70,7 +70,7 @@ class lib(commands.Cog):
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        e.set_footer(text=f"{self.self.bot.user.name} - {footer}")
+        e.set_footer(text=f"{self.bot.user.name} - {footer}")
         e.set_author(name=author, icon_url=avatar)
         return e
 
@@ -105,13 +105,13 @@ class lib(commands.Cog):
 
     async def sp(self, ctx, game):
         sp = (
-        await self.self.bot.change_presence(activity=discord.Game(name=game)),
+        await self.bot.change_presence(activity=discord.Game(name=game)),
         )
         return sp
 
     async def sa(self, ctx, type, game):
         sa = (
-        await self.self.bot.change_presence(activity=discord.Activity(type=type, name=game)),
+        await self.bot.change_presence(activity=discord.Activity(type=type, name=game)),
         )
         return sa
 

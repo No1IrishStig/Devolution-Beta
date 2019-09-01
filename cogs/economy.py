@@ -375,7 +375,7 @@ class Economy(commands.Cog):
                         timestamp=datetime.datetime.utcnow()
                         )
                     embed.set_author(name=f"{creator.name} started a match!")
-                    embed.set_footer(text="Devolution - Blackjack", icon_url="https://i.imgur.com/BS6YRcT.jpg")
+                    embed.set_footer(text=f"{self.bot.user.name} - Blackjack", icon_url=self.bot.user.avatar_url)
                     embed.add_field(name="Creator", value=f"{creator.name}", inline=True)
                     embed.add_field(name="Opponent", value=f"The House", inline=True)
                     embed.add_field(name="Bet", value=f"{bet_amount}", inline=True)
@@ -414,7 +414,6 @@ class Economy(commands.Cog):
             await ctx.send(f"{creator.mention} Hit or Stand?")
             choice = await self.bot.wait_for("message", check=lambda message: message.author == creator, timeout = 30)
             if choice.content == "Hit" or choice.content == "hit":
-                await ctx.send(f"{choice.author.name} chose to hit.")
                 await self.hit(ctx)
             elif choice.content == "Stand" or choice.content == "stand":
                     await ctx.send(f"{choice.author.name} chose to stand.")
@@ -424,7 +423,7 @@ class Economy(commands.Cog):
                     else:
                         STOOD_WHEN_LESS_HOUSE_WINS = True
             else:
-                await ctx.send("Invalid Response. Standing for you.")
+                await ctx.send("Invalid Response. Hit or Stand?")
         else:
             return
 

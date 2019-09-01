@@ -743,28 +743,31 @@ class Core(commands.Cog):
 
     @commands.Cog.listener(name="on_message")
     async def on_message_(self, message):
-        GID = str(message.guild.id)
-        UID = str(message.author.id)
-        if GID in self.levels:
-            if self.levels[GID]["Enabled"] is True:
-                if message.author != self.bot.user:
-                    if self.db_exists(GID, UID):
-                        if self.user_exists(GID, UID):
-                            self.add_xp(GID, UID)
-                            await self.level_up(message)
-                            self.db.sync()
+        try:
+            GID = str(message.guild.id)
+            UID = str(message.author.id)
+            if GID in self.levels:
+                if self.levels[GID]["Enabled"] is True:
+                    if message.author != self.bot.user:
+                        if self.db_exists(GID, UID):
+                            if self.user_exists(GID, UID):
+                                self.add_xp(GID, UID)
+                                await self.level_up(message)
+                                self.db.sync()
+                            else:
+                                self.setup(message)
                         else:
                             self.setup(message)
                     else:
-                        self.setup(message)
+                        return
                 else:
                     return
             else:
-                return
-        else:
-            self.levels[GID] = {"Enabled": True, "Messages": True}
-            with open("./data/settings/leveling.json", "w") as f:
-                json.dump(self.levels, f)
+                self.levels[GID] = {"Enabled": True, "Messages": True}
+                with open("./data/settings/leveling.json", "w") as f:
+                    json.dump(self.levels, f)
+        except AttributeError:
+            return
 
     @commands.group(invoke_without_command=True)
     async def leveling(self, ctx):
