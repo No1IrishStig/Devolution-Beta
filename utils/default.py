@@ -1,7 +1,9 @@
 import datetime
 import asyncio
 import discord
+import shelve
 import json
+import os
 
 from utils import default
 from discord.ext import commands
@@ -16,69 +18,60 @@ def get(file):
     except FileNotFoundError:
         raise FileNotFoundError("JSON file wasn't found")
 
-version = "Stable v1.7.6"
+version = "Stable v1.8"
 invite = "https://discord.gg/V9DhKbW"
 config = default.get("./utils/cfg.json")
+economydb = shelve.open("./data/db/economy/data.db", writeback=True)
+levelsdb = shelve.open("./data/db/levels/data.db", writeback=True)
+admindb = shelve.open("./data/db/admin/data.db", writeback=True)
+warningsdb = shelve.open("./data/db/warnings/data.db", writeback=True)
 
 class lib(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        with open("./utils/essentials/deltimer.json") as f:
-            self.deltimer = json.load(f)
 
-    def NoPerm():
+    def NoPerm(self):
         embed = discord.Embed(
             title = "Error!",
             description = "You dont have permission to do that!",
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        embed.set_footer(text="Devolution - Error", icon_url="https://i.imgur.com/BS6YRcT.jpg")
+        embed.set_footer(text=f"{self.bot.user.name} - Error", icon_url=self.bot.user.avatar_url)
 
         return embed
 
-    def Editable(title, desc, footer):
+    def Editable(self, title, desc, footer):
         e = discord.Embed(
             title = title,
             description = desc,
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        e.set_footer(text=f"Devolution - {footer}", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-        e.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
+        e.set_footer(text=f"{self.bot.user.name} - {footer}", icon_url=self.bot.user.avatar_url)
+        e.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
         return e
 
-    def EditableC(title, desc, colour, footer):
+    def EditableC(self, title, desc, colour, footer):
         e = discord.Embed(
             title = title,
             description = desc,
             colour = colour,
             timestamp=datetime.datetime.utcnow()
             )
-        e.set_footer(text=f"Devolution - {footer}", icon_url="https://i.imgur.com/BS6YRcT.jpg")
-        e.set_author(name="Devolution", icon_url="https://i.imgur.com/BS6YRcT.jpg")
+        e.set_footer(text=f"{self.self.bot.user.name} - {footer}", icon_url=self.bot.user.avatar_url)
+        e.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
         return e
 
-    def AvatarEdit(author, avatar, title, desc, footer):
+    def AvatarEdit(self, author, avatar, title, desc, footer):
         e = discord.Embed(
             title = title,
             description = desc,
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
-        e.set_footer(text=f"Devolution - {footer}")
+        e.set_footer(text=f"{self.self.bot.user.name} - {footer}")
         e.set_author(name=author, icon_url=avatar)
-        return e
-
-    def FromStig(title, desc, footer):
-        e = discord.Embed(
-            title = title,
-            description = desc,
-            colour = 0x9bf442,
-            timestamp=datetime.datetime.utcnow()
-            )
-        e.set_footer(text=f"Devolution - {footer}")
-        e.set_author(name="Stig", icon_url="https://cdn.discordapp.com/avatars/439327545557778433/a_09b7d5d0f8ecbd826fe3f7b15ee2fb93.gif?size=1024")
         return e
 
     async def erase(ctx, duration, name):
@@ -112,13 +105,13 @@ class lib(commands.Cog):
 
     async def sp(self, ctx, game):
         sp = (
-        await self.bot.change_presence(activity=discord.Game(name=game)),
+        await self.self.bot.change_presence(activity=discord.Game(name=game)),
         )
         return sp
 
     async def sa(self, ctx, type, game):
         sa = (
-        await self.bot.change_presence(activity=discord.Activity(type=type, name=game)),
+        await self.self.bot.change_presence(activity=discord.Activity(type=type, name=game)),
         )
         return sa
 
@@ -138,6 +131,35 @@ class lib(commands.Cog):
         levels.write("{}")
         levels.close
 
+    def db_create():
+        economydb["Economy"] = {}
+        economydb.sync()
+        levelsdb["Levels"] = {}
+        levelsdb.sync()
+        admindb["Admin"] = {}
+        admindb.sync()
+        warningsdb["Warnings"] = {}
+        warningsdb.sync()
+        f = open("./data/db/db_log.txt","w+")
+        f.write("Creating Economy Database...\nEconomy_DB Created Successfully\nCreating Levels Database...\nLevels_DB Created Successfully\nCreating Admins Database...\nAdmin_DB Created Successfully\nCreating Warnings Database...\nWarnings_DB Created Successfully")
+        f.close()
+
+    def cfg_file():
+        with open("./utils/cfg.json") as f:
+            settings = json.load(f)
+            print("Uh oh, it looks like you are missing the bot's token or OwnerID from your CFG File.\n")
+            input("Press enter to continue.")
+            os.system("cls")
+            token = input("Enter your bot token.\n\n")
+            os.system("cls")
+            UID = input("Enter your UserID.\n\n")
+            os.system("cls")
+            settings["token"] = token
+            settings["owner"] = UID
+            with open("./utils/cfg.json", "w") as f:
+                json.dump(settings, f)
+            os.system("cls")
+            os.system("py -3 ./self.bot.py")
 
 def setup(client):
     client.add_cog(Lib(client))

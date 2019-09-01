@@ -7,15 +7,14 @@ from discord.ext import commands
 from utils import default
 
 config = default.get("utils/cfg.json")
+settings = {"token": "Token", "owner": [0], "prefix": "!", "playing": "Stable v1.7.6"}
 
 if config.token == "Token" or config.owner == 0:
-    print("Uh oh, you got an error!\n\nYou appear to be missing the bot's token or OwnerID.\nPlease input these into the CFG file located in /utils/cfg.json\n\n")
-    a = input("Press enter to close this window.")
-    os.system("exit", a)
+    lib.cfg_file()
 
-dbcheck = os.path.exists(f"data/db/data.db.dat")
 JSON_VALIDATION = ['settings/deltimer.json', 'settings/logs.json', "settings/leveling.json"]
 ERRORS = ["deltimer", "logs", "leveling"]
+dbcheck = os.path.exists(f"data/db/db_log.txt")
 
 bot = commands.Bot(command_prefix = config.prefix)
 bot.remove_command('help')
@@ -24,6 +23,10 @@ bot.remove_command('help')
 async def on_ready():
     print(f'\nSuccessfully logged in as: {bot.user.name}\nVersion: {discord.__version__}\nBuild: {default.version}')
     await bot.change_presence(activity=discord.Game(name=config.playing, type=1, url='https://github.com/No1IrishStig/Devolution-Beta/'))
+    global bot_name
+    global bot_avatar_url
+    bot_name = bot.user.name
+    bot_avatar_url = bot.user.avatar_url
 
 i = 0
 for files in JSON_VALIDATION:
@@ -42,7 +45,8 @@ if check is False:
     print("JSON Files Generated")
 
 if dbcheck is False:
-    print("Database Generated")
+    print("Database's Generated")
+    lib.db_create()
 
 
 for file in os.listdir("cogs"):
@@ -53,6 +57,6 @@ for file in os.listdir("cogs"):
         except Exception as error:
             traceback.print_exc()
 
-bot.load_extension("utils.errorhandler")
+#bot.load_extension("utils.errorhandler")
 print("Boot Successful!")
 bot.run(config.token, reconnect=True)

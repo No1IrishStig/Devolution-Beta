@@ -41,7 +41,7 @@ class Economy(commands.Cog):
         self.config = default.get("./utils/cfg.json")
         self.benefits_register = {}
         self.slot_register = {}
-        self.db = shelve.open("./data/db/data.db", writeback=True)
+        self.db = shelve.open("./data/db/economy/data.db", writeback=True)
         with open("./data/settings/economy.json") as s:
             self.settings = json.load(s)
             with open("./data/settings/deltimer.json") as f:
@@ -53,13 +53,13 @@ class Economy(commands.Cog):
         user = ctx.author
         UID = str(user.id)
         GID = str(ctx.guild.id)
-        if "Economy" in self.db and GID in self.db["Economy"]:
+        if GID in self.db["Economy"]:
             if UID in self.db["Economy"][GID]:
-                await ctx.send(embed=lib.Editable("Bank Commands", f"`{ctx.prefix}bank register` - Creates you a bank account (You already have one)\n`{ctx.prefix}bank balance` - Shows your balance\n`{ctx.prefix}bank transfer @user (amount)` - Transfer credits to another user\n`{ctx.prefix}bank set @user (amount)` - Change the bank balance of another user (Admin Only)\n\nGame Commands\n`{ctx.prefix}blackjack play (bet)` - Play blackjack against the house\n`{ctx.prefix}slots (bet)` - Play the slot machine", "Devo Bank"))
+                await ctx.send(embed=lib.Editable(self, "Bank Commands", f"`{ctx.prefix}bank register` - Creates you a bank account (You already have one)\n`{ctx.prefix}bank balance` - Shows your balance\n`{ctx.prefix}bank transfer @user (amount)` - Transfer credits to another user\n`{ctx.prefix}bank set @user (amount)` - Change the bank balance of another user (Admin Only)\n\nGame Commands\n`{ctx.prefix}blackjack play (bet)` - Play blackjack against the house\n`{ctx.prefix}slots (bet)` - Play the slot machine", "Devo Bank"))
             else:
-                await ctx.send(embed=lib.Editable("Just do it!", "Use !bank register to create a bank account", "Devo Bank"))
+                await ctx.send(embed=lib.Editable(self, "Just do it!", "Use !bank register to create a bank account", "Devo Bank"))
         else:
-            await ctx.send(embed=lib.Editable("Just do it!", "Use !bank register to create a bank account", "Devo Bank"))
+            await ctx.send(embed=lib.Editable(self, "Just do it!", "Use !bank register to create a bank account", "Devo Bank"))
 
     @bank.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -67,45 +67,44 @@ class Economy(commands.Cog):
         user = ctx.author
         UID = str(user.id)
         GID = str(ctx.guild.id)
-        if "Economy" in self.db and GID in self.db["Economy"]:
+        if GID in self.db["Economy"]:
             if UID not in self.db["Economy"][GID]:
-                self.db["Economy"][GID][UID] = {"name": user.name, "balance": 100}
-                await ctx.send(embed=lib.Editable("Ayy", f"Bank Account Created for {ctx.author.mention}. Current balance: {str(self.check_balance(GID, user.id))}", "Devo Bank"))
+                self.db["Economy"][GID] = {UID: {"name": user.name, "balance": 100}}
+                await ctx.send(embed=lib.Editable(self, "Ayy", f"Bank Account Created for {ctx.author.mention}. Current balance: {str(self.check_balance(GID, user.id))}", "Devo Bank"))
                 self.db.sync()
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", "You're too poor to make another bank account ;)", "Devo Bank"))
+                await ctx.send(embed=lib.Editable(self, "Uh oh", "You're too poor to make another bank account ;)", "Devo Bank"))
         else:
-            self.db["Economy"] = {}
-            self.db["Economy"] = {GID: {UID: {"name": user.name, "balance": 100}}}
+            self.db["Economy"][GID] = {UID: {"name": user.name, "balance": 100}}
             self.db.sync()
-            await ctx.send(embed=lib.Editable("Ayy", f"Bank Account Created for {ctx.author.mention}. Current balance: {str(self.check_balance(GID, user.id))}", "Devo Bank"))
+            await ctx.send(embed=lib.Editable(self, "Ayy", f"Bank Account Created for {ctx.author.mention}. Current balance: {str(self.check_balance(GID, user.id))}", "Devo Bank"))
 
     @bank.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def balance(self, ctx, user: discord.Member=None):
         GID = str(ctx.guild.id)
-        if "Economy" in self.db and GID in self.db["Economy"]:
+        if GID in self.db["Economy"]:
             if user is None:
                 user = ctx.author
                 if self.account_check(GID, user.id):
-                    await ctx.send(embed=lib.Editable("Monayy", f"{user.mention}, Your bank balance is {str(self.check_balance(GID, user.id))}", "Devo Bank"))
+                    await ctx.send(embed=lib.Editable(self, "Monayy", f"{user.mention}, Your bank balance is {str(self.check_balance(GID, user.id))}", "Devo Bank"))
                 else:
-                    await ctx.send(embed=lib.Editable("Uh oh", f"{user.mention}, You dont have a bank account at the Devo Bank. Type !bank register to open one.", "Devo Bank"))
+                    await ctx.send(embed=lib.Editable(self, "Uh oh", f"{user.mention}, You dont have a bank account at the Devo Bank. Type !bank register to open one.", "Devo Bank"))
             else:
                 if self.account_check(GID, user.id):
                     balance = self.check_balance(GID, user.id)
-                    await ctx.send(embed=lib.Editable(f"{user.name} just flexed", f"{user.mention}'s balance is {str(balance)}", "Devo Bank"))
+                    await ctx.send(embed=lib.Editable(self, f"{user.name} just flexed", f"{user.mention}'s balance is {str(balance)}", "Devo Bank"))
                 else:
-                    await ctx.send(embed=lib.Editable("Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
+                    await ctx.send(embed=lib.Editable(self, "Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
         else:
-            await ctx.send(embed=lib.Editable("Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
+            await ctx.send(embed=lib.Editable(self, "Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
 
     @bank.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def transfer(self, ctx, user: discord.Member=None, amount : int=None):
         author = ctx.author
         GID = str(ctx.guild.id)
-        if "Economy" in self.db and GID in self.db["Economy"]:
+        if GID in self.db["Economy"]:
             if user and amount:
                 if not author == user:
                     if amount > 1:
@@ -114,39 +113,39 @@ class Economy(commands.Cog):
                                 self.withdraw_money(GID, author.id, amount)
                                 self.add_money(GID, user.id, amount)
                                 self.db.sync()
-                                await ctx.send(embed=lib.Editable("Bye Bye Money", f"Transferred {amount} credits to {user.name}'s account.", "Devo Bank"))
+                                await ctx.send(embed=lib.Editable(self, "Bye Bye Money", f"Transferred {amount} credits to {user.name}'s account.", "Devo Bank"))
                             else:
-                                await ctx.send(embed=lib.Editable("Aw shit, here we go again", f"{author.mention} You're too poor to do that", "Devo Bank"))
+                                await ctx.send(embed=lib.Editable(self, "Aw shit, here we go again", f"{author.mention} You're too poor to do that", "Devo Bank"))
                         else:
-                            await ctx.send(embed=lib.Editable("Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
+                            await ctx.send(embed=lib.Editable(self, "Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
                     else:
-                        await ctx.send(embed=lib.Editable("Uh oh", "You need to transfer at least 1 credit.", "Devo Bank"))
+                        await ctx.send(embed=lib.Editable(self, "Uh oh", "You need to transfer at least 1 credit.", "Devo Bank"))
                 else:
                     await ctx.send(f"{ctx.author.mention}, Bitch, do I look like a joke to you?")
             else:
-                return await ctx.send(embed=lib.Editable("Oops", "Please specify an amount of credits to set and for who.", "Devo Bank"))
+                return await ctx.send(embed=lib.Editable(self, "Oops", "Please specify an amount of credits to set and for who.", "Devo Bank"))
         else:
-            await ctx.send(embed=lib.Editable("Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
+            await ctx.send(embed=lib.Editable(self, "Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
 
     @bank.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def set(self, ctx, user: discord.Member=None, amount : int=None):
         GID = str(ctx.guild.id)
         if ctx.author is ctx.guild.owner or ctx.author.id in self.config.owner:
-            if "Economy" in self.db and GID in self.db["Economy"]:
+            if GID in self.db["Economy"]:
                 if user and amount:
                     done = self.set_money(GID, user.id, amount)
                     if done:
-                        await ctx.send(embed=lib.Editable("Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
+                        await ctx.send(embed=lib.Editable(self, "Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
                         self.db.sync()
                     else:
-                        await ctx.send(embed=lib.Editable("Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
+                        await ctx.send(embed=lib.Editable(self, "Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
                 else:
-                    await ctx.send(embed=lib.Editable("Oops", "Please specify a user and an amount.", "Devo Bank"))
+                    await ctx.send(embed=lib.Editable(self, "Oops", "Please specify a user and an amount.", "Devo Bank"))
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
+                await ctx.send(embed=lib.Editable(self, "Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
         else:
-            p = await ctx.send(embed=lib.NoPerm())
+            p = await ctx.send(embed=lib.NoPerm(self))
             await lib.eraset(self, ctx, p)
 
     @commands.command()
@@ -155,32 +154,32 @@ class Economy(commands.Cog):
         author = ctx.author
         GID = str(ctx.guild.id)
         id = author.id
-        if "Economy" in self.db and GID in self.db["Economy"]:
+        if GID in self.db["Economy"]:
             if self.account_check(GID, id):
                 if id in self.benefits_register:
                     seconds = abs(self.benefits_register[id] - int(time.perf_counter()))
                     if seconds >= self.settings["BENEFITS_TIME"]:
                         self.add_money(GID, id, self.settings["BENEFITS_CREDITS"])
                         self.benefits_register[id] = int(time.perf_counter())
-                        await ctx.send(embed=lib.Editable(f"{author.name} collected their benefits", "{} has been added to your account!".format(self.settings["BENEFITS_CREDITS"]), "Devo Bank"))
+                        await ctx.send(embed=lib.Editable(self, f"{author.name} collected their benefits", "{} has been added to your account!".format(self.settings["BENEFITS_CREDITS"]), "Devo Bank"))
                         self.db.sync()
                     else:
-                        await ctx.send(embed=lib.Editable("Uh oh", "You need to wait another {} seconds until you can get more benefits.".format(self.display_time(self.settings["BENEFITS_TIME"] - seconds)), "Devo Bank"))
+                        await ctx.send(embed=lib.Editable(self, "Uh oh", "You need to wait another {} seconds until you can get more benefits.".format(self.display_time(self.settings["BENEFITS_TIME"] - seconds)), "Devo Bank"))
                 else:
                     self.benefits_register[id] = int(time.perf_counter())
                     self.add_money(GID, id, self.settings["BENEFITS_CREDITS"])
-                    await ctx.send(embed=lib.Editable(f"{author.name} collected their benefits", "{} has been added to your account!".format(self.settings["BENEFITS_CREDITS"]), "Devo Bank"))
+                    await ctx.send(embed=lib.Editable(self, f"{author.name} collected their benefits", "{} has been added to your account!".format(self.settings["BENEFITS_CREDITS"]), "Devo Bank"))
                     self.db.sync()
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", f"{author.mention}, You dont have a bank account at the Devo Bank. Type !bank register to open one.", "Devo Bank"))
+                await ctx.send(embed=lib.Editable(self, "Uh oh", f"{author.mention}, You dont have a bank account at the Devo Bank. Type !bank register to open one.", "Devo Bank"))
         else:
-            await ctx.send(embed=lib.Editable("Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
+            await ctx.send(embed=lib.Editable(self, "Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def top(self, ctx, top : int=10):
         GID = str(ctx.guild.id)
-        if "Economy" in self.db and GID in self.db["Economy"]:
+        if GID in self.db["Economy"]:
             if top < 1:
                 top = 10
             bank_sorted = sorted(self.db["Economy"][GID].items(), key=lambda x: x[1]["balance"], reverse=True)
@@ -196,11 +195,11 @@ class Economy(commands.Cog):
                 place += 1
             if highscore:
                 if len(highscore) < 1985:
-                    await ctx.send(embed=lib.Editable(f"Top {top}", f"{highscore}", "Devo Bank"))
+                    await ctx.send(embed=lib.Editable(self, f"Top {top}", f"{highscore}", "Devo Bank"))
                 else:
-                    await ctx.send(embed=lib.Editable("Uh oh", "Thats too much data for me to handle, try a lower amount!", "Devo Bank"))
+                    await ctx.send(embed=lib.Editable(self, "Uh oh", "Thats too much data for me to handle, try a lower amount!", "Devo Bank"))
         else:
-            await ctx.send(embed=lib.Editable("Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
+            await ctx.send(embed=lib.Editable(self, "Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -211,7 +210,7 @@ class Economy(commands.Cog):
     async def slots(self, ctx, bid : int=None):
         GID = str(ctx.guild.id)
         start_bid = bid
-        if "Economy" in self.db and GID in self.db["Economy"]:
+        if GID in self.db["Economy"]:
             if bid:
                 author = ctx.author
                 if self.enough_money(GID, author.id, bid):
@@ -221,18 +220,18 @@ class Economy(commands.Cog):
                                 self.slot_register[author.id] = int(time.perf_counter())
                                 await self.slot_machine(ctx.message, bid)
                             else:
-                                await ctx.send(embed=lib.Editable("Uh oh", "The slot machine is still cooling off! Wait {} seconds between each pull".format(self.settings["SLOT_TIME"]), "Slot Machine"))
+                                await ctx.send(embed=lib.Editable(self, "Uh oh", "The slot machine is still cooling off! Wait {} seconds between each pull".format(self.settings["SLOT_TIME"]), "Slot Machine"))
                         else:
                             self.slot_register[author.id] = int(time.perf_counter())
                             await self.slot_machine(ctx.message, bid)
                     else:
-                        await ctx.send(embed=lib.Editable("Uh oh", "{0} Bid must be between {1} and {2}.".format(author.mention, self.settings["SLOT_MIN"], self.settings["SLOT_MAX"]), "Slot Machine"))
+                        await ctx.send(embed=lib.Editable(self, "Uh oh", "{0} Bid must be between {1} and {2}.".format(author.mention, self.settings["SLOT_MIN"], self.settings["SLOT_MAX"]), "Slot Machine"))
                 else:
-                    await ctx.send(embed=lib.Editable("You're Skint!", f"{author.mention} You're too poor to play that bet on the slot machine!", "Slot Machine"))
+                    await ctx.send(embed=lib.Editable(self, "You're Skint!", f"{author.mention} You're too poor to play that bet on the slot machine!", "Slot Machine"))
             else:
-                await ctx.send(embed=lib.Editable("Uhhh", "You need to type a bid amound", "Slot Machine"))
+                await ctx.send(embed=lib.Editable(self, "Uhhh", "You need to type a bid amound", "Slot Machine"))
         else:
-            await ctx.send(embed=lib.Editable("Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
+            await ctx.send(embed=lib.Editable(self, "Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
 
     async def slot_machine(self, message, bid):
         start_bid = bid
@@ -253,27 +252,27 @@ class Economy(commands.Cog):
 
         if line[0] == ":six:" and line[1] == ":six:" and line[2] == ":six:":
             bid = bid * 6666
-            await message.channel.send(embed=lib.Editable(f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\n666! Your bet is multiplied * 6666!", "Slot Machine"))
+            await message.channel.send(embed=lib.Editable(self, f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\n666! Your bet is multiplied * 6666!", "Slot Machine"))
         elif line[0] == ":four_leaf_clover:" and line[1] == ":four_leaf_clover:" and line[2] == ":four_leaf_clover:":
             bid += 1000
-            await message.channel.send(embed=lib.Editable(f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nThree FLC! +1000!", "Slot Machine"))
+            await message.channel.send(embed=lib.Editable(self, f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nThree FLC! +1000!", "Slot Machine"))
         elif line[0] == ":cherries:" and line[1] == ":cherries:" and line[2] == ":cherries:":
             bid += 800
-            await message.channel.send(embed=lib.Editable(f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nThree cherries! +800!", "Slot Machine"))
+            await message.channel.send(embed=lib.Editable(self, f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nThree cherries! +800!", "Slot Machine"))
         elif line[0] == line[1] == line[2]:
             bid += 500
-            await message.channel.send(embed=lib.Editable(f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nThree symbols! +500!", "Slot Machine"))
+            await message.channel.send(embed=lib.Editable(self, f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nThree symbols! +500!", "Slot Machine"))
         elif line[0] == ":nine:" and line[1] == ":six:" or line[1] == ":six:" and line[2] == ":nine:":
             bid = bid * 4
-            await message.channel.send(embed=lib.Editable(f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\n69! Your bet is multiplied * 4!", "Slot Machine"))
+            await message.channel.send(embed=lib.Editable(self, f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\n69! Your bet is multiplied * 4!", "Slot Machine"))
         elif line[0] == ":cherries:" and line[1] == ":cherries:" or line[1] == ":cherries:" and line[2] == ":cherries:":
             bid = bid * 3
-            await message.channel.send(embed=lib.Editable(f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nTwo cherries! Your bet is multiplied * 3!", "Slot Machine"))
+            await message.channel.send(embed=lib.Editable(self, f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nTwo cherries! Your bet is multiplied * 3!", "Slot Machine"))
         elif line[0] == line[1] or line[1] == line[2]:
             bid = bid * 2
-            await message.channel.send(embed=lib.Editable(f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nTwo symbols! Your bet is multiplied * 2!", "Slot Machine"))
+            await message.channel.send(embed=lib.Editable(self, f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nTwo symbols! Your bet is multiplied * 2!", "Slot Machine"))
         else:
-            await message.channel.send(embed=lib.Editable(f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nNothing! Bet lost..", "Slot Machine"))
+            await message.channel.send(embed=lib.Editable(self, f"{message.author.name} Bid {start_bid}", f"{display_reels} \n\nNothing! Bet lost..", "Slot Machine"))
             self.withdraw_money(GID, message.author.id, bid)
             self.db.sync()
             return True
@@ -291,7 +290,7 @@ class Economy(commands.Cog):
             msg += "\nType {}help to see the list of commands.```".format(ctx.prefix)
             await ctx.send(msg)
         else:
-            p = await ctx.send(embed=lib.NoPerm())
+            p = await ctx.send(embed=lib.NoPerm(self))
             await lib.eraset(self, ctx, p)
 
     @economyset.command(invoke_without_command=True)
@@ -303,7 +302,7 @@ class Economy(commands.Cog):
             with open("./data/economy/settings.json", "w") as s:
                 json.dump(self.settings, s)
         else:
-            await ctx.send(embed=lib.Editable("You Missed Something", "You need to enter a minimum amount", "Economy"))
+            await ctx.send(embed=lib.Editable(self, "You Missed Something", "You need to enter a minimum amount", "Economy"))
 
     @economyset.command(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -314,7 +313,7 @@ class Economy(commands.Cog):
             with open("./data/economy/settings.json", "w") as s:
                 json.dump(self.settings, s)
         else:
-            await ctx.send(embed=lib.Editable("You Missed Something", "You need to enter a maximum amount", "Economy"))
+            await ctx.send(embed=lib.Editable(self, "You Missed Something", "You need to enter a maximum amount", "Economy"))
 
     @economyset.command(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -325,7 +324,7 @@ class Economy(commands.Cog):
             with open("./data/economy/settings.json", "w") as s:
                 json.dump(self.settings, s)
         else:
-            await ctx.send(embed=lib.Editable("You Missed Something", "You need to enter a slot time.", "Economy"))
+            await ctx.send(embed=lib.Editable(self, "You Missed Something", "You need to enter a slot time.", "Economy"))
 
     @economyset.command(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -336,7 +335,7 @@ class Economy(commands.Cog):
             with open("./data/economy/settings.json", "w") as s:
                 json.dump(self.settings, s)
         else:
-            await ctx.send(embed=lib.Editable("You Missed Something", "You need to enter a benefits delay", "Economy"))
+            await ctx.send(embed=lib.Editable(self, "You Missed Something", "You need to enter a benefits delay", "Economy"))
 
     @economyset.command(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -347,7 +346,7 @@ class Economy(commands.Cog):
             with open("./data/economy/settings.json", "w") as s:
                 json.dump(self.settings, s)
         else:
-            await ctx.send(embed=lib.Editable("You Missed Something", "You need to enter an amount", "Economy"))
+            await ctx.send(embed=lib.Editable(self, "You Missed Something", "You need to enter an amount", "Economy"))
 
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -403,11 +402,11 @@ class Economy(commands.Cog):
                             break
 
                 else:
-                    await ctx.send(embed=lib.Editable("You're Skint!", f"{ctx.author.mention} You're too poor to play that bet!", "Blackjack"))
+                    await ctx.send(embed=lib.Editable(self, "You're Skint!", f"{ctx.author.mention} You're too poor to play that bet!", "Blackjack"))
             else:
-                await ctx.send(embed=lib.Editable("Uh oh", f"This guild doesnt have the bank setup! Type `{ctx.prefix}bank register` to start!", "Devo Bank"))
+                await ctx.send(embed=lib.Editable(self, "Uh oh", f"This guild doesnt have the bank setup! Type `{ctx.prefix}bank register` to start!", "Devo Bank"))
         else:
-            await ctx.send(embed=lib.Editable("Oops", "Please enter an amount to bet.", "Blackjack"))
+            await ctx.send(embed=lib.Editable(self, "Oops", "Please enter an amount to bet.", "Blackjack"))
 
     async def player(self, ctx):
         global choice, STOOD_WHEN_LESS_HOUSE_WINS, STAND
@@ -444,7 +443,7 @@ class Economy(commands.Cog):
             players_cards.append(SETS[s] + " " + CARDS[crds])
             CARDS_TOTAL_WORTH += c
         CARDS_TOTAL_WORTH += player_extra
-        await channel.send(embed=lib.EditableC(f"{creator.name}'s Cards", "You got a {} and a {} which equals {}".format(players_cards[0], players_cards[1], CARDS_TOTAL_WORTH), 0x58CCED, "Blackjack"))
+        await channel.send(embed=lib.EditableC(self, f"{creator.name}'s Cards", "You got a {} and a {} which equals {}".format(players_cards[0], players_cards[1], CARDS_TOTAL_WORTH), 0x58CCED, "Blackjack"))
 
     async def bot_cards(self, ctx):
         global OPPONENT_TOTAL_WORTH, bot_extra
@@ -461,7 +460,7 @@ class Economy(commands.Cog):
             bot_cards.append(SETS[s] + " " + CARDS[crds])
             OPPONENT_TOTAL_WORTH += c
         OPPONENT_TOTAL_WORTH += bot_extra
-        # [DEBUG] await ctx.send(embed=lib.EditableC("Opponents Cards (Debug Only)", "The House got a {} and a {} which equals {}".format(bot_cards[0], bot_cards[1], OPPONENT_TOTAL_WORTH), 0xff0000, "Blackjack"))
+        # [DEBUG] await ctx.send(embed=lib.EditableC(self, "Opponents Cards (Debug Only)", "The House got a {} and a {} which equals {}".format(bot_cards[0], bot_cards[1], OPPONENT_TOTAL_WORTH), 0xff0000, "Blackjack"))
 
     async def hit(self, ctx):
         global player_extra, CARDS_TOTAL_WORTH
@@ -476,7 +475,7 @@ class Economy(commands.Cog):
         CARDS_TOTAL_WORTH += c
         CARDS_TOTAL_WORTH += player_extra
         players_cards.append(SETS[s] + " " + CARDS[crds])
-        return await ctx.send(embed=lib.Editable(f"{ctx.author.name}'s Turn", "{} got a {} which gives a total of {}".format(creator.name, players_cards[0], CARDS_TOTAL_WORTH), "Blackjack"))
+        return await ctx.send(embed=lib.Editable(self, f"{ctx.author.name}'s Turn", "{} got a {} which gives a total of {}".format(creator.name, players_cards[0], CARDS_TOTAL_WORTH), "Blackjack"))
 
     async def win(self, ctx):
         global STOOD_WHEN_LESS_HOUSE_WINS
@@ -484,40 +483,40 @@ class Economy(commands.Cog):
         GID = str(ctx.guild.id)
         if OPPONENT_TOTAL_WORTH > 21:
             gameover = True
-            await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "The house bust with a total of {}\n\n{} wins {} credits!".format(OPPONENT_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
+            await ctx.send(embed=lib.Editable(self, f"{creator.name} Wins", "The house bust with a total of {}\n\n{} wins {} credits!".format(OPPONENT_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount * 2)
             return self.db.sync()
             self.reset_match()
         elif CARDS_TOTAL_WORTH > 21:
             gameover = True
-            return await ctx.send(embed=lib.Editable(f"The House Wins", "{} bust with a total of {}\n\nThe House wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
+            return await ctx.send(embed=lib.Editable(self, f"The House Wins", "{} bust with a total of {}\n\nThe House wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
             self.reset_match()
         elif OPPONENT_TOTAL_WORTH == 21:
             gameover = True
-            return await ctx.send(embed=lib.Editable(f"The House Wins", "The house got blackjack!\n\nThe house wins {} credits!".format(bet_amount * 2), "Blackjack"))
+            return await ctx.send(embed=lib.Editable(self, f"The House Wins", "The house got blackjack!\n\nThe house wins {} credits!".format(bet_amount * 2), "Blackjack"))
             self.reset_match()
         elif CARDS_TOTAL_WORTH == 21:
             gameover = True
-            await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "{} got blackjack!\n\n{} wins {} credits!".format(creator.name, creator.name, bet_amount * 2), "Blackjack"))
+            await ctx.send(embed=lib.Editable(self, f"{creator.name} Wins", "{} got blackjack!\n\n{} wins {} credits!".format(creator.name, creator.name, bet_amount * 2), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount * 2)
             return self.db.sync()
             self.reset_match()
         elif CARDS_TOTAL_WORTH == OPPONENT_TOTAL_WORTH:
             gameover = True
-            await ctx.send(embed=lib.Editable(f"Its a Tie!", "You both got {}!\n\nYour original bet of {} has been returned to your bank!".format(CARDS_TOTAL_WORTH, bet_amount), "Blackjack"))
+            await ctx.send(embed=lib.Editable(self, f"Its a Tie!", "You both got {}!\n\nYour original bet of {} has been returned to your bank!".format(CARDS_TOTAL_WORTH, bet_amount), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount)
             return self.db.sync()
             self.reset_match()
         elif STOOD_WHEN_LESS_HOUSE_WINS is True:
             gameover = True
-            return await ctx.send(embed=lib.Editable(f"The House Wins", "{} stood with {}!\n\nThe house wins {} credits with {}!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
+            return await ctx.send(embed=lib.Editable(self, f"The House Wins", "{} stood with {}!\n\nThe house wins {} credits with {}!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
             self.reset_match()
         elif STAND is True and HOUSE_STAND is True:
             gameover = True
             if OPPONENT_TOTAL_WORTH > CARDS_TOTAL_WORTH:
-                return await ctx.send(embed=lib.Editable(f"The House Wins", "The house stood with {}!\n\nThe house wins {} credits!".format(OPPONENT_TOTAL_WORTH, bet_amount * 2), "Blackjack"))
+                return await ctx.send(embed=lib.Editable(self, f"The House Wins", "The house stood with {}!\n\nThe house wins {} credits!".format(OPPONENT_TOTAL_WORTH, bet_amount * 2), "Blackjack"))
             else:
-                await ctx.send(embed=lib.Editable(f"{creator.name} Wins", "{} stood with {}!\n\n{} wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
+                await ctx.send(embed=lib.Editable(self, f"{creator.name} Wins", "{} stood with {}!\n\n{} wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
                 self.add_money(GID, creator.id, bet_amount * 2)
                 return self.db.sync()
                 self.reset_match()
@@ -538,7 +537,7 @@ class Economy(commands.Cog):
         bot_cards.append(SETS[s] + " " + CARDS[crds])
         await asyncio.sleep(2)
         await ctx.send("The house chose to hit")
-        # [DEBUG] await channel.send(embed=lib.Editable("Your Cards", "The House hit and got {} which equals {}".format(bot_cards[0], OPPONENT_TOTAL_WORTH), "Blackjack"))
+        # [DEBUG] await channel.send(embed=lib.Editable(self, "Your Cards", "The House hit and got {} which equals {}".format(bot_cards[0], OPPONENT_TOTAL_WORTH), "Blackjack"))
 
     async def blackjack_math(self, ctx):
         global HOUSE_STAND
