@@ -91,7 +91,7 @@ class Core(commands.Cog):
                     await changelog.edit(embed=e)
 
                 elif page_number == 5:
-                    e = lib.Editable(self, f"Devolution Beta Changelogs Since 15/12/18", f"__**Changelog (13/08/2019) v1.7.2**__\n+ Added Warnings System\n+ Added Leveling System\n\n- Bug Fixes and Improvements\n- Updated JSON Check\n- Updated Help\n\n__**Changelog (26/08/2019) v1.7.5**__\n+ Added Move Commands\n\n- Fixed a check for Prefix\n- Fixed music auto delete\n- Other random bugs\n\n__**Changelog (30/08/2019) v1.7.6**__\n- Rewrote changelog command\n- Rewrote uinfo command\n- Rewrote help command\n- Bug Fixes", f"Page {page_number}")
+                    e = lib.Editable(self, f"Devolution Beta Changelogs Since 15/12/18", f"__**Changelog (13/08/2019) v1.7.2**__\n+ Added Warnings System\n+ Added Leveling System\n\n- Bug Fixes and Improvements\n- Updated JSON Check\n- Updated Help\n\n__**Changelog (26/08/2019) v1.7.5**__\n+ Added Move Commands\n\n- Fixed a check for Prefix\n- Fixed music auto delete\n- Other random bugs\n\n__**Changelog (30/08/2019) v1.7.6**__\n- Rewrote changelog command\n- Rewrote uinfo command\n- Rewrote help command\n- Bug Fixes\n\n__**Changelog (01/09/2019) v1.8**__+ Added custom userid and avatar to every embed (your bot)\n+ Added token and userid request if they arent in the cfg file\n+ Added some functions to default.py\n+ Added Spotify command\n+ Added Math command\n\n- Reworked database check, and added 3 new databases\n- Reworked entire leveling system and its functions\n- Bug fixes and stability improvements\n Removed unnecessary checks\n- Tidied up bot.py\n- Fixed deltimer", f"Page {page_number}")
                     await changelog.edit(embed=e)
 
             else:
@@ -177,7 +177,7 @@ class Core(commands.Cog):
                     await help.edit(embed=e)
 
                 elif page_num == 3:
-                    e = lib.Editable(self, "Devolution Help", "**say** - Speak as the bot\n**rename** - Change a users nickname\n**invite** - Sends a bot invite link\n**embed** - Creates an embed message\n**role** - Gives role options\n**music** - Gives music help", "Useful Help")
+                    e = lib.Editable(self, "Devolution Help", "**say** - Speak as the bot\n**rename** - Change a users nickname\n**invite** - Sends a bot invite link\n**embed** - Creates an embed message\n**role** - Gives role options\n**music** - Gives music help\n**math** - Gives usage details", "Useful Help")
                     await help.edit(embed=e)
 
                 elif page_num == 4:
@@ -318,7 +318,7 @@ class Core(commands.Cog):
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def music(self, ctx):
-        m = await ctx.send(embed=lib.Editable(self, "Music Usage", f"**{ctx.prefix}play (song/link)** - Plays a song by name or url from youtube\n**{ctx.prefix}pause** - Pauses the current song\n**{ctx.prefix}resume** - Resumes the current song\n**{ctx.prefix}volume (number)** - Change the volume of the bot\n**{ctx.prefix}stop** - Disconnects the bot\n**{ctx.prefix}sstop** - Force disconnects the bot ", "Todo"))
+        m = await ctx.send(embed=lib.Editable(self, "Music Usage", f"**{ctx.prefix}play (song/link)** - Plays a song by name or url from youtube\n**{ctx.prefix}pause** - Pauses the current song\n**{ctx.prefix}resume** - Resumes the current song\n**{ctx.prefix}volume (number)** - Change the volume of the bot\n**{ctx.prefix}stop** - Disconnects the bot\n**{ctx.prefix}sstop** - Force disconnects the bot\n**{ctx.prefix}spotify @user** - Plays the spotify song through the bot", "Todo"))
         await lib.eraset(self, ctx, m)
 
     @commands.command(no_pm=True)
@@ -724,16 +724,18 @@ class Core(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def math(self, ctx, num1 : int, op, num2 : int):
-        if op == "+":
-            ans = num1 + num2
-        elif op == "-":
-            ans = num1 - num2
-        elif op == "*":
-            ans = num1 * num2
-        elif op == "/":
-            ans = num1 / num2
-
-        await ctx.send(embed=lib.Editable(self, f"You requested {num1} {op} {num2}", f"{num1} {op} {num2} = {ans}", "Maths"))
+        if num1 and op and num2:
+            if op == "+":
+                ans = num1 + num2
+            elif op == "-":
+                ans = num1 - num2
+            elif op == "*":
+                ans = num1 * num2
+            elif op == "/":
+                ans = num1 / num2
+            await ctx.send(embed=lib.Editable(self, f"You requested {num1} {op} {num2}", f"{num1} {op} {num2} = {ans}", "Maths"))
+        else:
+            await ctx.send(embed=lib.Editable(self, "Uh oh", "You need to provide a number, operator and another number.\nExamples\n\n1 + 1\n1 - 1\n 1 * 1\n 1 / 1", "Maths"))
 
 # Fun End --------------------------------------------------------------------------------
 
