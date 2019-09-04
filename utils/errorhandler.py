@@ -17,28 +17,28 @@ class ErrorHandler(commands.Cog):
         if isinstance(error, ignored):
             return
         elif isinstance(error, commands.BadArgument):
-            return await ctx.send(embed=lib.Editable("Error!", f"Oops! Please mention a user! {ctx.author.mention}", "Error"))
+            return await ctx.send(embed=lib.Editable(self, "Error!", f"Oops! Please mention a user! {ctx.author.mention}", "Error"))
         elif isinstance(error, commands.MissingPermissions):
             try:
-                return ctx.send(embed=lib.Editable("Error!", "Uh oh.. I seem to be missing some permissions!", "Error"))
+                return ctx.send(embed=lib.Editable(self, "Error!", "Uh oh.. I seem to be missing some permissions!", "Error"))
             except discord.Forbidden:
                 return
 
         elif isinstance(error, commands.CommandOnCooldown):
-            return await ctx.send(embed=lib.Editable("Error!", f"Woah woah {ctx.author.mention} calm down, that command is currently cooling down!", "Error"))
+            return await ctx.send(embed=lib.Editable(self, "Error!", f"Woah woah {ctx.author.mention} calm down, that command is currently cooling down!", "Error"))
 
         # Discord Error's
         elif isinstance(error, discord.Forbidden):
             try:
-                return await ctx.send(embed=lib.Editable("Error!", "Uh oh.. I seem to be missing some permissions! Use `!help permissions` to see what I require!", "Error"))
+                return await ctx.send(embed=lib.Editable(self, "Error!", "Uh oh.. I seem to be missing some permissions! Use `!help permissions` to see what I require!", "Error"))
             except discord.Forbidden:
                 return
         elif isinstance(error, discord.HTTPException):
-            return await ctx.send(embed=lib.Editable("Error!", f"There was an error with your command! Here it is: {error}", "Error"))
+            return await ctx.send(embed=lib.Editable(self, "Error!", f"There was an error with your command! Here it is: {error}", "Error"))
 
         # Asyncio Error's
         elif isinstance(error, asyncio.TimeoutError):
-            return await ctx.send(embed=lib.Editable("Woops!", "You didnt reply, so the action timed out!", "Timed Out"))
+            return await ctx.send(embed=lib.Editable(self, "Woops!", "You didnt reply, so the action timed out!", "Timed Out"))
         raise error
 
 def setup(bot):

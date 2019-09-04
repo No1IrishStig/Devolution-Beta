@@ -386,7 +386,7 @@ class Core(commands.Cog):
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def avatar(self, ctx, user:discord.User=None):
+    async def avatar(self, ctx, user : discord.User=None):
         if user is None:
             user = ctx.author
             pass
@@ -418,7 +418,7 @@ class Core(commands.Cog):
             ans = await ctx.send("Generating Embed...")
             footer = msgg.content
             await asyncio.sleep(2)
-            r = await ctx.send(embed=lib.Editable(title, desc, footer))
+            r = await ctx.send(embed=lib.Editable(self, title, desc, footer))
             await ques.delete()
             await msg.delete()
             await ques1.delete()
