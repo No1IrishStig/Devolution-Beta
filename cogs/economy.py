@@ -69,13 +69,14 @@ class Economy(commands.Cog):
         GID = str(ctx.guild.id)
         if GID in self.db["Economy"]:
             if UID not in self.db["Economy"][GID]:
-                self.db["Economy"][GID] = {UID: {"name": user.name, "balance": 100}}
+                self.db["Economy"][GID][UID] = {"name": user.name, "balance": 100}
                 await ctx.send(embed=lib.Editable(self, "Ayy", f"Bank Account Created for {ctx.author.mention}. Current balance: {str(self.check_balance(GID, user.id))}", "Devo Bank"))
                 self.db.sync()
             else:
                 await ctx.send(embed=lib.Editable(self, "Uh oh", "You're too poor to make another bank account ;)", "Devo Bank"))
         else:
-            self.db["Economy"][GID] = {UID: {"name": user.name, "balance": 100}}
+            self.db["Economy"][GID] = {}
+            self.db["Economy"][GID][UID] = {"name": user.name, "balance": 100}
             self.db.sync()
             await ctx.send(embed=lib.Editable(self, "Ayy", f"Bank Account Created for {ctx.author.mention}. Current balance: {str(self.check_balance(GID, user.id))}", "Devo Bank"))
 
