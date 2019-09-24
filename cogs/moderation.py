@@ -509,7 +509,7 @@ class Mod(commands.Cog):
                 with open("./data/settings/deltimer.json", "w") as f:
                     json.dump(self.deltimer, f)
             else:
-                self.deltimer[GID] = db_timer
+                self.deltimer = {GID: {db_timer}}
                 success = await ctx.send(embed=lib.Editable(self, "Success", f"{ctx.author.mention} enabled the Custom Deletion Timer. It has automatically been set to **20** seconds.", "Deletion Timer"))
                 await lib.eraset(self, ctx, success)
                 with open("./data/settings/deltimer.json", "w") as f:
@@ -537,7 +537,7 @@ class Mod(commands.Cog):
             if not gid in db:
                 db[gid] = inv_settings
                 db[gid]["Channel"] = ctx.channel.id
-                with open("./data/logs/settings.json", "w") as f:
+                with open("./data/settings/logs.json", "w") as f:
                     json.dump(db, f)
         else:
             p = await ctx.send(embed=lib.NoPerm(self))
@@ -562,7 +562,7 @@ class Mod(commands.Cog):
 
             if gid in db:
                 db[gid]["Channel"] = ctx.channel.id
-                with open("./data/logs/settings.json", "w") as f:
+                with open("./data/settings/logs.json", "w") as f:
                     json.dump(db, f)
                     await ctx.send("Channel set")
             else:
@@ -604,12 +604,12 @@ class Mod(commands.Cog):
             if not gid in db:
                 db[gid] = inv_settings
                 db[gid]["Channel"] = ctx.channel.id
-                with open("./data/logs/settings.json", "w") as f:
+                with open("./data/settings/logs.json", "w") as f:
                     json.dump(db, f)
                     await ctx.send("Logs are now enabled for this server.")
             else:
                 del db[gid]
-                with open("./data/logs/settings.json", "w") as f:
+                with open("./data/settings/logs.json", "w") as f:
                     json.dump(db, f)
                     await ctx.send("I will no longer send log notifications here.")
         else:
@@ -624,12 +624,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["delete"] == False:
             db[gid]["delete"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Delete logs enabled")
         elif db[gid]["delete"] == True:
             db[gid]["delete"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Delete logs disabled")
 
@@ -641,12 +641,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["edit"] == False:
             db[gid]["edit"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Edit logs enabled")
         elif db[gid]["edit"] == True:
             db[gid]["edit"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Edit logs disabled")
 
@@ -658,12 +658,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["user"] == False:
             db[gid]["user"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("User logs enabled")
         elif db[gid]["user"] == True:
             db[gid]["user"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("User logs disabled")
 
@@ -675,12 +675,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["join"] == False:
             db[gid]["join"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Join logs enabled")
         elif db[gid]["join"] == True:
             db[gid]["join"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Join logs disabled")
 
@@ -692,12 +692,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["leave"] == False:
             db[gid]["leave"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Leave logs enabled")
         elif db[gid]["leave"] == True:
             db[gid]["leave"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Leave logs disabled")
 
@@ -709,12 +709,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["server"] == False:
             db[gid]["server"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Server logs enabled")
         elif db[gid]["server"] == True:
             db[gid]["server"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Server logs disabled")
 
@@ -730,7 +730,7 @@ class Mod(commands.Cog):
         db[gid]["join"] = True
         db[gid]["leave"] = True
         db[gid]["server"] = True
-        with open("./data/logs/settings.json", "w") as f:
+        with open("./data/settings/logs.json", "w") as f:
             json.dump(db, f)
             await ctx.send("All logs enabled")
 

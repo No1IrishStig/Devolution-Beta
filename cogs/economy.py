@@ -518,7 +518,7 @@ class Economy(commands.Cog):
             else:
                 await ctx.send(embed=lib.Editable(self, f"{creator.name} Wins", "{} stood with {}!\n\n{} wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
                 self.add_money(GID, creator.id, bet_amount * 2)
-                return self.db.sync()
+                self.db.sync()
                 self.reset_match()
 
     async def bothit(self, ctx):

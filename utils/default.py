@@ -18,7 +18,7 @@ def get(file):
     except FileNotFoundError:
         raise FileNotFoundError("JSON file wasn't found")
 
-version = "Stable v1.8.1"
+version = "Stable v1.8.2"
 invite = "https://discord.gg/V9DhKbW"
 config = default.get("./utils/cfg.json")
 economydb = shelve.open("./data/db/economy/data.db", writeback=True)
