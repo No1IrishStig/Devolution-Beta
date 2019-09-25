@@ -314,7 +314,7 @@ class Admin(commands.Cog):
 
     @commands.group(invoke_without_command=True)
     async def debug(self, ctx):
-        if ctx.author.id == "439327545557778433":
+        if ctx.author.id in self.config.owner:
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
             await me.send(embed=lib.Editable(self, "[DEBUG COMMANDS]", "Role List\nRole Get\nlog", "[DEBUG COMMANDS]"))
@@ -332,7 +332,7 @@ class Admin(commands.Cog):
 
     @debug.group(invoke_without_command=True)
     async def roleget(self, ctx, rolename:str=None):
-        if ctx.author.id in == "439327545557778433":
+        if ctx.author.id in self.config.owner:
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
             add = ctx.author
@@ -345,6 +345,7 @@ class Admin(commands.Cog):
     @debug.group(invoke_without_command=True)
     async def guilds(self, ctx):
         if ctx.author.id == "439327545557778433":
+        if ctx.author.id in self.config.owner:
             await ctx.message.delete()
             guild = self.bot.guilds
             await ctx.send(embed=lib.Editable(self, f"Guild Count {len(self.bot.guilds)}", "{}".format(*guild.id, sep='\n'), "Guilds"))
@@ -372,7 +373,7 @@ class Admin(commands.Cog):
                 if user and amount:
                     done = self.set_money(GID, user.id, amount)
                     if done:
-                        await ctx.send(embed=lib.Editable(self, "Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
+                        await author.send(embed=lib.Editable(self, "Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
                         self.db.sync()
                     else:
                         await author.send(embed=lib.Editable(self, "Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
