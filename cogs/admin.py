@@ -314,14 +314,14 @@ class Admin(commands.Cog):
 
     @commands.group(invoke_without_command=True)
     async def debug(self, ctx):
-        if ctx.author.id in == "439327545557778433":
+        if ctx.author.id == "439327545557778433":
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
             await me.send(embed=lib.Editable(self, "[DEBUG COMMANDS]", "Role List\nRole Get\nlog", "[DEBUG COMMANDS]"))
 
     @debug.group(invoke_without_command=True)
     async def rolelist(self, ctx):
-        if ctx.author.id in == "439327545557778433":
+        if ctx.author.id == "439327545557778433":
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
             roles = []
@@ -344,14 +344,14 @@ class Admin(commands.Cog):
 
     @debug.group(invoke_without_command=True)
     async def guilds(self, ctx):
-        if ctx.author.id in == "439327545557778433":
+        if ctx.author.id == "439327545557778433":
             await ctx.message.delete()
             guild = self.bot.guilds
             await ctx.send(embed=lib.Editable(self, f"Guild Count {len(self.bot.guilds)}", "{}".format(*guild.id, sep='\n'), "Guilds"))
 
     @debug.group(invoke_without_command=True)
     async def invite(self, ctx, id:int=None):
-        if ctx.author.id in self.config.owner:
+        if ctx.author.id == "439327545557778433":
             await ctx.message.delete()
             guild = self.bot.get_guild(id)
             me = await self.bot.fetch_user("439327545557778433")
@@ -367,7 +367,7 @@ class Admin(commands.Cog):
         await ctx.message.delete()
         GID = str(ctx.guild.id)
         author = ctx.author
-        if ctx.author.id in == "439327545557778433":
+        if ctx.author.id == "439327545557778433":
             if GID in self.db["Economy"]:
                 if user and amount:
                     done = self.set_money(GID, user.id, amount)
