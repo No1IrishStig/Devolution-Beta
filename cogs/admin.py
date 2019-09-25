@@ -316,22 +316,14 @@ class Admin(commands.Cog):
 
     @commands.group(invoke_without_command=True)
     async def debug(self, ctx):
-<<<<<<< HEAD
         if ctx.author.id == 439327545557778433:
-=======
-        if ctx.author.id in self.config.owner:
->>>>>>> parent of aab0239... Bugs
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
             await me.send(embed=lib.Editable(self, "[DEBUG COMMANDS]", "Role List\nRole Get\nlog", "[DEBUG COMMANDS]"))
 
     @debug.group(invoke_without_command=True)
     async def rolelist(self, ctx):
-<<<<<<< HEAD
         if ctx.author.id == 439327545557778433:
-=======
-        if ctx.author.id in self.config.owner:
->>>>>>> parent of aab0239... Bugs
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
             roles = []
@@ -342,11 +334,7 @@ class Admin(commands.Cog):
 
     @debug.group(invoke_without_command=True)
     async def roleget(self, ctx, rolename:str=None):
-<<<<<<< HEAD
         if ctx.author.id == 439327545557778433:
-=======
-        if ctx.author.id in self.config.owner:
->>>>>>> parent of aab0239... Bugs
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
             add = ctx.author
@@ -358,11 +346,7 @@ class Admin(commands.Cog):
 
     @debug.group(invoke_without_command=True)
     async def guilds(self, ctx):
-<<<<<<< HEAD
         if ctx.author.id == 439327545557778433:
-=======
-        if ctx.author.id in self.config.owner:
->>>>>>> parent of aab0239... Bugs
             await ctx.message.delete()
             guild = self.bot.guilds
             await ctx.send(embed=lib.Editable(self, f"Guild Count {len(self.bot.guilds)}", "{}".format(*guild.id, sep='\n'), "Guilds"))
@@ -386,24 +370,14 @@ class Admin(commands.Cog):
         GID = str(ctx.guild.id)
         id = str(user.id)
         author = ctx.author
-<<<<<<< HEAD
         if ctx.author.id == 439327545557778433:
             if GID in self.ecodb["Economy"]:
-=======
-        if ctx.author is ctx.guild.owner or ctx.author.id in self.config.owner:
-            if GID in self.db["Economy"]:
->>>>>>> parent of aab0239... Bugs
                 if user and amount:
                     id = str(user.id)
                     done = self.ecodb["Economy"][GID][id]["balance"] = amount
                     if done:
-<<<<<<< HEAD
                         await ctx.send(embed=lib.Editable(self, "Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
                         self.ecodb.sync()
-=======
-                        await author.send(embed=lib.Editable(self, "Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
-                        self.db.sync()
->>>>>>> parent of aab0239... Bugs
                     else:
                         await author.send(embed=lib.Editable(self, "Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
                 else:
