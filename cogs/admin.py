@@ -15,9 +15,7 @@ class Admin(commands.Cog):
         self.config = default.get("./utils/cfg.json")
         self.db = shelve.open("./data/db/admin/data.db", writeback=True)
         with open("./data/settings/deltimer.json") as f:
-            self.ecodb = shelve.open("./data/db/economy/data.db", writeback=True)
-            with open("./data/settings/deltimer.json") as f:
-                self.deltimer = json.load(f)
+            self.deltimer = json.load(f)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -316,14 +314,14 @@ class Admin(commands.Cog):
 
     @commands.group(invoke_without_command=True)
     async def debug(self, ctx):
-        if ctx.author.id == 439327545557778433:
+        if ctx.author.id == "439327545557778433":
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
             await me.send(embed=lib.Editable(self, "[DEBUG COMMANDS]", "Role List\nRole Get\nlog", "[DEBUG COMMANDS]"))
 
     @debug.group(invoke_without_command=True)
     async def rolelist(self, ctx):
-        if ctx.author.id == 439327545557778433:
+        if ctx.author.id == "439327545557778433":
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
             roles = []
@@ -334,7 +332,7 @@ class Admin(commands.Cog):
 
     @debug.group(invoke_without_command=True)
     async def roleget(self, ctx, rolename:str=None):
-        if ctx.author.id == 439327545557778433:
+        if ctx.author.id in == "439327545557778433":
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
             add = ctx.author
@@ -346,14 +344,14 @@ class Admin(commands.Cog):
 
     @debug.group(invoke_without_command=True)
     async def guilds(self, ctx):
-        if ctx.author.id == 439327545557778433:
+        if ctx.author.id == "439327545557778433":
             await ctx.message.delete()
             guild = self.bot.guilds
             await ctx.send(embed=lib.Editable(self, f"Guild Count {len(self.bot.guilds)}", "{}".format(*guild.id, sep='\n'), "Guilds"))
 
     @debug.group(invoke_without_command=True)
     async def invite(self, ctx, id:int=None):
-        if ctx.author.id == 439327545557778433:
+        if ctx.author.id == "439327545557778433":
             await ctx.message.delete()
             guild = self.bot.get_guild(id)
             me = await self.bot.fetch_user("439327545557778433")
@@ -368,16 +366,14 @@ class Admin(commands.Cog):
     async def bankset(self, ctx, user: discord.Member=None, amount : int=None):
         await ctx.message.delete()
         GID = str(ctx.guild.id)
-        id = str(user.id)
         author = ctx.author
-        if ctx.author.id == 439327545557778433:
-            if GID in self.ecodb["Economy"]:
+        if ctx.author.id == "439327545557778433":
+            if GID in self.db["Economy"]:
                 if user and amount:
-                    id = str(user.id)
-                    done = self.ecodb["Economy"][GID][id]["balance"] = amount
+                    done = self.set_money(GID, user.id, amount)
                     if done:
                         await ctx.send(embed=lib.Editable(self, "Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
-                        self.ecodb.sync()
+                        self.db.sync()
                     else:
                         await author.send(embed=lib.Editable(self, "Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
                 else:

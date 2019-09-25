@@ -853,6 +853,7 @@ class Core(commands.Cog):
                 pass
             else:
                 required_xp = 25 * level
+                print(f"XP: {xp}\nLevel: {level}\nRequired XP: {required_xp}")
                 pass
             if xp >= required_xp:
                 self.db["Levels"][GID][UID]["level"] += 1
