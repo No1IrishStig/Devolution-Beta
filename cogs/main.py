@@ -169,7 +169,7 @@ class Core(commands.Cog):
                     await help.edit(embed=e)
 
                 elif page_num == 1:
-                    e = lib.Editable(self, f"Devolution Help", "**help** - Gives help!\n**about** - Displays stuff about the bot\n**changelog** - Displays the entire bots changelog\n**sinfo** - Displays guild information.\n**uinfo** - Displays user information\n**uptime** - Displays the bots uptime\n**bug** - Use it to report bugs.\n**suggest** - Suggest something to the dev\n**github** - Provides github link", "Information")
+                    e = lib.Editable(self, f"Devolution Help", "**help** - Gives help!\n**about** - Displays stuff about the bot\n**changelog** - Displays the entire bots changelog\n**sinfo** - Displays guild information.\n**uinfo** - Displays user information\n**uptime** - Displays the bots uptime\n**bug** - Use it to report bugs.\n**github** - Provides github link", "Information")
                     await help.edit(embed=e)
 
                 elif page_num == 2:
@@ -249,50 +249,8 @@ class Core(commands.Cog):
     @commands.command(no_pm=True)
     @commands.cooldown(1, 30, commands.BucketType.user)
     async def bug(self, ctx):
-        ques = await ctx.channel.send("What would you like to say?")
-        msg = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
-        user = ctx.author
-        userid = ctx.author.id
-        guild = ctx.message.guild.name
-        guildid = ctx.message.guild.id
-        me = await self.bot.fetch_user("439327545557778433")
-        embed = discord.Embed(
-            title = f"You've recieved a bug report from {user}",
-            colour = 0x9bf442,
-            )
-        embed.add_field(name="User ID", value=userid, inline=True)
-        embed.add_field(name="Server Name", value=guild, inline=True)
-        embed.add_field(name="Server ID", value=guildid, inline=True)
-        embed.add_field(name="Message", value=msg.content, inline=True)
-        await me.send(embed=embed)
-        f = await ctx.send(embed=lib.Editable(self, "Success", f"Thanks to you another bug is about to be squished! Thank you for your feedback **{ctx.author.name}** :smile:", "Bug Report"))
+        f = await ctx.send(embed=lib.Editable(self, "We've Moved!", f"We no longer take bugs directly on discord. However you are encouraged to still report these bugs, on the github!\n\nhttps://github.com/No1IrishStig/Devolution-Beta/issues", "Bug Report"))
         await lib.eraset(self, ctx, f)
-        await ques.delete()
-        await msg.delete()
-
-    @commands.command(no_pm=True)
-    @commands.cooldown(1, 30, commands.BucketType.user)
-    async def suggest(self, ctx):
-        ques = await ctx.channel.send("What would you like to say?")
-        msg = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
-        user = ctx.author
-        userid = ctx.author.id
-        guild = ctx.message.guild.name
-        guildid = ctx.message.guild.id
-        me = await self.bot.fetch_user("439327545557778433")
-        embed = discord.Embed(
-            title = f"You've recieved a suggestion from {user}",
-            colour = 0x9bf442,
-            )
-        embed.add_field(name="User ID", value=userid, inline=True)
-        embed.add_field(name="Server Name", value=guild, inline=True)
-        embed.add_field(name="Server ID", value=guildid, inline=True)
-        embed.add_field(name="Message", value=msg.content, inline=True)
-        await me.send(embed=embed)
-        f = await ctx.send(embed=lib.Editable(self, "Success", f"Thank you for your suggestion! It's been sent to our dev, **{ctx.author.name}** :smile:", "Suggestion"))
-        await lib.eraset(self, ctx, f)
-        await ques.delete()
-        await msg.delete()
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 60, commands.BucketType.guild)
@@ -407,26 +365,20 @@ class Core(commands.Cog):
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def embed(self, ctx):
         if ctx.author.guild_permissions.manage_messages:
-            ques = await ctx.send("What title?")
-            msg = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
-            ques1 = await ctx.send("What would you like to say?")
-            title = msg.content
-            msg1 = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
-            ques2 = await ctx.send("Ok.. What footer text?")
-            desc = msg1.content
-            msgg = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
-            ans = await ctx.send("Generating Embed...")
-            footer = msgg.content
-            await asyncio.sleep(2)
-            r = await ctx.send(embed=lib.Editable(self, title, desc, footer))
-            await ques.delete()
-            await msg.delete()
-            await ques1.delete()
-            await msg1.delete()
-            await ques2.delete()
-            await msgg.delete()
-            await ans.delete()
-            await lib.eraset(self, ctx, r)
+            await ctx.message.delete()
+            question = await ctx.send(embed=lib.Editable(self, "Embed Generator", "Please type your title!", "Embed Generation"))
+            title = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
+            await title.delete()
+            e = lib.Editable(self, title.content, "Please type your footer!", "Embed Generation")
+            await question.edit(embed=e)
+            footer = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
+            await footer.delete()
+            e = lib.Editable(self, title.content, "Please type your description!", footer.content)
+            await question.edit(embed=e)
+            description = await self.bot.wait_for("message", check=lambda message: message.author == ctx.author, timeout = 120)
+            await description.delete()
+            e = lib.Editable(self, title.content, description.content, footer.content)
+            await question.edit(embed=e)
         else:
             p = await ctx.send(embed=lib.NoPerm(self))
             await lib.eraset(self, ctx, p)
@@ -771,7 +723,23 @@ class Core(commands.Cog):
 
     @commands.group(invoke_without_command=True)
     async def leveling(self, ctx):
-        await ctx.send(embed=lib.Editable(self, "Uh oh", f"Looks like you forgot something.\n\n`{ctx.prefix}leaderboard - To show the highest rankers in the server\n`{ctx.prefix}leveling toggle` - To enable the leveling system\n`{ctx.prefix}leaderboard - To show the highest rankers in the server\n`{ctx.prefix}leveling toggle messages` - Disables level up messages for the guild", "Leveling"))
+        await ctx.send(embed=lib.Editable(self, "Information", f"`{ctx.prefix}leveling progress` - Shows your progress to the next level\n`{ctx.prefix}leveling calculate (level)` - Gives you the required XP for given level\n\n**Admin Commands**\n`{ctx.prefix}leaderboard` - To show the highest rankers in the server\n`{ctx.prefix}leveling toggle` - To enable the leveling system\n`{ctx.prefix}leveling toggle messages` - Disables level up messages for the guild", "Leveling"))
+
+    @leveling.group(invoke_without_command=True)
+    async def progress(self, ctx):
+        global required_xp
+        GID = str(ctx.guild.id)
+        UID = str(ctx.author.id)
+        xp = self.db["Levels"][GID][UID]["xp"]
+        level = self.db["Levels"][GID][UID]["level"]
+        await ctx.send(embed=lib.Editable(self, f"{ctx.author.name}'s Level Progression Report", f"Your XP: {xp}\nYour Level: {level}\n\nLevel {level + 1} requires: {required_xp} XP\n XP To Level Up: {required_xp - xp} XP", "Leveling"))
+
+    @leveling.group(invoke_without_command=True)
+    async def calculate(self, ctx, level :int = None):
+        if level:
+            xp = level * 25
+            await ctx.send(embed=lib.Editable(self, f"Level {level} Calculation", f"Level {level} requires {xp} XP", "Leveling"))
+
 
     @leveling.group(invoke_without_command=True)
     async def toggle(self, ctx):
@@ -800,7 +768,7 @@ class Core(commands.Cog):
         UID = str(ctx.author.id)
         if self.user_exists:
             top = 10
-            level_sorted = sorted(self.db["Levels"][GID].items(), key=lambda x: x[1]["level"], reverse=True)
+            level_sorted = sorted(self.db["Levels"][GID].items(), key=lambda x: x[1]["xp"], reverse=True)
             if len(level_sorted) < top:
                 top = len(level_sorted)
             topten = level_sorted[:top]
@@ -808,8 +776,8 @@ class Core(commands.Cog):
             place = 1
             for id in topten:
                 highscore += str(place).ljust(len(str(top))+1)
-                highscore += (id[1]["name"]+ "'s Level:" + " ").ljust(23-len(str(id[1]["level"])))
-                highscore += str(id[1]["level"]) + "\n"
+                highscore += (id[1]["name"]+ "'s XP:" + " ").ljust(23-len(str(id[1]["xp"])))
+                highscore += str(id[1]["xp"]) + "\n"
                 place += 1
             await ctx.send(embed=lib.Editable(self, f"Top 10", f"{highscore}", "Leveling"))
         else:
@@ -876,16 +844,19 @@ class Core(commands.Cog):
     async def level_up(self, message):
         GID = str(message.guild.id)
         UID = str(message.author.id)
+        global required_xp
         if self.user_exists:
             xp = self.db["Levels"][GID][UID]["xp"]
             level = self.db["Levels"][GID][UID]["level"]
-            required_xp = 15 * level
             if level == 0:
-                required_xp = 15 * 1
+                required_xp = 15
+                pass
+            else:
+                required_xp = 25 * level
+                print(f"XP: {xp}\nLevel: {level}\nRequired XP: {required_xp}")
                 pass
             if xp >= required_xp:
                 self.db["Levels"][GID][UID]["level"] += 1
-                self.db["Levels"][GID][UID]["xp"] = 0
                 if self.levels[GID]["Messages"] is True:
                     await message.channel.send(embed=lib.Editable(self, "Level Up!", f"{message.author.name} Leveled up to {level + 1}", "Leveling"))
         else:

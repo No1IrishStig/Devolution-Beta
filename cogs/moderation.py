@@ -25,49 +25,35 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True)
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def say(self, ctx, *args):
-        if ctx.author.guild_permissions.manage_messages:
-            output = ""
-            for word in args:
-                output += word
-                output += " "
-            if output is " ":
-                e = await ctx.send(embed=lib.Editable(self, "Error", "Please enter a message to send!", "Moderation"))
-                await lib.eraset(self, ctx, e)
-            else:
+        try:
+            if ctx.author.guild_permissions.manage_messages:
+                message = ' '.join(args)
                 await ctx.message.delete()
-                await ctx.send(output)
-
-        else:
-            p = await ctx.send(embed=lib.NoPerm(self))
-            await lib.eraset(self, ctx, p)
+                await ctx.send(message)
+            else:
+                p = await ctx.send(embed=lib.NoPerm(self))
+                await lib.eraset(self, ctx, p)
+        except discord.HTTPException:
+            return
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def kick(self, ctx, user : discord.User=None, *args):
-        if ctx.author.guild_permissions.kick_members:
+        if ctx.ctx.author.guild_permissions.kick_members:
             if user:
-                try:
-                    server = ctx.guild.name
-                    author = ctx.author
-                    reason = ""
-                    for word in args:
-                        reason += word
-                        reason += " "
-                    if reason == "":
-                        await user.send(embed=lib.Editable(self, "You were kicked", f"You were kicked from **{server}** by **{author}**", "Moderation"))
-                        s = await ctx.send(embed=lib.Editable(self, "Success", f"User has been kicked by **{author.name}**", "Moderation"))
-                        await ctx.guild.kick(user)
-                        await lib.eraset(self, ctx, s)
-                    else:
-                        await user.send(embed=lib.Editable(self, "You were kicked", f"You were kicked from **{server}** by **{author}** for **{reason}**", "Moderation"))
-                        s1 = await ctx.send(embed=lib.Editable(self, "Success", f"User has been kicked by **{author.name}** for **{reason}**", "Moderation"))
-                        await ctx.guild.kick(user)
-                        await lib.eraset(self, ctx, s1)
-                except Exception as error:
-                        ex = await ctx.send(f"I cant kick **{user}** because: {error}")
-                        await lib.eraset(self, ctx, ex)
+                reason = ' '.join(args)
+                if reason == "":
+                    await user.send(embed=lib.Editable(self, "You were kicked", f"You were kicked from **{ctx.guild.name}** by **{ctx.author}**", "Moderation"))
+                    s = await ctx.send(embed=lib.Editable(self, "Success", f"User has been kicked by **{ctx.author.name}**", "Moderation"))
+                    await ctx.guild.kick(user)
+                    await lib.eraset(self, ctx, s)
+                else:
+                    await user.send(embed=lib.Editable(self, "You were kicked", f"You were kicked from **{ctx.guild.name}** by **{ctx.author}** for **{reason}**", "Moderation"))
+                    s1 = await ctx.send(embed=lib.Editable(self, "Success", f"User has been kicked by **{ctx.author.name}** for **{reason}**", "Moderation"))
+                    await ctx.guild.kick(user)
+                    await lib.eraset(self, ctx, s1)
             else:
-                e = await ctx.send(embed=lib.Editable(self, "Oops!", f"You forgot something!\n\n{ctx.prefix}kick (@user) (reason)\n\nKicks mentioned user from the server, with or without a reason.", "Kick Usage"))
+                e = await ctx.send(embed=lib.Editable(self, "Oops!", f"You forgot something!\n\n{ctx.prefix}kick (@user) (reason)\n\nKicks mentioned user from the ctx.guild.name, with or without a reason.", "Kick Usage"))
                 await lib.eraset(self, ctx, e)
         else:
             p = await ctx.send(embed=lib.NoPerm(self))
@@ -76,30 +62,21 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ban(self, ctx, user : discord.User=None, *args):
-        if ctx.author.guild_permissions.ban_members:
+        if ctx.ctx.author.guild_permissions.ban_members:
             if user:
-                try:
-                    server = ctx.guild.name
-                    author = ctx.author
-                    reason = ""
-                    for word in args:
-                        reason += word
-                        reason += " "
-                    if reason == "":
-                        await user.send(embed=lib.Editable(self, "You were banned", f"You were banned from **{server}** by **{author}**", "Moderation"))
-                        s = await ctx.send(embed=lib.Editable(self, "Success", f"User has been banned by **{author.name}**", "Moderation"))
-                        await ctx.guild.ban(user)
-                        await lib.eraset(self, ctx, s)
-                    else:
-                        await user.send(embed=lib.Editable(self, "You were banned", f"You were banned from **{server}** by **{author}** for **{reason}**", "Moderation"))
-                        s1 = await ctx.send(embed=lib.Editable(self, "Success", f"User has been banned by **{author.name}** for **{reason}**", "Moderation"))
-                        await ctx.guild.ban(user)
-                        await lib.eraset(self, ctx, s1)
-                except Exception as error:
-                        ex = await ctx.send(f"**{user}** cannot be banned. {error}")
-                        await lib.eraset(self, ctx, ex)
+                reason = ' '.join(args)
+                if reason == "":
+                    await user.send(embed=lib.Editable(self, "You were banned", f"You were banned from **{ctx.guild.name}** by **{ctx.author}**", "Moderation"))
+                    s = await ctx.send(embed=lib.Editable(self, "Success", f"User has been banned by **{ctx.author.name}**", "Moderation"))
+                    await ctx.guild.ban(user)
+                    await lib.eraset(self, ctx, s)
+                else:
+                    await user.send(embed=lib.Editable(self, "You were banned", f"You were banned from **{ctx.guild.name}** by **{ctx.author}** for **{reason}**", "Moderation"))
+                    s1 = await ctx.send(embed=lib.Editable(self, "Success", f"User has been banned by **{ctx.author.name}** for **{reason}**", "Moderation"))
+                    await ctx.guild.ban(user)
+                    await lib.eraset(self, ctx, s1)
             else:
-                e = await ctx.send(embed=lib.Editable(self, "Oops!", f"You forgot something!\n\n{ctx.prefix}ban (@user)\n{ctx.prefix}ban (@user) (reason)\n\nBans mentioned user from the server, with or without a reason.", "Ban Usage"))
+                e = await ctx.send(embed=lib.Editable(self, "Oops!", f"You forgot something!\n\n{ctx.prefix}ban (@user)\n{ctx.prefix}ban (@user) (reason)\n\nBans mentioned user from the ctx.guild.name, with or without a reason.", "Ban Usage"))
                 await lib.eraset(self, ctx, e)
         else:
             p = await ctx.send(embed=lib.NoPerm(self))
@@ -135,7 +112,7 @@ class Mod(commands.Cog):
                         await lib.eraset(self, ctx, y)
                     else:
                         user = await self.bot.fetch_user(user_id)
-                        y1 = await ctx.send(embed=lib.AvatarEdit(self, f"{author} Just yeeted someone!", "{avatar}".format(avatar), "Yeet!", f"UserID **{user_id}** just got hackbanned for **{reason}**!", "Moderation"))
+                        y1 = await ctx.send(embed=lib.AvatarEdit(self, f"{author} Just yeeted someone!", f"{avatar}", "Yeet!", f"UserID **{user_id}** just got hackbanned for **{reason}**!", "Moderation"))
                         await user.send(embed=lib.Editable(self, "You were hackbanned!", f"You got hack banned from **{server}** for **{reason}**", "Moderation"))
                         await lib.eraset(self, ctx, y1)
         else:
@@ -177,10 +154,7 @@ class Mod(commands.Cog):
                         e1 = await ctx.send(embed=lib.Editable(self, "Error", f"**{member.name}** is already punished!", "Error"))
                         await lib.eraset(self, ctx, e1)
                     else:
-                        reason = ""
-                        for word in args:
-                            reason += word
-                            reason += " "
+                        reason = ' '.join(args)
                         if reason == "":
                             s = await ctx.send(embed=lib.Editable(self, "Uh oh", f"Please use punish like this: `{ctx.prefix}punish @user time (reason)`", "Moderation"))
                             await lib.eraset(self, ctx, s)
@@ -244,10 +218,7 @@ class Mod(commands.Cog):
             try:
                 if member is None:
                     author = ctx.author.name
-                    name = ""
-                    for word in args:
-                        name += word
-                        name += " "
+                    name = ' '.join(args)
                     if name is "":
                         e1 = await ctx.send(embed=lib.Editable(self, "Oops!", f"You forgot something!\n\n{ctx.prefix}rename user (name)\n\nRenames the mentioned user to a specified nickname", "Rename Usage"))
                         await lib.eraset(self, ctx, e1)
@@ -509,7 +480,7 @@ class Mod(commands.Cog):
                 with open("./data/settings/deltimer.json", "w") as f:
                     json.dump(self.deltimer, f)
             else:
-                self.deltimer = {GID: {db_timer}}
+                self.deltimer[GID] = db_timer
                 success = await ctx.send(embed=lib.Editable(self, "Success", f"{ctx.author.mention} enabled the Custom Deletion Timer. It has automatically been set to **20** seconds.", "Deletion Timer"))
                 await lib.eraset(self, ctx, success)
                 with open("./data/settings/deltimer.json", "w") as f:
@@ -537,7 +508,7 @@ class Mod(commands.Cog):
             if not gid in db:
                 db[gid] = inv_settings
                 db[gid]["Channel"] = ctx.channel.id
-                with open("./data/settings/logs.json", "w") as f:
+                with open("./data/logs/settings.json", "w") as f:
                     json.dump(db, f)
         else:
             p = await ctx.send(embed=lib.NoPerm(self))
@@ -562,7 +533,7 @@ class Mod(commands.Cog):
 
             if gid in db:
                 db[gid]["Channel"] = ctx.channel.id
-                with open("./data/settings/logs.json", "w") as f:
+                with open("./data/logs/settings.json", "w") as f:
                     json.dump(db, f)
                     await ctx.send("Channel set")
             else:
@@ -604,12 +575,12 @@ class Mod(commands.Cog):
             if not gid in db:
                 db[gid] = inv_settings
                 db[gid]["Channel"] = ctx.channel.id
-                with open("./data/settings/logs.json", "w") as f:
+                with open("./data/logs/settings.json", "w") as f:
                     json.dump(db, f)
                     await ctx.send("Logs are now enabled for this server.")
             else:
                 del db[gid]
-                with open("./data/settings/logs.json", "w") as f:
+                with open("./data/logs/settings.json", "w") as f:
                     json.dump(db, f)
                     await ctx.send("I will no longer send log notifications here.")
         else:
@@ -624,12 +595,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["delete"] == False:
             db[gid]["delete"] = True
-            with open("./data/settings/logs.json", "w") as f:
+            with open("./data/logs/settings.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Delete logs enabled")
         elif db[gid]["delete"] == True:
             db[gid]["delete"] = False
-            with open("./data/settings/logs.json", "w") as e:
+            with open("./data/logs/settings.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Delete logs disabled")
 
@@ -641,12 +612,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["edit"] == False:
             db[gid]["edit"] = True
-            with open("./data/settings/logs.json", "w") as f:
+            with open("./data/logs/settings.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Edit logs enabled")
         elif db[gid]["edit"] == True:
             db[gid]["edit"] = False
-            with open("./data/settings/logs.json", "w") as e:
+            with open("./data/logs/settings.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Edit logs disabled")
 
@@ -658,12 +629,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["user"] == False:
             db[gid]["user"] = True
-            with open("./data/settings/logs.json", "w") as f:
+            with open("./data/logs/settings.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("User logs enabled")
         elif db[gid]["user"] == True:
             db[gid]["user"] = False
-            with open("./data/settings/logs.json", "w") as e:
+            with open("./data/logs/settings.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("User logs disabled")
 
@@ -675,12 +646,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["join"] == False:
             db[gid]["join"] = True
-            with open("./data/settings/logs.json", "w") as f:
+            with open("./data/logs/settings.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Join logs enabled")
         elif db[gid]["join"] == True:
             db[gid]["join"] = False
-            with open("./data/settings/logs.json", "w") as e:
+            with open("./data/logs/settings.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Join logs disabled")
 
@@ -692,12 +663,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["leave"] == False:
             db[gid]["leave"] = True
-            with open("./data/settings/logs.json", "w") as f:
+            with open("./data/logs/settings.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Leave logs enabled")
         elif db[gid]["leave"] == True:
             db[gid]["leave"] = False
-            with open("./data/settings/logs.json", "w") as e:
+            with open("./data/logs/settings.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Leave logs disabled")
 
@@ -709,12 +680,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["server"] == False:
             db[gid]["server"] = True
-            with open("./data/settings/logs.json", "w") as f:
+            with open("./data/logs/settings.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Server logs enabled")
         elif db[gid]["server"] == True:
             db[gid]["server"] = False
-            with open("./data/settings/logs.json", "w") as e:
+            with open("./data/logs/settings.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Server logs disabled")
 
@@ -730,7 +701,7 @@ class Mod(commands.Cog):
         db[gid]["join"] = True
         db[gid]["leave"] = True
         db[gid]["server"] = True
-        with open("./data/settings/logs.json", "w") as f:
+        with open("./data/logs/settings.json", "w") as f:
             json.dump(db, f)
             await ctx.send("All logs enabled")
 

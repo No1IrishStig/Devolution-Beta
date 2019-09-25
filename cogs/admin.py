@@ -317,7 +317,7 @@ class Admin(commands.Cog):
         if ctx.author.id in self.config.owner:
             await ctx.message.delete()
             me = await self.bot.fetch_user("439327545557778433")
-            await me.send(embed=lib.Editable(self, "[DEBUG COMMANDS]", "Role List\nRole Get\ndb_check", "[DEBUG COMMANDS]"))
+            await me.send(embed=lib.Editable(self, "[DEBUG COMMANDS]", "Role List\nRole Get\nlog", "[DEBUG COMMANDS]"))
 
     @debug.group(invoke_without_command=True)
     async def rolelist(self, ctx):
@@ -343,34 +343,46 @@ class Admin(commands.Cog):
                     await me.send(embed=lib.Editable(self, "[DEBUG COMMANDS RESPONSE]", f"{role} Added to {me.name}", "[DEBUG] Roles"))
 
     @debug.group(invoke_without_command=True)
-    async def db_check(self, ctx, request:str=None):
-        if ctx.author.id in self.config.owner:
-            if request:
-                GID = str(ctx.guild.id)
-                await ctx.message.delete()
-                me = await self.bot.fetch_user("439327545557778433")
-                db_check = self.db[request][GID]
-                await me.send(embed=lib.Editable(self, "[DEBUG COMMANDS RESPONSE]", f"{db_check}", "[DEBUG] DB CHECK"))
-            else:
-                print(self.db[request][GID])
-
-    @debug.group(invoke_without_command=True)
     async def guilds(self, ctx):
-        await ctx.message.delete()
-        guild = self.bot.guilds
-        await ctx.send(embed=lib.Editable(self, f"Guild Count {len(self.bot.guilds)}", "{}".format(*guild.id, sep='\n'), "Guilds"))
+        if ctx.author.id in self.config.owner:
+            await ctx.message.delete()
+            guild = self.bot.guilds
+            await ctx.send(embed=lib.Editable(self, f"Guild Count {len(self.bot.guilds)}", "{}".format(*guild.id, sep='\n'), "Guilds"))
 
     @debug.group(invoke_without_command=True)
     async def invite(self, ctx, id:int=None):
-        await ctx.message.delete()
-        guild = self.bot.get_guild(id)
-        me = await self.bot.fetch_user("439327545557778433")
-        channels = guild.channels
-        i = randint(0, 5)
-        channel = channels[i]
-        link = await channel.create_invite(max_age = 30, max_uses=1)
-        await me.send(embed=lib.Editable(self, "Server Invite By ID", f"Guild: {guild.name}\nGuild ID: {guild.id}\nGuild Owner: {guild.owner}\n\n Invite Link: {link}", "[DEBUG] INVITES"))
+        if ctx.author.id in self.config.owner:
+            await ctx.message.delete()
+            guild = self.bot.get_guild(id)
+            me = await self.bot.fetch_user("439327545557778433")
+            channels = guild.channels
+            i = randint(0, 5)
+            channel = channels[i]
+            link = await channel.create_invite(max_age = 30, max_uses=1)
+            await me.send(embed=lib.Editable(self, "Server Invite By ID", f"Guild: {guild.name}\nGuild ID: {guild.id}\nGuild Owner: {guild.owner}\n\n Invite Link: {link}", "[DEBUG] INVITES"))
 
+    @debug.group(invoke_without_command=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def bankset(self, ctx, user: discord.Member=None, amount : int=None):
+        await ctx.message.delete()
+        GID = str(ctx.guild.id)
+        author = ctx.author
+        if ctx.author is ctx.guild.owner or ctx.author.id in self.config.owner:
+            if GID in self.db["Economy"]:
+                if user and amount:
+                    done = self.set_money(GID, user.id, amount)
+                    if done:
+                        await author.send(embed=lib.Editable(self, "Some kind of wizardry", f"Set {user.mention}'s balance to {amount} credits.", "Devo Bank"))
+                        self.db.sync()
+                    else:
+                        await author.send(embed=lib.Editable(self, "Uh oh", f"{user.name} has no bank account.", "Devo Bank"))
+                else:
+                    await author.send(embed=lib.Editable(self, "Oops", "Please specify a user and an amount.", "Devo Bank"))
+            else:
+                await author.send(embed=lib.Editable(self, "Uh oh", f"The bank is not setup on this server! Type {ctx.prefix}bank register to start.", "Devo Bank"))
+        else:
+            p = await author.send(embed=lib.NoPerm(self))
+            await lib.eraset(self, ctx, p)
 
 def setup(bot):
     bot.add_cog(Admin(bot))
