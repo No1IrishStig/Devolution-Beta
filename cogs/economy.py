@@ -485,31 +485,31 @@ class Economy(commands.Cog):
             gameover = True
             await ctx.send(embed=lib.Editable(self, f"{creator.name} Wins", "The house bust with a total of {}\n\n{} wins {} credits!".format(OPPONENT_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount * 2)
-            return self.db.sync()
+            self.db.sync()
             self.reset_match()
         elif CARDS_TOTAL_WORTH > 21:
             gameover = True
-            return await ctx.send(embed=lib.Editable(self, f"The House Wins", "{} bust with a total of {}\n\nThe House wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
+            await ctx.send(embed=lib.Editable(self, f"The House Wins", "{} bust with a total of {}\n\nThe House wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
             self.reset_match()
         elif OPPONENT_TOTAL_WORTH == 21:
             gameover = True
-            return await ctx.send(embed=lib.Editable(self, f"The House Wins", "The house got blackjack!\n\nThe house wins {} credits!".format(bet_amount * 2), "Blackjack"))
+            await ctx.send(embed=lib.Editable(self, f"The House Wins", "The house got blackjack!\n\nThe house wins {} credits!".format(bet_amount * 2), "Blackjack"))
             self.reset_match()
         elif CARDS_TOTAL_WORTH == 21:
             gameover = True
             await ctx.send(embed=lib.Editable(self, f"{creator.name} Wins", "{} got blackjack!\n\n{} wins {} credits!".format(creator.name, creator.name, bet_amount * 2), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount * 2)
-            return self.db.sync()
+            self.db.sync()
             self.reset_match()
         elif CARDS_TOTAL_WORTH == OPPONENT_TOTAL_WORTH:
             gameover = True
             await ctx.send(embed=lib.Editable(self, f"Its a Tie!", "You both got {}!\n\nYour original bet of {} has been returned to your bank!".format(CARDS_TOTAL_WORTH, bet_amount), "Blackjack"))
             self.add_money(GID, creator.id, bet_amount)
-            return self.db.sync()
+            self.db.sync()
             self.reset_match()
         elif STOOD_WHEN_LESS_HOUSE_WINS is True:
             gameover = True
-            return await ctx.send(embed=lib.Editable(self, f"The House Wins", "{} stood with {}!\n\nThe house wins {} credits with {}!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
+            await ctx.send(embed=lib.Editable(self, f"The House Wins", "{} stood with {}!\n\nThe house wins {} credits with {}!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
             self.reset_match()
         elif STAND is True and HOUSE_STAND is True:
             gameover = True
