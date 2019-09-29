@@ -18,17 +18,21 @@ def get(file):
     except FileNotFoundError:
         raise FileNotFoundError("JSON file wasn't found")
 
-version = "Stable v1.8.3"
+version = "Stable v1.9"
 invite = "https://discord.gg/V9DhKbW"
 config = default.get("./utils/cfg.json")
 economydb = shelve.open("./data/db/economy/data.db", writeback=True)
 levelsdb = shelve.open("./data/db/levels/data.db", writeback=True)
-admindb = shelve.open("./data/db/admin/data.db", writeback=True)
 warningsdb = shelve.open("./data/db/warnings/data.db", writeback=True)
+JSON_VALIDATION = ['settings/deltimer.json', 'settings/logs.json', "settings/leveling.json"]
+ERRORS = ["deltimer", "logs", "leveling"]
+dbcheck = os.path.exists(f"data/db/db.log")
 
 class lib(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        with open("./data/settings/deltimer.json") as f:
+            self.deltimer = json.load(f)
 
     def NoPerm(self):
         embed = discord.Embed(
@@ -136,12 +140,10 @@ class lib(commands.Cog):
         economydb.sync()
         levelsdb["Levels"] = {}
         levelsdb.sync()
-        admindb["Admin"] = {}
-        admindb.sync()
         warningsdb["Warnings"] = {}
         warningsdb.sync()
-        f = open("./data/db/db_log.txt","w+")
-        f.write("Creating Economy Database...\nEconomy_DB Created Successfully\nCreating Levels Database...\nLevels_DB Created Successfully\nCreating Admins Database...\nAdmin_DB Created Successfully\nCreating Warnings Database...\nWarnings_DB Created Successfully")
+        f = open("./data/db/db.log","w+")
+        f.write("Creating Economy Database...\nEconomy_DB Created Successfully\nCreating Levels Database...\nLevels_DB Created Successfully\nCreating Warnings Database...\nWarnings_DB Created Successfully")
         f.close()
 
     def cfg_file():
@@ -160,6 +162,27 @@ class lib(commands.Cog):
                 json.dump(settings, f)
             os.system("cls")
             os.system("py -3 ./self.bot.py")
+
+    def initilization():
+        i = 0
+        for files in JSON_VALIDATION:
+            check = os.path.exists(f"data/{files}")
+            if check is False:
+                ERRORS[i]
+                if ERRORS[i] == "deltimer":
+                    lib.deltimer()
+                elif ERRORS[i] == "logs":
+                    lib.logs()
+                elif ERRORS[i] == "leveling":
+                    lib.levels()
+            i += 1
+
+        if check is False:
+            print("JSON Files Generated")
+
+        if dbcheck is False:
+            print("Database's Generated")
+            lib.db_create()
 
 def setup(client):
     client.add_cog(Lib(client))

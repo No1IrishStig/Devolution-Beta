@@ -1,3 +1,4 @@
+import datetime
 import discord
 import asyncio
 
@@ -39,6 +40,11 @@ class ErrorHandler(commands.Cog):
         # Asyncio Error's
         elif isinstance(error, asyncio.TimeoutError):
             return await ctx.send(embed=lib.Editable(self, "Woops!", "You didnt reply, so the action timed out!", "Timed Out"))
+
+        errorfile = open("./utils/error.log","a")
+        errorfile.write("[{}]: {} \n".format(datetime.datetime.utcnow().strftime("%d/%m/%Y at %H:%M:%S (GMT)"), error))
+        errorfile.close()
+        print("An error has been logged.")
         raise error
 
 def setup(bot):

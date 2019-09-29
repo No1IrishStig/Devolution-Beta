@@ -1,4 +1,5 @@
 import os, sys, traceback
+import datetime
 import discord
 import json
 
@@ -12,10 +13,6 @@ settings = {"token": "Token", "owner": [0], "prefix": "!", "playing": "Stable v1
 if config.token == "Token" or config.owner == 0:
     lib.cfg_file()
 
-JSON_VALIDATION = ['settings/deltimer.json', 'settings/logs.json', "settings/leveling.json"]
-ERRORS = ["deltimer", "logs", "leveling"]
-dbcheck = os.path.exists(f"data/db/db_log.txt")
-
 bot = commands.Bot(command_prefix = config.prefix)
 bot.remove_command('help')
 
@@ -28,26 +25,7 @@ async def on_ready():
     bot_name = bot.user.name
     bot_avatar_url = bot.user.avatar_url
 
-i = 0
-for files in JSON_VALIDATION:
-    check = os.path.exists(f"data/{files}")
-    if check is False:
-        ERRORS[i]
-        if ERRORS[i] == "deltimer":
-            lib.deltimer()
-        elif ERRORS[i] == "logs":
-            lib.logs()
-        elif ERRORS[i] == "leveling":
-            lib.levels()
-    i += 1
-
-if check is False:
-    print("JSON Files Generated")
-
-if dbcheck is False:
-    print("Database's Generated")
-    lib.db_create()
-
+lib.initilization()
 
 for file in os.listdir("cogs"):
     if file.endswith(".py"):
@@ -58,5 +36,8 @@ for file in os.listdir("cogs"):
             traceback.print_exc()
 
 bot.load_extension("utils.errorhandler")
+errorfile = open("./utils/error.log","a")
+errorfile.write("[{}]: Boot\n".format(datetime.datetime.utcnow().strftime("%d/%m/%Y at %H:%M:%S (GMT)")))
+errorfile.close()
 print("Boot Successful!")
 bot.run(config.token, reconnect=True)

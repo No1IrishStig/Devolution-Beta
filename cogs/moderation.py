@@ -24,17 +24,20 @@ class Mod(commands.Cog):
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def say(self, ctx, *args):
+    async def say(self, ctx, channel:discord.TextChannel=None, *args):
         try:
             if ctx.author.guild_permissions.manage_messages:
                 message = ' '.join(args)
                 await ctx.message.delete()
-                await ctx.send(message)
+                if channel:
+                    await channel.send(message)
+                else:
+                    await ctx.send(message)
             else:
                 p = await ctx.send(embed=lib.NoPerm(self))
                 await lib.eraset(self, ctx, p)
         except discord.HTTPException:
-            return
+            await ctx.send(embed=lib.Editable(self, "Say Usage", f"{ctx.prefix}say #channel Hello\n{ctx.prefix}say Hello", "Say"))
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -213,10 +216,10 @@ class Mod(commands.Cog):
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def rename(self, ctx, member:discord.Member=None, *args):
+    async def rename(self, ctx, member:discord.User=None, *args):
         if ctx.author.guild_permissions.manage_nicknames:
             try:
-                if member is None:
+                if member:
                     author = ctx.author.name
                     name = ' '.join(args)
                     if name is "":
@@ -504,11 +507,11 @@ class Mod(commands.Cog):
             db = self.logs
             guild = ctx.guild
             gid = str(guild.id)
-            await ctx.send(embed=lib.Editable(self, "Logs - Usage", f"{ctx.prefix}logs set channel\n{ctx.prefix}logs toggle\n\n Enable logs for this server.", "Logs"))
+            await ctx.send(embed=lib.Editable(self, "Logs - Usage", f"{ctx.prefix}logs set channel\n{ctx.prefix}logs toggle\n\n Enable logs for this server.\n{ctx.prefix}logs toggle all - Enable every log for the server", "Logs"))
             if not gid in db:
                 db[gid] = inv_settings
                 db[gid]["Channel"] = ctx.channel.id
-                with open("./data/logs/settings.json", "w") as f:
+                with open("./data/settings/logs.json", "w") as f:
                     json.dump(db, f)
         else:
             p = await ctx.send(embed=lib.NoPerm(self))
@@ -533,7 +536,7 @@ class Mod(commands.Cog):
 
             if gid in db:
                 db[gid]["Channel"] = ctx.channel.id
-                with open("./data/logs/settings.json", "w") as f:
+                with open("./data/settings/logs.json", "w") as f:
                     json.dump(db, f)
                     await ctx.send("Channel set")
             else:
@@ -575,12 +578,12 @@ class Mod(commands.Cog):
             if not gid in db:
                 db[gid] = inv_settings
                 db[gid]["Channel"] = ctx.channel.id
-                with open("./data/logs/settings.json", "w") as f:
+                with open("./data/settings/logs.json", "w") as f:
                     json.dump(db, f)
                     await ctx.send("Logs are now enabled for this server.")
             else:
                 del db[gid]
-                with open("./data/logs/settings.json", "w") as f:
+                with open("./data/settings/logs.json", "w") as f:
                     json.dump(db, f)
                     await ctx.send("I will no longer send log notifications here.")
         else:
@@ -595,12 +598,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["delete"] == False:
             db[gid]["delete"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Delete logs enabled")
         elif db[gid]["delete"] == True:
             db[gid]["delete"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Delete logs disabled")
 
@@ -612,12 +615,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["edit"] == False:
             db[gid]["edit"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Edit logs enabled")
         elif db[gid]["edit"] == True:
             db[gid]["edit"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Edit logs disabled")
 
@@ -629,12 +632,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["user"] == False:
             db[gid]["user"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("User logs enabled")
         elif db[gid]["user"] == True:
             db[gid]["user"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("User logs disabled")
 
@@ -646,12 +649,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["join"] == False:
             db[gid]["join"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Join logs enabled")
         elif db[gid]["join"] == True:
             db[gid]["join"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Join logs disabled")
 
@@ -663,12 +666,12 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["leave"] == False:
             db[gid]["leave"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Leave logs enabled")
         elif db[gid]["leave"] == True:
             db[gid]["leave"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Leave logs disabled")
 
@@ -680,28 +683,27 @@ class Mod(commands.Cog):
         gid = str(guild.id)
         if db[gid]["server"] == False:
             db[gid]["server"] = True
-            with open("./data/logs/settings.json", "w") as f:
+            with open("./data/settings/logs.json", "w") as f:
                 json.dump(db, f)
                 await ctx.send("Server logs enabled")
         elif db[gid]["server"] == True:
             db[gid]["server"] = False
-            with open("./data/logs/settings.json", "w") as e:
+            with open("./data/settings/logs.json", "w") as e:
                 json.dump(db, e)
                 await ctx.send("Server logs disabled")
 
-    @toggle.group(invoke_without_command=True)
+    @toggle.group(invoke_without_command=True, name="all")
     @commands.cooldown(1, 2, commands.BucketType.user)
-    async def all(self, ctx):
+    async def _all(self, ctx):
         db = self.logs
-        guild = ctx.guild
-        gid = str(guild.id)
+        gid = str(ctx.guild.id)
         db[gid]["delete"] = True
         db[gid]["edit"] = True
         db[gid]["user"] = True
         db[gid]["join"] = True
         db[gid]["leave"] = True
         db[gid]["server"] = True
-        with open("./data/logs/settings.json", "w") as f:
+        with open("./data/settings/logs.json", "w") as f:
             json.dump(db, f)
             await ctx.send("All logs enabled")
 
@@ -935,7 +937,7 @@ class Mod(commands.Cog):
                         self.db.sync()
                         await ctx.reinvoke()
                 else:
-                    await ctx.send(embed=lib.Editable(self, "Warn Usage", f"{ctx.prefix}warn @user (reason), {ctx.prefix}warn list, {ctx.prefix}warn get (userid), {ctx.prefix}warn remove (userid) (warning number)", "Warnings"))
+                    await ctx.send(embed=lib.Editable(self, "Warn Usage", f"{ctx.prefix}warn @user (reason)\n{ctx.prefix}warn list\n{ctx.prefix}warn get (userid)\n{ctx.prefix}warn remove (userid) (warning number)", "Warnings"))
             else:
                 self.db["Warnings"][GID] = {"Users": {}}
                 self.db.sync()
@@ -945,8 +947,8 @@ class Mod(commands.Cog):
             p = await ctx.send(embed=lib.NoPerm(self))
             await lib.eraset(self, ctx, p)
 
-    @warn.group()
-    async def list(self, ctx):
+    @warn.group(name="list")
+    async def _list(self, ctx):
         GID = str(ctx.guild.id)
         if ctx.author.guild_permissions.manage_messages:
             if "Warnings" in self.db and GID in self.db["Warnings"]:
@@ -967,7 +969,10 @@ class Mod(commands.Cog):
         if ctx.author.guild_permissions.manage_messages:
             if "Warnings" in self.db and GID in self.db["Warnings"]:
                 if UID is not None:
-                    await ctx.send(embed=lib.Editable(self, f"{UID}'s ({user.name}) Warnings", "{}".format(", ".join(self.db["Warnings"][GID]["Users"][UID]["Reasons"])), "Warnings"))
+                    if UID in self.db["Warnings"][GID]["Users"]:
+                        await ctx.send(embed=lib.Editable(self, f"{UID}'s ({user.name}) Warnings", "{}".format(", ".join(self.db["Warnings"][GID]["Users"][UID]["Reasons"])), "Warnings"))
+                    else:
+                        await ctx.send(embed=lib.Editable(self, UID, f"{user.name} has no warnings!", "Warnings"))
                 else:
                     await ctx.send(embed=lib.Editable(self, "Uh oh", "Please give me a UserID to get the warnings of!", "Warnings"))
             else:
@@ -1011,7 +1016,7 @@ class Mod(commands.Cog):
     @commands.group(invoke_without_command=True)
     async def move(self, ctx):
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.send(embed=lib.Editable(self, "Move Usage", f"You must be in a voice channel\n\n`{ctx.prefix}move list`\n`{ctx.prefix}move all`\n`{ctx.prefix}move role`\n`{ctx.prefix}move channel` (ChannelID)", "Voice Moderation"))
+            await ctx.send(embed=lib.Editable(self, "Move Usage", f"You must be in a voice channel\n\n`{ctx.prefix}move list`\n`{ctx.prefix}move all`\n`{ctx.prefix}move role`\n`{ctx.prefix}move channel` #voicechannel", "Voice Moderation"))
         else:
             p = await ctx.send(embed=lib.NoPerm(self))
             await lib.eraset(self, ctx, p)
@@ -1079,7 +1084,7 @@ class Mod(commands.Cog):
             await lib.eraset(self, ctx, p)
 
     @move.group()
-    async def channel(self, ctx, channelname:int=None):
+    async def channel(self, ctx, channelname:discord.VoiceChannel=None):
         if ctx.author.guild_permissions.manage_messages:
             move_to = ctx.author.voice.channel
             list_of_channels = ctx.guild.voice_channels

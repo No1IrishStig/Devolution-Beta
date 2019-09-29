@@ -38,7 +38,7 @@ class Core(commands.Cog):
                             with open("./data/settings/leveling.json") as f:
                                 self.levels = json.load(f)
 
-    @commands.Cog.listener()
+    """@commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         global page_number
         emojis = ['◀', '▶', '🗑', ':one:', ':two:', ':three:', ':four:', ':five:']
@@ -114,7 +114,7 @@ class Core(commands.Cog):
         await changelog.add_reaction("3\N{combining enclosing keycap}")
         await changelog.add_reaction("4\N{combining enclosing keycap}")
         await changelog.add_reaction("5\N{combining enclosing keycap}")
-        await changelog.add_reaction("0\N{combining enclosing keycap}")
+        await changelog.add_reaction("0\N{combining enclosing keycap}")"""
 
     @commands.Cog.listener(name="on_reaction_add")
     async def reaction_add_(self, reaction, user):
@@ -169,7 +169,7 @@ class Core(commands.Cog):
                     await help.edit(embed=e)
 
                 elif page_num == 1:
-                    e = lib.Editable(self, f"Devolution Help", "**help** - Gives help!\n**about** - Displays stuff about the bot\n**changelog** - Displays the entire bots changelog\n**sinfo** - Displays guild information.\n**uinfo** - Displays user information\n**uptime** - Displays the bots uptime\n**bug** - Use it to report bugs.\n**github** - Provides github link", "Information")
+                    e = lib.Editable(self, f"Devolution Help", "**help** - Gives help!\n**about** - Displays stuff about the bot\n**sinfo** - Displays guild information.\n**uinfo** - Displays user information\n**uptime** - Displays the bots uptime\n**bug** - Use it to report bugs.\n**github** - Provides github link", "Information")
                     await help.edit(embed=e)
 
                 elif page_num == 2:
@@ -185,7 +185,7 @@ class Core(commands.Cog):
                     await help.edit(embed=e)
 
                 elif page_num == 5:
-                    e = lib.Editable(self, f"Devolution Help", "**leave** - Makes the bot leave the guild\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.\n**admin** - Gives usage details\n**leveling** - Gives usage details", "Admin Help")
+                    e = lib.Editable(self, f"Devolution Help", "**leave** - Makes the bot leave the guild\n**setpresence(sp)** - Change the playing status of the bot.\n**shutdown** - Sends the bot into a deep sleep ...\n**cog** - Displays list of Cog Options\n**pm** - PMs Target user as bot\n**pmid** - PMs target ID as bot\n**amiadmin** - Tells you if your UserID is inside the cfg file.\n**leveling** - Gives usage details", "Admin Help")
                     await help.edit(embed=e)
 
             else:
@@ -387,7 +387,7 @@ class Core(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def role(self, ctx):
         if ctx.author.guild_permissions.manage_roles:
-            u = await ctx.send(embed=lib.Editable(self, "Role Usage!", f"**{ctx.prefix}add** - Adds a user to a role.\n**{ctx.prefix}list** - List all roles in the server\n**{ctx.prefix}remove** - Removes a user from a role\n**{ctx.prefix}create** - Creates a role\n**{ctx.prefix}delete** - Deletes a role", "Role Usage"))
+            u = await ctx.send(embed=lib.Editable(self, "Role Usage!", f"**{ctx.prefix}role add** - Adds a user to a role.\n**{ctx.prefix}role list** - List all roles in the server\n**{ctx.prefix}role remove** - Removes a user from a role\n**{ctx.prefix}role create** - Creates a role\n**{ctx.prefix}role delete** - Deletes a role", "Role Usage"))
             await lib.eraset(self, ctx, u)
         else:
             p = await ctx.send(embed=lib.NoPerm(self))
@@ -675,7 +675,7 @@ class Core(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 2, commands.BucketType.user)
-    async def math(self, ctx, num1 : int, op, num2 : int):
+    async def math(self, ctx, num1 : int=0, op=None, num2 : int=0):
         if num1 and op and num2:
             if op == "+":
                 ans = num1 + num2
@@ -748,14 +748,17 @@ class Core(commands.Cog):
             if GID in self.levels:
                 if self.levels[GID]["Enabled"] is False:
                     self.levels[GID]["Enabled"] = True
+                    await ctx.send(embed=lib.Editable(self, "Leveling System is now Enabled", f"The leveling system has been enabled for {ctx.guild.name}", "Leveling"))
                     with open("./data/settings/leveling.json", "w") as f:
                         json.dump(self.levels, f)
                 else:
                     self.levels[GID]["Enabled"] = False
+                    await ctx.send(embed=lib.Editable(self, "Leveling System is now Disabled", f"The leveling system has been disabled for {ctx.guild.name}", "Leveling"))
                     with open("./data/settings/leveling.json", "w") as f:
                         json.dump(self.levels, f)
             else:
                 self.levels[GID] = {"Enabled": True, "Messages": True}
+                await ctx.send(embed=lib.Editable(self, "Leveling", "Leveling is enabled with messages.", "Leveling"))
                 with open("./data/settings/leveling.json", "w") as f:
                     json.dump(self.levels, f)
         else:
@@ -790,15 +793,18 @@ class Core(commands.Cog):
             if GID in self.levels:
                 if self.levels[GID]["Messages"] is False:
                     self.levels[GID]["Messages"] = True
+                    await ctx.send(embed=lib.Editable(self, "Leveling Announcements are now Enabled", f"The leveling announcements have been enabled for {ctx.guild.name}", "Leveling"))
                     with open("./data/settings/leveling.json", "w") as f:
                         json.dump(self.levels, f)
                 else:
                     self.levels[GID]["Messages"] = False
+                    await ctx.send(embed=lib.Editable(self, "Leveling Announcements are now Disabled", f"The leveling announcements have been disabled for {ctx.guild.name}", "Leveling"))
                     with open("./data/settings/leveling.json", "w") as f:
                         json.dump(self.levels, f)
 
             else:
                 self.levels[GID] = {"Enabled": True, "Messages": True}
+                await ctx.reinvoke()
         else:
             p = await ctx.send(embed=lib.NoPerm(self))
             await lib.eraset(self, ctx, p)
@@ -853,7 +859,7 @@ class Core(commands.Cog):
                 pass
             else:
                 required_xp = 25 * level
-                print(f"XP: {xp}\nLevel: {level}\nRequired XP: {required_xp}")
+                # print(f"XP: {xp}\nLevel: {level}\nRequired XP: {required_xp}")
                 pass
             if xp >= required_xp:
                 self.db["Levels"][GID][UID]["level"] += 1

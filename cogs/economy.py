@@ -632,13 +632,9 @@ class Economy(commands.Cog):
         return ', '.join(result[:granularity])
 
     def reset_match(self):
-        global is_active
-        global creator
-        global opponent
-        global bet_amount
-        global CARDS_TOTAL_WORTH
-        global OPPONENT_TOTAL_WORTH
-        global gameover
+        global is_active, creator, opponent
+        global bet_amount, CARDS_TOTAL_WORTH, OPPONENT_TOTAL_WORTH
+        global STOOD_WHEN_LESS_HOUSE_WINS, STAND, HOUSE_STAND, gameover
         is_active = False
         gameover = False
         creator = "Noone"
@@ -646,6 +642,10 @@ class Economy(commands.Cog):
         bet_amount = 0
         CARDS_TOTAL_WORTH = 0
         OPPONENT_TOTAL_WORTH = 0
+        STOOD_WHEN_LESS_HOUSE_WINS = False
+        STAND = False
+        HOUSE_STAND = False
+
 
 
 def setup(bot):
