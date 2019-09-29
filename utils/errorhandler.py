@@ -45,7 +45,7 @@ class ErrorHandler(commands.Cog):
         errorfile.write("[{}]: {} \n".format(datetime.datetime.utcnow().strftime("%d/%m/%Y at %H:%M:%S (GMT)"), error))
         errorfile.close()
         print("An error has been logged.")
-        raise error
+        #raise error
 
 def setup(bot):
     bot.add_cog(ErrorHandler(bot))
