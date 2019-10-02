@@ -535,7 +535,7 @@ class Economy(commands.Cog):
             if OPPONENT_TOTAL_WORTH < 18:
                 await self.bothit(ctx)
             else:
-                await startmsg.edit(embed=self.BJ_E(0xd42c2c, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), f"{bot_cards[0]}", f"Result: {creator.name} Stood."))
+                await startmsg.edit(embed=self.BJ_E(0xd42c2c, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), f"{bot_cards[0]}", f"Result: {self.bot.user.name} Stood."))
                 await asyncio.sleep(2)
                 HOUSE_STAND = True
                 await self.win(ctx)
