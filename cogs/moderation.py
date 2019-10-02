@@ -29,10 +29,7 @@ class Mod(commands.Cog):
             if ctx.author.guild_permissions.manage_messages:
                 message = ' '.join(args)
                 await ctx.message.delete()
-                if channel:
-                    await channel.send(message)
-                else:
-                    await ctx.send(message)
+                await channel.send(message)
             else:
                 p = await ctx.send(embed=lib.NoPerm(self))
                 await lib.eraset(self, ctx, p)
