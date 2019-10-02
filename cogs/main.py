@@ -350,7 +350,6 @@ class Core(commands.Cog):
             pass
         embed = discord.Embed(
             title = "Avatar Stealer",
-            description = user.avatar_url,
             colour = 0x9bf442,
             timestamp=datetime.datetime.utcnow()
             )
@@ -619,7 +618,13 @@ class Core(commands.Cog):
                 result = await r.json()
                 boob = randchoice(result)
                 boob = "http://media.oboobs.ru/{}".format(boob["preview"])
-            await ctx.send(boob)
+            embed = discord.Embed(
+                colour = 0x9bf442,
+                timestamp=datetime.datetime.utcnow()
+                )
+            embed.set_image(url=boob)
+            embed.set_footer(text=f"{self.bot.user.name} - Tits", icon_url=self.bot.user.avatar_url)
+            e = await ctx.send(embed=embed)
 
     @commands.command(no_pm=True, aliases=["booty"])
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -632,7 +637,13 @@ class Core(commands.Cog):
                 result = await r.json(content_type=None)
                 ass = randchoice(result)
                 ass = "http://media.obutts.ru/{}".format(ass["preview"])
-            await ctx.send(ass)
+            embed = discord.Embed(
+                colour = 0x9bf442,
+                timestamp=datetime.datetime.utcnow()
+                )
+            embed.set_image(url=ass)
+            embed.set_footer(text=f"{self.bot.user.name} - Ass", icon_url=self.bot.user.avatar_url)
+            e = await ctx.send(embed=embed)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -643,7 +654,14 @@ class Core(commands.Cog):
                 result = await r.json()
                 if r.status == 200:
                     if result["data"]:
-                        g = await ctx.send(result["data"][0]["url"])
+                        g = result["data"][0]["url"]
+                        embed = discord.Embed(
+                            colour = 0x9bf442,
+                            timestamp=datetime.datetime.utcnow()
+                            )
+                        embed.set_image(url=g)
+                        embed.set_footer(text=f"{self.bot.user.name} - Gifs", icon_url=self.bot.user.avatar_url)
+                        e = await ctx.send(embed=embed)
                     else:
                         e = await ctx.send(embed=lib.Editable(self, "Error", "No search results found", "Giphy"))
                         await lib.eraset(self, ctx, e)
@@ -660,7 +678,14 @@ class Core(commands.Cog):
                 result = await r.json()
                 if r.status == 200:
                     if result["data"]:
-                        g = await ctx.send(result["data"]["url"])
+                        g = result["data"]["url"]
+                        embed = discord.Embed(
+                            colour = 0x9bf442,
+                            timestamp=datetime.datetime.utcnow()
+                            )
+                        embed.set_image(url=g)
+                        embed.set_footer(text=f"{self.bot.user.name} - Random Gifs", icon_url=self.bot.user.avatar_url)
+                        e = await ctx.send(embed=embed)
                     else:
                         e = await ctx.send(embed=lib.Editable(self, "Error", "No search results found", "Giphy"))
                         await lib.eraset(self, ctx, e)

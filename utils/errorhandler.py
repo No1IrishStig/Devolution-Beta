@@ -18,7 +18,7 @@ class ErrorHandler(commands.Cog):
         if isinstance(error, ignored):
             return
         elif isinstance(error, commands.BadArgument):
-            return await ctx.send(embed=lib.Editable(self, "Error!", f"Oops! Please mention a user! {ctx.author.mention}", "Error"))
+            return await ctx.send(embed=lib.Editable(self, "Error!", f"Oops! Invalid arguments provided! {ctx.author.mention}", "Error"))
         elif isinstance(error, commands.MissingPermissions):
             try:
                 return ctx.send(embed=lib.Editable(self, "Error!", "Uh oh.. I seem to be missing some permissions!", "Error"))

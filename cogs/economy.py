@@ -20,7 +20,7 @@ slot_winnings = """Slot machine winnings:
     Three symbols: +500
     Two symbols: Bet * 2"""
 
-SETS = ["Hearts", "Clubs", "Spades", "Diamonds"]
+SETS = ["♥", "♣", "♠", "♦"]
 
 CARDS = ['Ace', 'Two', 'Three', 'Four',
          'Five', 'Six', 'Seven', 'Eight',
@@ -34,6 +34,9 @@ is_active = False
 STAND = False
 STOOD_WHEN_LESS_HOUSE_WINS = False
 HOUSE_STAND = False
+
+players_cards = []
+bot_cards = []
 
 class Economy(commands.Cog):
     def __init__(self, bot):
@@ -357,36 +360,25 @@ class Economy(commands.Cog):
     @blackjack.group(invoke_without_command=True)
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def play(self, ctx, bet:int=None):
-        global is_active, creator, gameover, is_active, STOOD_WHEN_LESS_HOUSE_WINS, bet_amount, STAND, HOUSE_STAND
+        global is_active, creator, gameover, is_active, STOOD_WHEN_LESS_HOUSE_WINS, bet_amount, STAND, HOUSE_STAND, startmsg, bet_amount, UID
         GID = str(ctx.guild.id)
+        UID = str(ctx.author.id)
         creator = ctx.author
-        HOUSE_STAND = False
-        STAND = False
         gameover = False
         if bet:
             if self.bank_exists(GID):
-                if self.enough_money(GID, creator.id, bet):
-                    self.withdraw_money(GID, creator.id, bet)
-                    self.db.sync()
+                if self.enough_money(GID, UID, bet):
                     bet_amount = bet
                     await ctx.message.delete()
                     channel = ctx.message.channel
-                    embed = discord.Embed(
-                        colour=0x9bf442,
-                        timestamp=datetime.datetime.utcnow()
-                        )
-                    embed.set_author(name=f"{creator.name} started a match!")
-                    embed.set_footer(text=f"{self.bot.user.name} - Blackjack", icon_url=self.bot.user.avatar_url)
-                    embed.add_field(name="Creator", value=f"{creator.name}", inline=True)
-                    embed.add_field(name="Opponent", value=f"The House", inline=True)
-                    embed.add_field(name="Bet", value=f"{bet_amount}", inline=True)
-                    embed.add_field(name="Get Ready!", value=f"The match will start in 5 seconds.", inline=False)
-                    blackjack_start = await ctx.send(embed=embed)
+                    blackjack_start = await ctx.send(embed=self.BJ_START())
                     is_active = True
                     await asyncio.sleep(5)
                     await self.cards(channel)
                     await asyncio.sleep(2)
                     await self.bot_cards(channel)
+                    await blackjack_start.delete()
+                    startmsg = await ctx.send(embed=self.BJ_E(0xd42c2c, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), f"{bot_cards[0]}", "**Options**: hit, stand, double?"))
                     while is_active is True:
                         await self.win(ctx)
                         if gameover is False:
@@ -410,21 +402,25 @@ class Economy(commands.Cog):
             await ctx.send(embed=lib.Editable(self, "Oops", "Please enter an amount to bet.", "Blackjack"))
 
     async def player(self, ctx):
-        global choice, STOOD_WHEN_LESS_HOUSE_WINS, STAND
+        global choice, STOOD_WHEN_LESS_HOUSE_WINS, STAND, bet_amount, startmsg
         if STAND is False:
-            await ctx.send(f"{creator.mention} Hit or Stand?")
             choice = await self.bot.wait_for("message", check=lambda message: message.author == creator, timeout = 30)
             if choice.content == "Hit" or choice.content == "hit":
+                await choice.delete()
                 await self.hit(ctx)
             elif choice.content == "Stand" or choice.content == "stand":
-                    await ctx.send(f"{choice.author.name} chose to stand.")
-                    STAND = True
-                    if CARDS_TOTAL_WORTH > OPPONENT_TOTAL_WORTH:
-                        await asyncio.sleep(2)
-                    else:
-                        STOOD_WHEN_LESS_HOUSE_WINS = True
+                await choice.delete()
+                await startmsg.edit(embed=self.BJ_E(0xd42c2c, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), f"{bot_cards[0]}", f"Result: {creator.name} Stood."))
+                STAND = True
+                if CARDS_TOTAL_WORTH > OPPONENT_TOTAL_WORTH:
+                    await asyncio.sleep(2)
+                else:
+                    STOOD_WHEN_LESS_HOUSE_WINS = True
+            elif choice.content == "Double" or choice.content == "double":
+                bet_amount = bet_amount * 2
+                await self.hit(ctx)
             else:
-                await ctx.send("Invalid Response. Hit or Stand?")
+                await ctx.send("Invalid Response. Skipping.")
         else:
             return
 
@@ -432,7 +428,6 @@ class Economy(commands.Cog):
         global creator, CARDS_TOTAL_WORTH, player_extra
         CARDS_TOTAL_WORTH = 0
         player_extra = 2
-        players_cards = []
         for i in range(2):
             s = randint(0, 3)
             c = randint(0, 12)
@@ -443,13 +438,12 @@ class Economy(commands.Cog):
             players_cards.append(SETS[s] + " " + CARDS[crds])
             CARDS_TOTAL_WORTH += c
         CARDS_TOTAL_WORTH += player_extra
-        await channel.send(embed=lib.EditableC(self, f"{creator.name}'s Cards", "You got a {} and a {} which equals {}".format(players_cards[0], players_cards[1], CARDS_TOTAL_WORTH), 0x58CCED, "Blackjack"))
+        # await channel.send(embed=lib.EditableC(self, f"{creator.name}'s Cards", "You got a {} and a {} which equals {}".format(players_cards[0], players_cards[1], CARDS_TOTAL_WORTH), 0x58CCED, "Blackjack"))
 
     async def bot_cards(self, ctx):
-        global OPPONENT_TOTAL_WORTH, bot_extra
+        global OPPONENT_TOTAL_WORTH, bot_extra, bot_onecard
         OPPONENT_TOTAL_WORTH = 0
         bot_extra = 2
-        bot_cards = []
         for i in range(2):
             s = randint(0, 3)
             c = randint(0, 12)
@@ -460,12 +454,12 @@ class Economy(commands.Cog):
             bot_cards.append(SETS[s] + " " + CARDS[crds])
             OPPONENT_TOTAL_WORTH += c
         OPPONENT_TOTAL_WORTH += bot_extra
+        bot_onecard = c
         # [DEBUG] await ctx.send(embed=lib.EditableC(self, "Opponents Cards (Debug Only)", "The House got a {} and a {} which equals {}".format(bot_cards[0], bot_cards[1], OPPONENT_TOTAL_WORTH), 0xff0000, "Blackjack"))
 
     async def hit(self, ctx):
-        global player_extra, CARDS_TOTAL_WORTH
+        global player_extra, CARDS_TOTAL_WORTH, startmsg
         player_extra = 1
-        players_cards = []
         s = randint(0, 3)
         c = randint(0, 12)
         crds = c
@@ -475,57 +469,55 @@ class Economy(commands.Cog):
         CARDS_TOTAL_WORTH += c
         CARDS_TOTAL_WORTH += player_extra
         players_cards.append(SETS[s] + " " + CARDS[crds])
-        return await ctx.send(embed=lib.Editable(self, f"{ctx.author.name}'s Turn", "{} got a {} which gives a total of {}".format(creator.name, players_cards[0], CARDS_TOTAL_WORTH), "Blackjack"))
+        await startmsg.edit(embed=self.BJ_E(0xd42c2c, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), f"{bot_cards[0]}", "**Options**: hit, stand, double?"))
+        #return await ctx.send(embed=lib.Editable(self, f"{ctx.author.name}'s Turn", "{} got a {} which gives a total of {}".format(creator.name, players_cards[0], CARDS_TOTAL_WORTH), "Blackjack"))
 
     async def win(self, ctx):
-        global STOOD_WHEN_LESS_HOUSE_WINS
-        global gameover
+        global STOOD_WHEN_LESS_HOUSE_WINS, gameover, bet_amount, GID
         GID = str(ctx.guild.id)
         if OPPONENT_TOTAL_WORTH > 21:
-            gameover = True
-            await ctx.send(embed=lib.Editable(self, f"{creator.name} Wins", "The house bust with a total of {}\n\n{} wins {} credits!".format(OPPONENT_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
-            self.add_money(GID, creator.id, bet_amount * 2)
-            self.db.sync()
-            self.reset_match()
+            await startmsg.edit(embed=self.BJ_E(0x28acd1, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), "{}\n**Score:** {}".format(", ".join(bot_cards), OPPONENT_TOTAL_WORTH), f"{self.bot.user.name} Bust with {OPPONENT_TOTAL_WORTH}!\n\n{creator.name} Wins {bet_amount * 2} credits!"))
+            self.win_end()
         elif CARDS_TOTAL_WORTH > 21:
-            gameover = True
-            await ctx.send(embed=lib.Editable(self, f"The House Wins", "{} bust with a total of {}\n\nThe House wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
-            self.reset_match()
+            await startmsg.edit(embed=self.BJ_E(0xd42c2c, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), "{}\n**Score:** {}".format(", ".join(bot_cards), OPPONENT_TOTAL_WORTH), f"{creator.name} Bust with {CARDS_TOTAL_WORTH}!\n\n{self.bot.user.name} Wins {bet_amount * 2} credits!"))
+            self.lose_end()
         elif OPPONENT_TOTAL_WORTH == 21:
-            gameover = True
-            await ctx.send(embed=lib.Editable(self, f"The House Wins", "The house got blackjack!\n\nThe house wins {} credits!".format(bet_amount * 2), "Blackjack"))
-            self.reset_match()
+            await startmsg.edit(embed=self.BJ_E(0xd42c2c, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), "{}\n**Score:** {}".format(", ".join(bot_cards), OPPONENT_TOTAL_WORTH), f"{self.bot.user.name} Got blackjack!\n\n{self.bot.user.name} Wins {bet_amount * 2} credits!"))
+            self.lose_end()
         elif CARDS_TOTAL_WORTH == 21:
-            gameover = True
-            await ctx.send(embed=lib.Editable(self, f"{creator.name} Wins", "{} got blackjack!\n\n{} wins {} credits!".format(creator.name, creator.name, bet_amount * 2), "Blackjack"))
-            self.add_money(GID, creator.id, bet_amount * 2)
-            self.db.sync()
-            self.reset_match()
+            await startmsg.edit(embed=self.BJ_E(0x28acd1, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), "{}\n**Score:** {}".format(", ".join(bot_cards), OPPONENT_TOTAL_WORTH), f"{creator.name} Got blackjack!\n\n{creator.name} Wins {bet_amount * 2} credits!"))
+            self.win_end()
         elif CARDS_TOTAL_WORTH == OPPONENT_TOTAL_WORTH:
-            gameover = True
-            await ctx.send(embed=lib.Editable(self, f"Its a Tie!", "You both got {}!\n\nYour original bet of {} has been returned to your bank!".format(CARDS_TOTAL_WORTH, bet_amount), "Blackjack"))
-            self.add_money(GID, creator.id, bet_amount)
-            self.db.sync()
-            self.reset_match()
+            await startmsg.edit(embed=self.BJ_E(0x28acd1, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), "{}\n**Score:** {}".format(", ".join(bot_cards), OPPONENT_TOTAL_WORTH), f"Its a tie! Your credits have been returned."))
+            self.lose_end()
+            self.add_money(GID, UID, bet_amount)
         elif STOOD_WHEN_LESS_HOUSE_WINS is True:
-            gameover = True
-            await ctx.send(embed=lib.Editable(self, f"The House Wins", "{} stood with {}!\n\nThe house wins {} credits with {}!".format(creator.name, CARDS_TOTAL_WORTH, bet_amount * 2, OPPONENT_TOTAL_WORTH), "Blackjack"))
-            self.reset_match()
+            await startmsg.edit(embed=self.BJ_E(0xd42c2c, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), "{}\n**Score:** {}".format(", ".join(bot_cards), OPPONENT_TOTAL_WORTH), f"{creator.name} Stood with {CARDS_TOTAL_WORTH}!\n\n{self.bot.user.name} Wins {bet_amount * 2} credits!"))
+            self.lose_end()
         elif STAND is True and HOUSE_STAND is True:
-            gameover = True
             if OPPONENT_TOTAL_WORTH > CARDS_TOTAL_WORTH:
-                return await ctx.send(embed=lib.Editable(self, f"The House Wins", "The house stood with {}!\n\nThe house wins {} credits!".format(OPPONENT_TOTAL_WORTH, bet_amount * 2), "Blackjack"))
+                await startmsg.edit(embed=self.BJ_E(0xd42c2c, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), "{}\n**Score:** {}".format(", ".join(bot_cards), OPPONENT_TOTAL_WORTH), f"{self.bot.user.name} Stood with {OPPONENT_TOTAL_WORTH}!\n\n{self.bot.user.name} Wins {bet_amount * 2} credits!"))
+                self.lose_end()
             else:
-                await ctx.send(embed=lib.Editable(self, f"{creator.name} Wins", "{} stood with {}!\n\n{} wins {} credits!".format(creator.name, CARDS_TOTAL_WORTH, creator.name, bet_amount * 2), "Blackjack"))
-                self.add_money(GID, creator.id, bet_amount * 2)
-                self.db.sync()
-                self.reset_match()
+                await startmsg.edit(embed=self.BJ_E(0x28acd1, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), "{}\n**Score:** {}".format(", ".join(bot_cards), OPPONENT_TOTAL_WORTH), f"{creator.name} Stood with {CARDS_TOTAL_WORTH}!\n\n{creator.name} Wins {bet_amount * 2} credits!"))
+                self.win_end()
+
+    def lose_end(self):
+        gameover = True
+        self.withdraw_money(GID, UID, bet_amount)
+        self.reset_match()
+        self.db.sync()
+
+    def win_end(self):
+        gameover = True
+        self.add_money(GID, UID, bet_amount * 2)
+        self.reset_match()
+        self.db.sync()
 
     async def bothit(self, ctx):
-        global OPPONENT_TOTAL_WORTH
+        global OPPONENT_TOTAL_WORTH, startmsg
         channel = ctx.message.channel
         extra = 1
-        bot_cards = []
         s = randint(0, 3)
         c = randint(0, 12)
         crds = c
@@ -535,17 +527,15 @@ class Economy(commands.Cog):
         OPPONENT_TOTAL_WORTH += c
         OPPONENT_TOTAL_WORTH += bot_extra
         bot_cards.append(SETS[s] + " " + CARDS[crds])
-        await asyncio.sleep(2)
-        await ctx.send("The house chose to hit")
         # [DEBUG] await channel.send(embed=lib.Editable(self, "Your Cards", "The House hit and got {} which equals {}".format(bot_cards[0], OPPONENT_TOTAL_WORTH), "Blackjack"))
 
     async def blackjack_math(self, ctx):
-        global HOUSE_STAND
+        global HOUSE_STAND, startmsg
         if HOUSE_STAND is False:
             if OPPONENT_TOTAL_WORTH < 18:
                 await self.bothit(ctx)
             else:
-                await ctx.send("The house stood")
+                await startmsg.edit(embed=self.BJ_E(0xd42c2c, "{}\n**Score:** {}".format(", ".join(players_cards), CARDS_TOTAL_WORTH), f"{bot_cards[0]}", f"Result: {creator.name} Stood."))
                 await asyncio.sleep(2)
                 HOUSE_STAND = True
                 await self.win(ctx)
@@ -635,8 +625,10 @@ class Economy(commands.Cog):
         global is_active, creator, opponent
         global bet_amount, CARDS_TOTAL_WORTH, OPPONENT_TOTAL_WORTH
         global STOOD_WHEN_LESS_HOUSE_WINS, STAND, HOUSE_STAND, gameover
+        players_cards.clear()
+        bot_cards.clear()
         is_active = False
-        gameover = False
+        gameover = True
         creator = "Noone"
         opponent = "Noone"
         bet_amount = 0
@@ -646,7 +638,27 @@ class Economy(commands.Cog):
         STAND = False
         HOUSE_STAND = False
 
+    def BJ_START(self):
+        embed = discord.Embed(
+            colour=0xd42c2c,
+            )
+        embed.set_author(name=f"{creator.name} started a match!")
+        embed.set_footer(text=f"{self.bot.user.name} - Blackjack", icon_url=self.bot.user.avatar_url)
+        embed.add_field(name="Creator", value=f"{creator.name}", inline=True)
+        embed.add_field(name="Opponent", value=f"{self.bot.user.name}", inline=True)
+        embed.add_field(name="Bet", value=f"{bet_amount}", inline=True)
+        embed.add_field(name="Get Ready!", value=f"The match will start in 5 seconds.", inline=False)
+        return embed
 
+    def BJ_E(self, color, value1, value2, value3):
+        e = discord.Embed(
+            colour = color,
+            )
+        e.add_field(name=f"{creator.name}'s Hand", value=value1, inline=True)
+        e.add_field(name="\u200B", value="\u200B", inline=True)
+        e.add_field(name=f"Their Hand", value=value2, inline=True)
+        e.add_field(name="\u200B", value=value3, inline=False)
+        return e
 
 def setup(bot):
     bot.add_cog(Economy(bot))

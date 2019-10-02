@@ -24,7 +24,7 @@ class Mod(commands.Cog):
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def say(self, ctx, channel:discord.TextChannel=None, *args):
+    async def sayto(self, ctx, channel:discord.TextChannel, *args):
         try:
             if ctx.author.guild_permissions.manage_messages:
                 message = ' '.join(args)
@@ -37,7 +37,20 @@ class Mod(commands.Cog):
                 p = await ctx.send(embed=lib.NoPerm(self))
                 await lib.eraset(self, ctx, p)
         except discord.HTTPException:
-            await ctx.send(embed=lib.Editable(self, "Say Usage", f"{ctx.prefix}say #channel Hello\n{ctx.prefix}say Hello", "Say"))
+            await ctx.send(embed=lib.Editable(self, "SayTo Usage", f"{ctx.prefix}say #channel Hello"))
+
+    @commands.command(no_pm=True)
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def say(self, ctx, *args):
+        try:
+            if ctx.author.guild_permissions.manage_messages:
+                message = ' '.join(args)
+                await ctx.send(message)
+            else:
+                p = await ctx.send(embed=lib.NoPerm(self))
+                await lib.eraset(self, ctx, p)
+        except discord.HTTPException:
+            await ctx.send(embed=lib.Editable(self, "Say Usage", f"{ctx.prefix}say Hello"))
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
