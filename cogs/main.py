@@ -235,16 +235,16 @@ class Core(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def about(self, ctx):
         embed=discord.Embed(
-            title="About Devolution",
-            description="A discord bot created for guild Administration, with plenty of commands for Admins, Moderators, games and more. For more information see below:",
+            title=f"About {self.bot.user.name}",
+            description="Created with passion, for the greater good. Useful for guild Administration, Music, Fun and more.",
             colour = 0x9bf442
             )
-        embed.set_author(name="Stig", icon_url="https://cdn.discordapp.com/avatars/439327545557778433/a_09b7d5d0f8ecbd826fe3f7b15ee2fb93.gif?size=1024")
-        embed.add_field(name="Discord Support", value="https://discord.gg/frcc5vF", inline=True)
-        embed.add_field(name="Bot Creator", value="Stig#1337", inline=True)
-        embed.add_field(name="Version & API version", value=f"Build - {default.version} & API Version {discord.__version__}", inline=True)
-        embed.set_footer(text="Devolution - About - Providing Discord support since May 2018")
-        await ctx.channel.send(embed=embed)
+        embed.set_author(name="Stig - Developer", icon_url="https://cdn.discordapp.com/avatars/439327545557778433/a_09b7d5d0f8ecbd826fe3f7b15ee2fb93.gif?size=1024", url="https://github.com/No1IrishStig")
+        embed.add_field(name="Discord Support", value="[Discord](https://discord.gg/frcc5vF)", inline=True)
+        embed.add_field(name="Programmed In", value="[Discord.py](https://github.com/Rapptz/discord.py)", inline=True)
+        embed.add_field(name="Version & API version", value=f"Build - {default.version}\n API Version - {discord.__version__}", inline=True)
+        embed.set_footer(text="{} - Providing Discord since {}".format(self.bot.user.name, self.bot.user.created_at.strftime("%d/%m/%Y")))
+        await ctx.send(embed=embed)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 30, commands.BucketType.user)
@@ -272,6 +272,25 @@ class Core(commands.Cog):
         else:
             p = await ctx.send(embed=lib.NoPerm(self))
             await lib.eraset(self, ctx, p)
+
+    @commands.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def info(self, ctx):
+        activeServers = self.bot.guilds
+        sum = 0
+        for s in activeServers:
+            sum += len(s.members)
+        embed=discord.Embed(
+            title=f"Info about {self.bot.user.name}",
+            description="Multifunctional Bot, constantly recieving updates.",
+            colour = 0x9bf442
+            )
+        embed.set_author(name="Stig - Developer", icon_url="https://cdn.discordapp.com/avatars/439327545557778433/a_09b7d5d0f8ecbd826fe3f7b15ee2fb93.gif?size=1024", url="https://github.com/No1IrishStig")
+        embed.add_field(name="Discord Support", value="[Discord](https://discord.gg/frcc5vF)", inline=True)
+        embed.add_field(name="Source", value="[Github](https://github.com/No1IrishStig/Devolution-Beta)", inline=True)
+        embed.add_field(name="Currently Serving", value=f"{sum} Members in {len(self.bot.guilds)} Guild", inline=True)
+        embed.set_footer(text="{} - Providing Discord since {}".format(self.bot.user.name, self.bot.user.created_at.strftime("%d/%m/%Y")))
+        await ctx.send(embed=embed)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
