@@ -52,7 +52,7 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def kick(self, ctx, user : discord.User=None, *args):
-        if ctx.ctx.author.guild_permissions.kick_members:
+        if ctx.author.guild_permissions.kick_members:
             if user:
                 reason = ' '.join(args)
                 if reason == "":
@@ -75,7 +75,7 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ban(self, ctx, user : discord.User=None, *args):
-        if ctx.ctx.author.guild_permissions.ban_members:
+        if ctx.author.guild_permissions.ban_members:
             if user:
                 reason = ' '.join(args)
                 if reason == "":
